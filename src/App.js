@@ -92,6 +92,78 @@ const FinanzTool = () => {
   // Animation states
   const [pageTransition, setPageTransition] = useState(false);
 
+  // Import/Export Funktionalität
+  const exportData = () => {
+    const allData = {
+      version: "1.0",
+      exportDate: new Date().toISOString(),
+      finanzData,
+      fixkostenData,
+      lifestyleData,
+      sicherheitData,
+      wuenscheData,
+      kurzfristigData,
+      mittelfristigData,
+      langfristigData
+    };
+    
+    const dataStr = JSON.stringify(allData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileName = `Finanzberatung_${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileName);
+    linkElement.click();
+  };
+  
+  const importData = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        // Daten wiederherstellen
+        if (data.finanzData) setFinanzData(data.finanzData);
+        if (data.fixkostenData) setFixkostenData(data.fixkostenData);
+        if (data.lifestyleData) setLifestyleData(data.lifestyleData);
+        if (data.sicherheitData) setSicherheitData(data.sicherheitData);
+        if (data.wuenscheData) setWuenscheData(data.wuenscheData);
+        if (data.kurzfristigData) setKurzfristigData(data.kurzfristigData);
+        if (data.mittelfristigData) setMittelfristigData(data.mittelfristigData);
+        if (data.langfristigData) setLangfristigData(data.langfristigData);
+        
+        alert('Daten erfolgreich importiert!');
+      } catch (error) {
+        alert('Fehler beim Importieren der Datei!');
+      }
+    };
+    reader.readAsText(file);
+  };
+  
+  // Drag & Drop State
+  const [dragActive, setDragActive] = useState(false);
+  
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+  
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      importData(e.dataTransfer.files[0]);
+    }
+  };
+    
   // Page transition effect
   useEffect(() => {
     setPageTransition(true);
@@ -460,9 +532,9 @@ const createMiniPieChart = () => {
     );
   };
 
-// Header mit Balken - Grüne Farbpalette
+// Header mit Balken und Import/Export
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-60 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
@@ -476,45 +548,63 @@ const HeaderBars = () => (
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
         </p>
+        
+        {/* Import/Export Buttons */}
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={exportData}
+            className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-all"
+          >
+            📥 Export
+          </button>
+          
+          <label className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
+            📤 Import
+            <input
+              type="file"
+              accept=".json"
+              onChange={(e) => e.target.files[0] && importData(e.target.files[0])}
+              className="hidden"
+            />
+          </label>
+        </div>
       </div>
-      {/* NEUER Home-Button - rechts symmetrisch zum Titel */}
-<div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-  <button
-    onClick={() => setCurrentPage('overview')}
-    className="flex items-center justify-center w-12 h-12 rounded-lg border-2 border-slate-300 bg-white/80 hover:bg-white hover:border-slate-400 transition-all duration-200 group"
-  >
-    <svg 
-      width="20" 
-      height="20" 
-      viewBox="0 0 24 24" 
-      fill="none"
-    >
-      <path 
-        d="M3 12L5 10L12 3L19 10L21 12M5 12V20C5 20.5523 5.44772 21 6 21H9V16C9 15.4477 9.44772 15 10 15H14C14.5523 15 15 15.4477 15 16V21H18C18.5523 21 19 20.5523 19 20V12M9 21H15"
-        stroke="#004225"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="group-hover:stroke-[#002818]"
-      />
-    </svg>
-  </button>
-</div>
+      
+      {/* Drag & Drop Zone */}
+      <div 
+        className={`absolute right-8 top-1/2 transform -translate-y-1/2 w-48 h-20 border-2 border-dashed rounded-lg transition-all ${
+          dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+        }`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <div className="flex flex-col items-center justify-center h-full pointer-events-none">
+          <span className="text-2xl mb-1">📁</span>
+          <span className="text-xs text-gray-600">
+            {dragActive ? 'Datei hier ablegen' : 'Drag & Drop Import'}
+          </span>
+        </div>
+      </div>
+      
+      {/* Bestehende Navigation Balken */}
       <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-6">
+        {/* Hier bleibt der Rest Ihrer Navigation wie gehabt */}
         <div className="flex flex-col items-center">
           <div 
             className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#004225'}} // Hauptgrün - Wünsche
+            style={{backgroundColor: '#0B2E70'}}
             onClick={() => setCurrentPage('wuensche')}
           >
             <span className="text-xs text-white font-medium">Wünsche</span>
           </div>
         </div>
-
+        
+        {/* Rest der Balken... */}
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#1f5f3f'}} // Grün Stufe 2 - Kurzfristig
+            className="bg-slate-500 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('kurzfristig')}
           >
             <span className="text-xs text-white font-medium">Kurz</span>
@@ -525,9 +615,7 @@ const HeaderBars = () => (
           <div className="relative group">
             {createMiniPieChart()}
             {headerHovered && (
-              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                   style={{backgroundColor: '#004225'}} // Grüner Tooltip statt grau
-              >
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 Klicken zum Navigieren
               </div>
             )}
@@ -536,8 +624,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#4d7c5f'}} // Grün Stufe 3 - Mittelfristig
+            className="bg-slate-400 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('mittelfristig')}
           >
             <span className="text-xs text-white font-medium">Mittel</span>
@@ -546,8 +633,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#6b8e6b'}} // Grün Stufe 4 - Langfristig
+            className="bg-slate-600 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('langfristig')}
           >
             <span className="text-xs text-white font-medium">Lang</span>
@@ -557,7 +643,6 @@ const HeaderBars = () => (
     </div>
   </div>
 );
-
   // Kuchendiagramm erstellen
   const createPieChart = () => {
     const radius = 120;
