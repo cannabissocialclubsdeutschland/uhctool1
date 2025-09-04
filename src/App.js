@@ -548,7 +548,13 @@ const HeaderBars = () => (
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
         </p>
-        
+        {/* Alternativer Home-Button als Icon oben links */}
+<button
+  onClick={() => setCurrentPage('overview')}
+  className="absolute left-8 top-4 w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
+>
+  <span className="text-xl">🏠</span>
+</button>
         {/* Import/Export Buttons */}
         <div className="flex gap-2 mt-2">
           <button
