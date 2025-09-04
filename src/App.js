@@ -551,7 +551,7 @@ const HeaderBars = () => (
         {/* Alternativer Home-Button als Icon oben links */}
 <button
   onClick={() => setCurrentPage('overview')}
-  className="absolute left-8 top-4 w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
+  className="absolute left-8 top-1 w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
 >
   <span className="text-xl">🏠</span>
 </button>
