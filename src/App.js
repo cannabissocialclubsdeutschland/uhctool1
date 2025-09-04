@@ -534,7 +534,7 @@ const createMiniPieChart = () => {
 
 // Header mit Balken und Import/Export
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-50 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
@@ -548,15 +548,17 @@ const HeaderBars = () => (
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
         </p>
-        {/* Alternativer Home-Button als Icon oben links */}
-<button
-  onClick={() => setCurrentPage('overview')}
-  className="absolute left-8 top-1 w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
->
-  <span className="text-xl">🏠</span>
-</button>
-        {/* Import/Export Buttons */}
-        <div className="flex gap-2 mt-2">
+
+         {/* Home Button hinzufügen */}
+        <button
+          onClick={() => setCurrentPage('overview')}
+          className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all inline-flex items-center gap-1"
+        >
+          🏠 Zur Übersicht
+        </button>
+        
+        {/* Import/Export Buttons daneben */}
+        <div className="inline-flex gap-2 ml-2">
           <button
             onClick={exportData}
             className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-all"
