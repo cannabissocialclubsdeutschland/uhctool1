@@ -1070,24 +1070,25 @@ const OverviewPage = () => (
           <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
         </div>
 
-       <button
-  onClick={() => setCurrentPage('zigaretten')}
-  className="px-4 py-2 bg-white text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-50 hover:opacity-100"
->
-  ⏮️
-</button>
-
+        {/* HIER DEN BUTTON EINFÜGEN */}
+        <button
+          onClick={() => setCurrentPage('zigaretten')}
+          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+        >
+          ⏮️
+        </button>
       </div>
     </div>
     
  
     {/* Hauptcontainer für die vier Elemente in einer Reihe */}
-    
-<div className="flex flex-nowrap overflow-x-auto h-[calc(100vh-180px)] items-start relative z-10 pt-8 gap-6">
-  
-  {/* Basis Absicherung */}
-  <div className="w-1/4 p-4 flex items-center justify-center animate-fadeIn" onClick={() => setCurrentPage('basisabsicherung')}>
-    <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
+    <div className="flex h-[calc(100vh-180px)] items-start relative z-10 pt-8">
+      {/* Basis Absicherung - mit Regenschirm Animation */}
+      <div 
+        className="w-1/4 p-4 flex items-center justify-center animate-fadeIn"
+        onClick={() => setCurrentPage('basisabsicherung')}
+      >
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
       <svg width="180" height="180" className="overflow-visible">
             
             {/* Regentropfen Animation - stoppt am Schirm */}
@@ -1196,67 +1197,64 @@ const OverviewPage = () => (
       <div className="w-1/4 p-4 flex items-center justify-center">
   <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
           <div>
-           
- {/* Kuchendiagramm */}
-  <div className="w-1/4 p-4 flex items-center justify-center">
-    <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-      <div>
-        <svg className="max-w-full h-auto" viewBox="0 0 450 450">
-          {createPieChart()}
-          <circle
-            cx="225"
-            cy="225"
-            r="60"
-            fill="white"
-            stroke="#004225"
-            strokeWidth="3"
-            className="cursor-pointer transition-all hover:r-67"
-            onClick={() => setCurrentPage('budget')}
-          />
-          <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-            Budget
-          </text>
-          <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{ fill: '#004225' }}>
-            {calculateBudget().toLocaleString()}€
-          </text>
-        </svg>
-      </div>
           
+            {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
+            <svg width="100%" height="auto" viewBox="0 0 450 450">
+              {createPieChart()}
+              
+              {/* Zentraler Kreis ebenfalls proportional vergrößert */}
+              <circle
+                cx="225"
+                cy="225"
+                r="60"
+                fill="white"
+                stroke="#004225"
+                strokeWidth="3"
+                className="cursor-pointer transition-all hover:r-67"
+                onClick={() => setCurrentPage('budget')}
+              />
+              <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+                Budget
+              </text>
+              <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+                {calculateBudget().toLocaleString()}€
+              </text>
+            </svg>
+          </div>
           
-{/* Legende – korrigiert */}
-      <div className="ml-6 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
-        <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
-        <div className="space-y-4">
-          {[
-            { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
-            { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
-            { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
-            { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
-          ].map((item, index) => (
-            <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-1 rounded transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: item.color }}></div>
-                <span className="text-sm font-medium text-slate-700">{item.name}</span>
-              </div>
-              <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+          {/* Legende-Box Position angepasst für größeres Diagramm */}
+          <div className="ml-6 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
+            <div className="space-y-4">
+              {[
+                { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
+                { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
+                { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
+                { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-1 rounded transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-sm" style={{backgroundColor: item.color}}></div>
+                    <span className="text-sm font-medium text-slate-700">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
+
+      {/* Legende */}
+      <div className="w-1/4 p-4 flex items-start justify-center">
+        {/* Hier kommt deine Legende */}
+      </div>
+
+      {/* Sidebar */}
+     <div className="w-1/4 p-4 flex items-start justify-center">
+  <Sidebar />
+      </div>
     </div>
-  </div>
-     
-{/* Legende-Box (Platzhalter) */}
-  <div className="w-1/4 p-4 flex items-start justify-center">
-    {/* Hier kommt deine Legende */}
-  </div>
-
-  {/* Sidebar */}
-  <div className="w-1/4 p-4 flex items-start justify-center">
-    <Sidebar />
-  </div>
-</div>
-
 
     <div className="absolute bottom-0 left-0 right-0 h-1/2 z-10">
       <div className="flex h-full gap-6 p-6">
@@ -1392,6 +1390,7 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
+};
 
 // Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
