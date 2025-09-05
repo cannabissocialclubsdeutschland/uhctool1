@@ -997,7 +997,7 @@ const HeaderBars = () => (
 );
   // Kuchendiagramm erstellen
   const createPieChart = () => {
-    const radius = 220;
+    const radius = 180;
     const centerX = 225;
     const centerY = 225;
     
