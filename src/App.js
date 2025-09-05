@@ -1164,32 +1164,33 @@ const OverviewPage = () => (
           </div>
         </div>
 
-        {/* Kuchen-Diagramm - ZENTRAL */}
-  <div className="flex justify-center">
+ {/* Kuchen-Diagramm - ZENTRAL - VERGRÖßERT */}
+<div className="flex justify-center">
   <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-    <svg width="450" height="450" viewBox="0 0 450 450">
-      {/* Kuchendiagramm - MITTIG AUSGERICHTET */}
-      <g transform="translate(225, 225)">
-              {createPieChart()}
-              <circle
-                cx="225"
-                cy="225"
-                r="60"
-                fill="white"
-                stroke="#004225"
-                strokeWidth="3"
-                className="cursor-pointer transition-all hover:r-67"
-                onClick={() => setCurrentPage('budget')}
-              />
-              <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-                Budget
-              </text>
-              <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
-                {calculateBudget().toLocaleString()}€
-              </text>
-            </svg>
-          </div>
-        </div>
+    <svg width="320" height="320" viewBox="0 0 450 450">
+      {/* Kuchendiagramm */}
+      {createPieChart()}
+      
+      {/* Innerer Kreis - MITTIG AUSGERICHTET */}
+      <circle
+        cx="225"
+        cy="225"
+        r="60"
+        fill="white"
+        stroke="#004225"
+        strokeWidth="3"
+        className="cursor-pointer transition-all hover:r-67"
+        onClick={() => setCurrentPage('budget')}
+      />
+      <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+        Budget
+      </text>
+      <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+        {calculateBudget().toLocaleString()}€
+      </text>
+    </svg>
+  </div>
+</div>
 
         {/* Budget-Verteilung Legende - RECHTS */}
         <div className="flex justify-center">
