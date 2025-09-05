@@ -998,8 +998,8 @@ const HeaderBars = () => (
   // Kuchendiagramm erstellen
   const createPieChart = () => {
     const radius = 120;
-    const centerX = 150;
-    const centerY = 150;
+    const centerX = 225;
+    const centerY = 225;
     
     let cumulativePercentage = 0;
     const slices = [
