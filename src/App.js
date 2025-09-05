@@ -1070,13 +1070,13 @@ const OverviewPage = () => (
           <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
         </div>
 
-        {/* HIER DEN BUTTON EINFÜGEN */}
-        <button
-          onClick={() => setCurrentPage('zigaretten')}
-          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
-        >
-          ⏮️
-        </button>
+       <button
+  onClick={() => setCurrentPage('zigaretten')}
+  className="px-4 py-2 bg-white text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-50 hover:opacity-100"
+>
+  ⏮️
+</button>
+
       </div>
     </div>
     
