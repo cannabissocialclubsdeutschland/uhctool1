@@ -1195,7 +1195,7 @@ const OverviewPage = () => (
 
       {/* Kuchen-Diagramm */}
       <div className="w-1/4 p-4 flex items-center justify-center">
-        <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+  <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
           <div>
           
             {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
