@@ -1057,7 +1057,7 @@ const OverviewPage = () => (
       />
     </div>
 
-  {/* Header */}
+ // Header mit korrekter JSX-Struktur
 <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
   <div className="grid grid-cols-3 items-center px-8 py-4">
     {/* Linker Bereich */}
@@ -1072,7 +1072,7 @@ const OverviewPage = () => (
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
     </div>
 
-    {/* Rechter Bereich (für zukünftige Elemente) */}
+    {/* Rechter Bereich */}
     <div className="flex justify-end">
       <button
         onClick={() => setCurrentPage('zigaretten')}
