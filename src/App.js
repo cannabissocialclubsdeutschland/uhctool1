@@ -1165,9 +1165,11 @@ const OverviewPage = () => (
         </div>
 
         {/* Kuchen-Diagramm - ZENTRAL */}
-        <div className="flex justify-center">
-          <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            <svg width="450" height="450" viewBox="0 0 450 450">
+  <div className="flex justify-center">
+  <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+    <svg width="450" height="450" viewBox="0 0 450 450">
+      {/* Kuchendiagramm - MITTIG AUSGERICHTET */}
+      <g transform="translate(225, 225)">
               {createPieChart()}
               
               <circle
