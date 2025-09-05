@@ -818,40 +818,7 @@ const OverviewPage = () => (
   </svg>  {/* HIER MUSS DAS SCHLIESSENDE TAG HIN! */}
 </div>
 
-{/* SEPARATER BLOCK - Das ist ein zweiter, unabhängiger Basis-Absicherung Kreis */}
-<div className="absolute left-12 top-24 animate-fadeIn">
-  <div 
-    className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
-    onClick={() => setCurrentPage('basisabsicherung')}
-  >
-    <svg width="180" height="180">
-      <circle
-        cx="90"
-        cy="90"
-        r="85"
-        fill="none"
-        stroke="#e5e7eb"
-        strokeWidth="3"
-      />
-      <circle
-        cx="90"
-        cy="90"
-        r="65"
-        fill="#f9fafb"
-        stroke="#0B2E70"
-        strokeWidth="2"
-        strokeDasharray="5,5"
-        className="animate-spin-slow"
-      />
-      <text x="90" y="80" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-        Basis
-      </text>
-      <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-        Absicherung
-      </text>
-    </svg>  {/* Dieses schließende Tag gehört zum zweiten SVG */}
-  </div>
-</div>
+
       <div className="flex-1 flex justify-center items-start pt-12">
         <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
           <div>
