@@ -552,7 +552,7 @@ const Sidebar = () => {
       <div 
         className="fixed right-8 z-[100]" 
         style={{ 
-          top: '44%', 
+          top: '34%', 
           transform: 'translateY(-50%)',
           pointerEvents: 'auto' 
         }}
