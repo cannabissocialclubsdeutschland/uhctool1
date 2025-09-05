@@ -915,7 +915,7 @@ const createMiniPieChart = () => {
 
 // Header mit Balken und Import/Export
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-50 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-47 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
