@@ -1063,7 +1063,13 @@ const OverviewPage = () => (
           <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
           <p className="text-slate-600 font-medium">Finanzberatungstool</p>
         </div>
-        
+
+        {/* GESAMTBUDGET */}
+  <div className="text-right">
+      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
+      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+    </div>
+
         {/* HIER DEN BUTTON EINFÜGEN */}
         <button
           onClick={() => setCurrentPage('zigaretten')}
@@ -1074,11 +1080,6 @@ const OverviewPage = () => (
       </div>
     </div>
     
-    <div className="text-right">
-      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
-      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
-    </div>
-
     {/* Basis Absicherung - mit Regenschirm Animation */}
     <div className="absolute left-12 top-8 animate-fadeIn">
       <div 
