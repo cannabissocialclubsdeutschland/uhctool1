@@ -1083,15 +1083,6 @@ const OverviewPage = () => (
     </div>
   </div>
 </div>
-        {/* HIER DEN BUTTON EINFÜGEN */}
-        <button
-          onClick={() => setCurrentPage('zigaretten')}
-          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
-        >
-          ⏮️
-        </button>
-      </div>
-    </div>
     
     {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM PERFEKT ZENTRIERT */}
     <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
