@@ -1318,6 +1318,7 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
+
 // Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
   const [selectedVersicherung, setSelectedVersicherung] = useState(null);
