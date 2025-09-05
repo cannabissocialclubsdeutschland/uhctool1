@@ -901,14 +901,6 @@ const HeaderBars = () => (
           🏠 Zur Übersicht
         </button>
 
-        {/* Zigaretten-Rechner Button - klein und dezent */}
-        <button
-          onClick={() => setCurrentPage('zigaretten')}
-          className="mt-2 ml-2 px-3 py-1 bg-emerald-700 text-white text-xs rounded-lg hover:bg-emerald-800 transition-all"
-        >
-          Zigaretten-Rechner
-        </button>
-
         {/* Import/Export Buttons daneben */}
         <div className="inline-flex gap-2 ml-2">
           <button
