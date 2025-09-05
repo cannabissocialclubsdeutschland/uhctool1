@@ -1109,6 +1109,16 @@ const OverviewPage = () => (
                 />
               </g>
             ))}
+            
+            {/* Text-Elemente müssen in einer Gruppe zusammengefasst werden */}
+            <g>
+              <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                Basis
+              </text>
+              <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                Absicherung
+              </text>
+            </g>
           </svg>
         </div>
       </div>
