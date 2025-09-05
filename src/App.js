@@ -1080,19 +1080,16 @@ const OverviewPage = () => (
       </div>
     </div>
     
- {/* Hauptcontainer für die vier Elemente in einer Reihe */}
-<div className="flex h-[calc(100vh-180px)] items-start relative z-10 pt-8">
-  {/* Basis Absicherung - mit Regenschirm Animation */}
-  <div 
-    className="w-1/4 p-4 flex items-center justify-center animate-fadeIn"
-    onClick={() => setCurrentPage('basisabsicherung')}
-  >
-    <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
-      <svg width="180" height="180" className="overflow-visible">
-        {/* SVG-Inhalt unverändert */}
-      </svg>
-    </div>
-  </div>
+ 
+    {/* Hauptcontainer für die vier Elemente in einer Reihe */}
+    <div className="flex h-[calc(100vh-80px)] relative z-10">
+      {/* Basis Absicherung - mit Regenschirm Animation */}
+      <div 
+        className="w-1/4 p-4 flex items-center justify-center animate-fadeIn"
+        onClick={() => setCurrentPage('basisabsicherung')}
+      >
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full h-full flex items-center justify-center">
+          <svg width="180" height="180" className="overflow-visible">
             
             {/* Regentropfen Animation - stoppt am Schirm */}
             {[...Array(8)].map((_, i) => (
