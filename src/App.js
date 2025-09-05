@@ -1057,23 +1057,27 @@ const OverviewPage = () => (
       />
     </div>
 
-   {/* Header */}
+  {/* Header */}
 <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
-  <div className="flex items-center justify-between px-8 py-4">
+  <div className="grid grid-cols-3 items-center px-8 py-4">
+    {/* Linker Bereich */}
     <div>
       <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
       <p className="text-slate-600 font-medium">Finanzberatungstool</p>
     </div>
 
-    {/* GESAMTBUDGET - ABSOLUT ZENTRIERT */}
-    <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
+    {/* Mittlerer Bereich - ZENTRIERT */}
+    <div className="text-center">
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
     </div>
 
-    {/* Platzhalter für den Button, um die Symmetrie zu erhalten */}
-    <div className="invisible">
-      <button className="px-4 py-2 bg-white0 text-black text-sm rounded-lg">
+    {/* Rechter Bereich (für zukünftige Elemente) */}
+    <div className="flex justify-end">
+      <button
+        onClick={() => setCurrentPage('zigaretten')}
+        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+      >
         ⏮️
       </button>
     </div>
