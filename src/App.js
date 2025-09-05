@@ -1390,7 +1390,6 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
-};
 
 // Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
@@ -3010,9 +3009,11 @@ const BasisAbsicherungPage = () => {
             ]}
             color="#475569"
           />
+        );
       default:
         return <OverviewPage />;
     }
+  };
 
   return renderCurrentPage();
 };
