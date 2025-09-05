@@ -1065,10 +1065,10 @@ const OverviewPage = () => (
         </div>
 
         {/* GESAMTBUDGET */}
-  <div>
-      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
-      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
-    </div>
+        <div>
+          <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
+          <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+        </div>
 
         {/* HIER DEN BUTTON EINFÜGEN */}
         <button
@@ -1080,34 +1080,56 @@ const OverviewPage = () => (
       </div>
     </div>
     
-    {/* Basis Absicherung - mit Regenschirm Animation */}
-    <div className="absolute left-12 top-12 animate-fadeIn">
+    {/* Hauptcontainer für die vier Elemente in einer Reihe */}
+    <div className="flex h-[calc(100vh-80px)] relative z-10">
+      {/* Basis Absicherung - mit Regenschirm Animation */}
       <div 
-        className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+        className="w-1/4 p-4 flex items-center justify-center animate-fadeIn"
         onClick={() => setCurrentPage('basisabsicherung')}
       >
-        <svg width="180" height="180" className="overflow-visible">
-          
-          {/* Regentropfen Animation - stoppt am Schirm */}
-          {[...Array(8)].map((_, i) => (
-            <g key={`rain-${i}`}>
-              <line
-                x1={30 + i * 15}
-                y1={10}
-                x2={28 + i * 15}
-                y2={30}
-                stroke="#3b82f6"
-                strokeWidth="2"
-                strokeLinecap="round"
-                opacity="0.6"
-                style={{
-                  animation: `rain-fall-short 2s linear infinite`,
-                  animationDelay: `${i * 0.3}s`
-                }}
-              />
-            </g>
-          ))}
-          
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full h-full flex items-center justify-center">
+          <svg width="180" height="180" className="overflow-visible">
+            
+            {/* Regentropfen Animation - stoppt am Schirm */}
+            {[...Array(8)].map((_, i) => (
+              <g key={`rain-${i}`}>
+                <line
+                  x1={30 + i * 15}
+                  y1={10}
+                  x2={28 + i * 15}
+                  y2={30}
+                  stroke="#3b82f6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  opacity="0.6"
+                  style={{
+                    animation: `rain-fall-short 2s linear infinite`,
+                    animationDelay: `${i * 0.3}s`
+                  }}
+                />
+              </g>
+            ))}
+          </svg>
+        </div>
+      </div>
+
+      {/* Kuchen-Diagramm */}
+      <div className="w-1/4 p-4 flex items-center justify-center">
+        {/* Hier kommt dein Kuchen-Diagramm Code */}
+      </div>
+
+      {/* Legende */}
+      <div className="w-1/4 p-4 flex items-center justify-center">
+        {/* Hier kommt deine Legende */}
+      </div>
+
+      {/* Sidebar */}
+      <div className="w-1/4 p-4 flex items-center justify-center">
+        {/* Hier kommt deine Sidebar */}
+      </div>
+    </div>
+  </div>
+);
           {/* Regenschirm über dem Text */}
           <g style={{
             animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
