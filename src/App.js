@@ -364,7 +364,7 @@ const ZigarettenInvestmentPage = () => {
       name: 'Ausgewogenes Portfolio',
       wert: berechneMixPortfolio(),
       risiko: 'Mittel',
-      color: '#3b82f6'
+      color: '#10b981'
     },
     {
       typ: 'aktienMSCI',
@@ -947,7 +947,7 @@ const HeaderBars = () => (
             📥 Export
           </button>
           
-          <label className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
+          <label className="px-3 py-1 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-all cursor-pointer">
             📤 Import
             <input
               type="file"
@@ -962,7 +962,7 @@ const HeaderBars = () => (
       {/* Drag & Drop Zone */}
       <div 
         className={`absolute right-8 top-1/2 transform -translate-y-1/2 w-48 h-20 border-2 border-dashed rounded-lg transition-all ${
-          dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+          dragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 bg-gray-50'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -983,7 +983,7 @@ const HeaderBars = () => (
         <div className="flex flex-col items-center">
           <div 
             className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#0B2E70'}}
+            style={{backgroundColor: '#14532d'}}
             onClick={() => setCurrentPage('wuensche')}
           >
             <span className="text-xs text-white font-medium">Wünsche</span>
@@ -1138,7 +1138,7 @@ const OverviewPage = () => (
                     y1={10}
                     x2={23 + i * 15}
                     y2={30}
-                    stroke="#3b82f6"
+                    stroke="#10b981"
                     strokeWidth="2"
                     strokeLinecap="round"
                     opacity="0.6"
@@ -1545,12 +1545,12 @@ const BasisAbsicherungPage = () => {
   };
   
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-slate-100 font-sans">
       {/* Premium Header mit Glassmorphism */}
       <div className="fixed top-0 left-0 right-0 h-32 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 z-50 shadow-lg">
         <div className="h-full flex items-center px-8 relative">
           <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-green-600 bg-clip-text text-transparent">
               United Hands Capital
             </h1>
             <p className="text-sm text-slate-600">Basis-Absicherung 2025 • Ihr professioneller Schutz</p>
@@ -1635,7 +1635,7 @@ const BasisAbsicherungPage = () => {
                   <span className="text-gray-600 font-medium">Empfohlene Kosten</span>
                   <span className="text-2xl">📈</span>
                 </div>
-                <p className="text-3xl font-bold text-blue-700">
+                <p className="text-3xl font-bold text-emerald-800">
                   +{calculateEmpfohleneKosten()}€/M
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
@@ -1742,7 +1742,7 @@ const BasisAbsicherungPage = () => {
             
             {/* Handlungsempfehlungen */}
             {getHandlungsempfehlungen().length > 0 && (
-              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-emerald-200">
                 <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <span className="text-2xl">🎯</span>
                   Ihre priorisierten Handlungsempfehlungen
@@ -1760,7 +1760,7 @@ const BasisAbsicherungPage = () => {
                       <div className={`w-2 h-2 rounded-full mt-2 ${
                         empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-500' :
                         empfehlung.prioritaet === 'HOCH' ? 'bg-orange-500' :
-                        'bg-blue-500'
+                        'bg-emerald-500'
                       }`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -1778,7 +1778,7 @@ const BasisAbsicherungPage = () => {
                           </p>
                         )}
                       </div>
-                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                      <button className="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 transition-colors">
                         Jetzt handeln
                       </button>
                     </div>
@@ -1831,7 +1831,7 @@ const BasisAbsicherungPage = () => {
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4">
+                <div className="bg-emerald-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600">Aktueller Status</p>
                   <p className="text-lg font-bold" style={{ 
                     color: tempBasisData[selectedVersicherung.id].status === 'vorhanden' ? '#059669' : '#dc2626' 
@@ -1952,7 +1952,7 @@ const BasisAbsicherungPage = () => {
                         className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
                           activeField === feld.id 
                             ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                            : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
                         }`}
                         style={{
                           backgroundColor: activeField === feld.id ? '#004225' : 'white',
@@ -2000,7 +2000,7 @@ const BasisAbsicherungPage = () => {
                                 type="number" 
                                 value={tempValues[aktivesFeld.field]}
                                 onChange={(e) => handleInputChange(aktivesFeld.field, e.target.value)}
-                                className="w-full p-4 bg-white border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-xl font-semibold"
+                                className="w-full p-4 bg-white border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-center text-xl font-semibold"
                                 placeholder="0"
                                 autoFocus
                               />
@@ -2029,7 +2029,7 @@ const BasisAbsicherungPage = () => {
                                           ...prev, 
                                           brutto: parseFloat(e.target.value) || 0
                                         }))}
-                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
+                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-center text-base"
                                         placeholder="0"
                                       />
                                     </div>
@@ -2044,7 +2044,7 @@ const BasisAbsicherungPage = () => {
                                           ...prev, 
                                           zusatzleistungen: parseFloat(e.target.value) || 0
                                         }))}
-                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
+                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-center text-base"
                                         placeholder="0"
                                       />
                                     </div>
@@ -2085,197 +2085,189 @@ const BasisAbsicherungPage = () => {
   };
 
   // Fixkosten Page mit mehreren Eingabefeldern pro Kategorie
-  const FixkostenPage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData});
+  
+/* --- Patched FixkostenPage (emerald-themed, improved UI, monthly normalization, import/export, persist) --- */
+const FixkostenPage = () => {
+  const uid_local = () => {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
+  };
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempFixkosten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const EUR_fmt = (v) => {
+    try { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(Number(v)); } catch { return v; }
+  };
 
-    const addEintrag = (kategorie) => {
-      setTempFixkosten(prev => ({
-        ...prev,
-        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-      }));
-    };
+  // local working copy to avoid immediate mutation
+  const [tempFixkosten, setTempFixkosten] = useState(() => {
+    try {
+      const raw = localStorage.getItem('fixkostenData_v2');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    // create normalized structure based on outer fixkostenData if available
+    const base = { wohnen:[], lebensmittel:[], abos:[], mobilitaet:[], sonstiges:[] };
+    if (typeof fixkostenData === 'object' && fixkostenData !== null) {
+      Object.keys(base).forEach(k => {
+        if (Array.isArray(fixkostenData[k])) {
+          base[k] = fixkostenData[k].map(item => ({ id: item.id || uid_local(), bezeichnung: item.bezeichnung || item.label || '', betrag: item.betrag || item.amount || 0, periode: item.periode || 'monatlich', note: item.note || '' }));
+        }
+      });
+    }
+    return base;
+  });
 
-    const removeEintrag = (kategorie, index) => {
-      setTempFixkosten(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-      }));
-    };
+  // advice mode toggle
+  const [adviceMode, setAdviceModeLocal] = useState(true);
 
-    const updateEintrag = (kategorie, index, field, value) => {
-      setTempFixkosten(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].map((item, i) => 
-          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-        )
-      }));
-    };
+  const sumCategory = (arr) => (arr || []).reduce((s,it) => {
+    const a = Number(it.betrag) || 0;
+    return s + (it.periode === 'jährlich' ? a/12 : a);
+  }, 0);
 
-    const handleSave = () => {
-      setFixkostenData(tempFixkosten);
-      const newTotal = Object.keys(tempFixkosten).reduce((total, key) => {
-        return total + calculateKategorieTotal(key);
-      }, 0);
-      setFinanzData(prev => ({ ...prev, fixkostenTotal: newTotal }));
-      setActiveField(null);
-    };
+  const monthlyTotals = {
+    wohnen: sumCategory(tempFixkosten.wohnen),
+    lebensmittel: sumCategory(tempFixkosten.lebensmittel),
+    abos: sumCategory(tempFixkosten.abos),
+    mobilitaet: sumCategory(tempFixkosten.mobilitaet),
+    sonstiges: sumCategory(tempFixkosten.sonstiges)
+  };
 
-    const handleCancel = () => {
-      setTempFixkosten({...fixkostenData});
-      setActiveField(null);
-    };
+  const grandTotal = Object.values(monthlyTotals).reduce((a,b)=>a+b,0);
 
-    const fixkostenKategorien = [
-      { id: 'wohnen', name: 'Wohnen', icon: '🏠' },
-      { id: 'lebensmittel', name: 'Lebensmittel', icon: '🛒' },
-      { id: 'abos', name: 'Abos', icon: '📱' },
-      { id: 'mobilitaet', name: 'Mobilität', icon: '🚗' },
-      { id: 'sonstiges', name: 'Sonstiges', icon: '📋' }
-    ];
+  // sync to localStorage and outer state
+  useEffect(()=> {
+    try {
+      localStorage.setItem('fixkostenData_v2', JSON.stringify(tempFixkosten));
+    } catch {}
+    try {
+      // write simplified structure back to global setFixkostenData if available
+      if (typeof setFixkostenData === 'function') {
+        setFixkostenData(tempFixkosten);
+      }
+      // also propagate to global finanzData.fixkostenTotal if setter exists
+      if (typeof setFinanzData === 'function') {
+        setFinanzData(prev => ({ ...(prev||{}), fixkostenTotal: Number(grandTotal.toFixed(2)) }));
+      }
+    } catch {}
+  }, [tempFixkosten, grandTotal]);
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-        <HeaderBars />
-        
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-slate-800">Fixkosten</h2>
-                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.fixkostenTotal.toLocaleString()}€</p>
-              </div>
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {fixkostenKategorien.map((kategorie) => (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? '#004225' : 'white',
-                          borderColor: activeField === kategorie.id ? '#004225' : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id) {
-                            setActiveField(kategorie.id);
-                            setTempSicherheit({...sicherheitData});
-                          }
-                        }}
-                      >
-                        <span className="text-3xl mb-2">{kategorie.icon}</span>
-                        <span className="text-lg font-semibold text-center px-4 leading-tight">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-2xl font-bold mt-2">
-                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  const addEntry = (k) => {
+    setTempFixkosten(prev => ({ ...prev, [k]: [...(prev[k]||[]), { id: uid_local(), bezeichnung: '', betrag: 0, periode: 'monatlich', note: '' }] }));
+  };
 
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {(() => {
-                      const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
-                      return (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-bold text-slate-800 text-center">
-                            {aktiveKategorie.icon} {aktiveKategorie.name}
-                          </h3>
-                          
-                          <div className="space-y-4">
-                            {tempSicherheit[activeField].map((eintrag, index) => (
-                              <div key={index} className="flex gap-3 items-center">
-                                <input 
-                                  type="text"
-                                  value={eintrag.bezeichnung}
-                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                  placeholder="Bezeichnung"
-                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
-                                />
-                                <input 
-                                  type="number"
-                                  value={eintrag.betrag}
-                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                  placeholder="0"
-                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
-                                />
-                                <span className="text-lg font-semibold">€</span>
-                                {tempSicherheit[activeField].length > 1 && (
-                                  <button
-                                    onClick={() => removeEintrag(activeField, index)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                  >
-                                    ✕
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                            
-                            <button
-                              onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <span className="text-2xl">+</span>
-                              <span className="font-semibold">Neuen Eintrag hinzufügen</span>
-                            </button>
-                          </div>
-                          
-                          <div className="border-t-2 border-slate-200 pt-4">
-                            <div className="flex justify-between items-center text-lg font-bold">
-                              <span>Gesamtsumme:</span>
-                              <span className="text-slate-700">
-                                {calculateKategorieTotal(activeField).toLocaleString()}€
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex space-x-4 justify-center">
-                            <button 
-                              onClick={handleSave}
-                              className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
-                            >
-                              Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                            >
-                              Zurück
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                )}
-              </div>
-            </div>
+  const updateEntry = (k, id, patch) => {
+    setTempFixkosten(prev => ({ ...prev, [k]: prev[k].map(it => it.id===id ? { ...it, ...patch } : it) }));
+  };
+
+  const removeEntry = (k, id) => {
+    setTempFixkosten(prev => ({ ...prev, [k]: prev[k].filter(it=>it.id!==id) }));
+  };
+
+  const handleExport = () => {
+    try {
+      const blob = new Blob([JSON.stringify(tempFixkosten, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fixkosten-export-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) { alert('Export fehlgeschlagen'); }
+  };
+
+  const handleImport = async (file) => {
+    try {
+      const txt = await file.text();
+      const parsed = JSON.parse(txt);
+      const keys = ['wohnen','lebensmittel','abos','mobilitaet','sonstiges'];
+      const ok = keys.every(k => Object.prototype.hasOwnProperty.call(parsed,k));
+      if (!ok) throw new Error('Ungültiges Format');
+      // augment entries with ids and default fields
+      keys.forEach(k => {
+        parsed[k] = (parsed[k]||[]).map(it => ({ id: it.id || uid_local(), bezeichnung: it.bezeichnung || it.label || '', betrag: it.betrag || it.amount || 0, periode: it.periode || 'monatlich', note: it.note || '' }));
+      });
+      setTempFixkosten(parsed);
+    } catch (e) {
+      alert('Import fehlgeschlagen: ' + (e.message||e));
+    }
+  };
+
+  const handleReset = () => {
+    if (!confirm('Fixkosten zurücksetzen?')) return;
+    localStorage.removeItem('fixkostenData_v2');
+    setTempFixkosten({ wohnen:[], lebensmittel:[], abos:[], mobilitaet:[], sonstiges:[] });
+  };
+
+  const categories = [
+    { id:'wohnen', title:'Wohnen (Miete, Strom, Heizung, GEZ)' },
+    { id:'lebensmittel', title:'Lebensmittel' },
+    { id:'abos', title:'Abonnements' },
+    { id:'mobilitaet', title:'Mobilität' },
+    { id:'sonstiges', title:'Sonstiges' }
+  ];
+
+  // render
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white via-emerald-50 to-white">
+      <div className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-emerald-700">
+            <strong>Gesamt pro Monat:</strong> <span className="font-semibold">{EUR_fmt(Number(grandTotal.toFixed(2)))}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button onClick={handleExport} className="rounded-2xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">Export (JSON)</button>
+            <label className="rounded-2xl border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50 cursor-pointer">
+              Import
+              <input type="file" accept="application/json" onChange={(e)=> e.target.files && handleImport(e.target.files[0]) } className="hidden" />
+            </label>
+            <button onClick={handleReset} className="rounded-2xl border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">Reset</button>
+            <label className="ml-3 flex items-center text-sm text-emerald-700"><input type="checkbox" checked={adviceMode} onChange={e=>setAdviceModeLocal(e.target.checked)} className="mr-2 h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500" /> Beratungsmodus</label>
           </div>
         </div>
-        <Sidebar /> 
-        <NavigationButtons />
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {categories.map(cat => (
+            <div key={cat.id} className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-emerald-900">{cat.title}</h3>
+                  <p className="text-sm text-emerald-600 mt-1">Erfasse Positionen und Beträge (monatlich/jährlich).</p>
+                </div>
+                <div className="text-sm text-emerald-700 font-medium">{EUR_fmt(monthlyTotals[cat.id]||0)}/Monat</div>
+              </div>
+
+              <div className="space-y-3">
+                {(tempFixkosten[cat.id]||[]).map(it => (
+                  <div key={it.id} className="grid grid-cols-1 gap-2 rounded-xl border border-emerald-50 p-3 sm:grid-cols-12">
+                    <input aria-label="Bezeichnung" value={it.bezeichnung} onChange={e=> updateEntry(cat.id, it.id, { bezeichnung: e.target.value })} placeholder="Bezeichnung" className="sm:col-span-5 rounded-xl border border-emerald-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input aria-label="Betrag" value={it.betrag} onChange={e=>{ const v=e.target.value.replace(',','.').replace(/[^\d.]/g,''); if(/^\d*\.?\d{0,2}$/.test(v)) updateEntry(cat.id, it.id, { betrag: v }); }} placeholder="Betrag" className="sm:col-span-3 rounded-xl border border-emerald-200 px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <select aria-label="Periode" value={it.periode||'monatlich'} onChange={e=> updateEntry(cat.id, it.id, { periode: e.target.value })} className="sm:col-span-2 rounded-xl border border-emerald-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                      <option value="monatlich">monatlich</option>
+                      <option value="jährlich">jährlich</option>
+                    </select>
+                    <div className="sm:col-span-2 flex items-center justify-end gap-2">
+                      <span className="rounded-lg bg-emerald-50 px-2 py-1 text-sm text-emerald-700">{EUR_fmt(it.periode === 'jährlich' ? (Number(it.betrag||0)/12) : Number(it.betrag||0))}/Mo</span>
+                      <button onClick={()=> removeEntry(cat.id, it.id)} className="rounded-xl border border-emerald-200 px-3 py-2 text-sm hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">Entfernen</button>
+                    </div>
+
+                    <input aria-label="Notiz" value={it.note||''} onChange={e=> updateEntry(cat.id, it.id, { note: e.target.value })} placeholder="Notiz (optional)" className="sm:col-span-12 mt-2 rounded-xl border border-emerald-100 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    {adviceMode && <div className="sm:col-span-12 mt-1 text-xs text-emerald-600">Tipp: jährliche Zahlungen bitte jährlich erfassen — das Tool rechnet monatlich um.</div>}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <button onClick={()=> addEntry(cat.id)} className="rounded-2xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">+ Position hinzufügen</button>
+                <div className="text-sm text-emerald-700 font-medium">{EUR_fmt(monthlyTotals[cat.id]||0)}/Monat</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
+;
   // Lifestyle Page
   const LifestylePage = () => {
     const [activeField, setActiveField] = useState(null);
@@ -2594,14 +2586,14 @@ const BasisAbsicherungPage = () => {
                                   value={eintrag.bezeichnung}
                                   onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
                                   placeholder="Bezeichnung"
-                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
                                 />
                                 <input 
                                   type="number"
                                   value={eintrag.betrag}
                                   onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                                   placeholder="0"
-                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-right"
                                 />
                                 <span className="text-lg font-semibold">€</span>
                                 {tempFixkosten[activeField].length > 1 && (
@@ -2617,7 +2609,7 @@ const BasisAbsicherungPage = () => {
                             
                             <button
                               onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                             >
                               <span className="text-2xl">+</span>
                               <span className="font-semibold">Neue Ausgabe hinzufügen</span>
@@ -2823,7 +2815,7 @@ const BasisAbsicherungPage = () => {
                                       )
                                     }))}
                                     placeholder="Bezeichnung"
-                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
                                   />
                                   <div className="flex items-center gap-2">
                                     <input 
@@ -2839,7 +2831,7 @@ const BasisAbsicherungPage = () => {
                                       value={eintrag.betrag}
                                       onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                                       placeholder="0"
-                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-right"
                                     />
                                     <span className="text-lg font-semibold">€</span>
                                   </div>
@@ -2855,7 +2847,7 @@ const BasisAbsicherungPage = () => {
                                 {/* Fortschrittsbalken */}
                                 <div className="w-full bg-gray-200 rounded-full h-2">
                                   <div 
-                                    className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                                    className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
                                     style={{width: `${calculateProgress(eintrag.erreicht, eintrag.betrag)}%`}}
                                   />
                                 </div>
@@ -2864,7 +2856,7 @@ const BasisAbsicherungPage = () => {
                             
                             <button
                               onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                             >
                               <span className="text-2xl">+</span>
                               <span className="font-semibold">Neues Ziel hinzufügen</span>
@@ -2985,7 +2977,7 @@ const BasisAbsicherungPage = () => {
                           className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
                             activeField === kategorie.id 
                               ? 'text-white shadow-xl' 
-                              : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                              : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
                           }`}
                           style={{
                             backgroundColor: activeField === kategorie.id ? color : 'white',
@@ -3063,7 +3055,7 @@ const BasisAbsicherungPage = () => {
                                       )
                                     }))}
                                     placeholder="Bezeichnung"
-                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
                                   />
                                   <div className="flex items-center gap-2">
                                     <input 
@@ -3079,7 +3071,7 @@ const BasisAbsicherungPage = () => {
                                       value={eintrag.betrag}
                                       onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                                       placeholder="0"
-                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-right"
                                     />
                                     <span className="text-lg font-semibold">€</span>
                                   </div>
@@ -3107,7 +3099,7 @@ const BasisAbsicherungPage = () => {
                             
                             <button
                               onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                             >
                               <span className="text-2xl">+</span>
                               <span className="font-semibold">Neues Ziel hinzufügen</span>
