@@ -1070,12 +1070,13 @@ const OverviewPage = () => (
     <div>
       <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
       <p className="text-slate-600 font-medium">Finanzberatungstool</p>
+          <div className="flex items-center justify-between px-8 pt-4 pb-8">
     </div>
     
     {/* HIER DEN BUTTON EINFÜGEN */}
     <button
       onClick={() => setCurrentPage('zigaretten')}
-      className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all flex items-center gap-2"
+      className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all flex items-left gap-2"
     >
       ⏮️
     </button>
