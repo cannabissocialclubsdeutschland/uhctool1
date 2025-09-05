@@ -1044,10 +1044,10 @@ const HeaderBars = () => (
     });
   };
 
- // Overview Page mit Logo-Hintergrund
+// Overview Page mit Logo-Hintergrund
 const OverviewPage = () => (
-  <div className={h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300}>
-
+  <div className={`h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+    
     {/* Logo als Hintergrundbild - hinterste Ebene */}
     <div className="absolute inset-0 pointer-events-none z-0">
       <img 
@@ -1056,14 +1056,13 @@ const OverviewPage = () => (
         className="w-full h-full object-cover opacity-15"
       />
     </div>
-<div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-6">
-  <div className="flex items-center justify-between px-8 py-4">
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
-      <p className="text-slate-600 font-medium">Finanzberatungstool</p>
-    </div>
-  </div>
-</div>
+
+    <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-6">
+      <div className="flex items-center justify-between px-8 py-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
+          <p className="text-slate-600 font-medium">Finanzberatungstool</p>
+        </div>
         
         {/* HIER DEN BUTTON EINFÜGEN */}
         <button
