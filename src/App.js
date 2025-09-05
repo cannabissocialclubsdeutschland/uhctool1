@@ -2087,42 +2087,18 @@ const BasisAbsicherungPage = () => {
   // Fixkosten Page mit mehreren Eingabefeldern pro Kategorie
   
 /* --- Patched FixkostenPage (emerald-themed, improved UI, monthly normalization, import/export, persist) --- */
+
+// Fixkosten Page — angepasst an das Seiten-Pattern (Buttons öffnen Eingabefenster wie bei anderen Seiten)
 const FixkostenPage = () => {
-  const uid_local = () => {
-    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
-  };
+  const [activeField, setActiveField] = useState(null);
+  const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData});
 
-  const EUR_fmt = (v) => {
-    try { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(Number(v)); } catch { return v; }
-  };
+  // create a local copy on mount to avoid accidental mutation
+  useEffect(() => {
+    setTempFixkosten({...fixkostenData});
+  }, [fixkostenData]);
 
-  // local working copy to avoid immediate mutation
-  const [tempFixkosten, setTempFixkosten] = useState(() => {
-    try {
-      const raw = localStorage.getItem('fixkostenData_v2');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    // create normalized structure based on outer fixkostenData if available
-    const base = { wohnen:[], lebensmittel:[], abos:[], mobilitaet:[], sonstiges:[] };
-    if (typeof fixkostenData === 'object' && fixkostenData !== null) {
-      Object.keys(base).forEach(k => {
-        if (Array.isArray(fixkostenData[k])) {
-          base[k] = fixkostenData[k].map(item => ({ id: item.id || uid_local(), bezeichnung: item.bezeichnung || item.label || '', betrag: item.betrag || item.amount || 0, periode: item.periode || 'monatlich', note: item.note || '' }));
-        }
-      });
-    }
-    return base;
-  });
-
-  // advice mode toggle
-  const [adviceMode, setAdviceModeLocal] = useState(true);
-
-  const sumCategory = (arr) => (arr || []).reduce((s,it) => {
-    const a = Number(it.betrag) || 0;
-    return s + (it.periode === 'jährlich' ? a/12 : a);
-  }, 0);
-
+  const sumCategory = (arr) => (arr || []).reduce((s, it) => s + (Number(it.betrag)||0), 0);
   const monthlyTotals = {
     wohnen: sumCategory(tempFixkosten.wohnen),
     lebensmittel: sumCategory(tempFixkosten.lebensmittel),
@@ -2130,143 +2106,138 @@ const FixkostenPage = () => {
     mobilitaet: sumCategory(tempFixkosten.mobilitaet),
     sonstiges: sumCategory(tempFixkosten.sonstiges)
   };
-
   const grandTotal = Object.values(monthlyTotals).reduce((a,b)=>a+b,0);
 
-  // sync to localStorage and outer state
+  // sync grandTotal back to finanzData
   useEffect(()=> {
     try {
-      localStorage.setItem('fixkostenData_v2', JSON.stringify(tempFixkosten));
-    } catch {}
-    try {
-      // write simplified structure back to global setFixkostenData if available
-      if (typeof setFixkostenData === 'function') {
-        setFixkostenData(tempFixkosten);
-      }
-      // also propagate to global finanzData.fixkostenTotal if setter exists
-      if (typeof setFinanzData === 'function') {
-        setFinanzData(prev => ({ ...(prev||{}), fixkostenTotal: Number(grandTotal.toFixed(2)) }));
-      }
-    } catch {}
-  }, [tempFixkosten, grandTotal]);
+      setFinanzData(prev => ({...(prev||{}), fixkostenTotal: Number(grandTotal.toFixed(2))}));
+    } catch(e) {}
+  }, [grandTotal]);
 
-  const addEntry = (k) => {
-    setTempFixkosten(prev => ({ ...prev, [k]: [...(prev[k]||[]), { id: uid_local(), bezeichnung: '', betrag: 0, periode: 'monatlich', note: '' }] }));
+  const categories = [
+    { id: 'wohnen', label: 'Wohnen', hint: 'Miete, Strom, Heizung' },
+    { id: 'lebensmittel', label: 'Lebensmittel', hint: 'Wocheneinkauf' },
+    { id: 'abos', label: 'Abonnements', hint: 'Streaming, Cloud' },
+    { id: 'mobilitaet', label: 'Mobilität', hint: 'Monatskarte, Tanken' },
+    { id: 'sonstiges', label: 'Sonstiges', hint: 'Unvorhergesehenes' }
+  ];
+
+  const openField = (id) => {
+    setActiveField(id);
   };
 
-  const updateEntry = (k, id, patch) => {
-    setTempFixkosten(prev => ({ ...prev, [k]: prev[k].map(it => it.id===id ? { ...it, ...patch } : it) }));
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempFixkosten(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => i===index ? {...item, [field]: field==='betrag' ? (Number(value)||0) : value } : item)
+    }));
   };
 
-  const removeEntry = (k, id) => {
-    setTempFixkosten(prev => ({ ...prev, [k]: prev[k].filter(it=>it.id!==id) }));
+  const addEintrag = (kategorie) => {
+    setTempFixkosten(prev => ({ ...prev, [kategorie]: [...(prev[kategorie]||[]), { bezeichnung: '', betrag: 0 }] }));
   };
 
+  const removeEintrag = (kategorie, index) => {
+    setTempFixkosten(prev => ({ ...prev, [kategorie]: prev[kategorie].filter((_,i)=>i!==index) }));
+  };
+
+  const handleSave = () => {
+    setFixkostenData(tempFixkosten);
+    // Optional: persist to localStorage
+    try { localStorage.setItem('fixkostenData_v2', JSON.stringify(tempFixkosten)); } catch(e){}
+    alert('Fixkosten gespeichert.');
+  };
+
+  const handleCancel = () => {
+    setTempFixkosten({...fixkostenData});
+    setActiveField(null);
+  };
+
+  // Export / Import simple JSON
   const handleExport = () => {
-    try {
-      const blob = new Blob([JSON.stringify(tempFixkosten, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `fixkosten-export-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) { alert('Export fehlgeschlagen'); }
+    const blob = new Blob([JSON.stringify(tempFixkosten, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `fixkosten-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
   };
 
   const handleImport = async (file) => {
     try {
-      const txt = await file.text();
-      const parsed = JSON.parse(txt);
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      // simple validation: keys exist
       const keys = ['wohnen','lebensmittel','abos','mobilitaet','sonstiges'];
-      const ok = keys.every(k => Object.prototype.hasOwnProperty.call(parsed,k));
+      const ok = keys.every(k => k in parsed);
       if (!ok) throw new Error('Ungültiges Format');
-      // augment entries with ids and default fields
-      keys.forEach(k => {
-        parsed[k] = (parsed[k]||[]).map(it => ({ id: it.id || uid_local(), bezeichnung: it.bezeichnung || it.label || '', betrag: it.betrag || it.amount || 0, periode: it.periode || 'monatlich', note: it.note || '' }));
-      });
       setTempFixkosten(parsed);
-    } catch (e) {
-      alert('Import fehlgeschlagen: ' + (e.message||e));
-    }
+      alert('Import erfolgreich.');
+    } catch(e) { alert('Import fehlgeschlagen: '+e.message); }
   };
 
-  const handleReset = () => {
-    if (!confirm('Fixkosten zurücksetzen?')) return;
-    localStorage.removeItem('fixkostenData_v2');
-    setTempFixkosten({ wohnen:[], lebensmittel:[], abos:[], mobilitaet:[], sonstiges:[] });
-  };
-
-  const categories = [
-    { id:'wohnen', title:'Wohnen (Miete, Strom, Heizung, GEZ)' },
-    { id:'lebensmittel', title:'Lebensmittel' },
-    { id:'abos', title:'Abonnements' },
-    { id:'mobilitaet', title:'Mobilität' },
-    { id:'sonstiges', title:'Sonstiges' }
-  ];
-
-  // render
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-emerald-50 to-white">
-      <div className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-sm text-emerald-700">
-            <strong>Gesamt pro Monat:</strong> <span className="font-semibold">{EUR_fmt(Number(grandTotal.toFixed(2)))}</span>
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-emerald-900">Fixkosten</h2>
+            <p className="text-sm text-emerald-700">Erfasse deine wiederkehrenden Ausgaben – klicke eine Kategorie, um Details zu bearbeiten.</p>
           </div>
-
           <div className="flex items-center gap-2">
-            <button onClick={handleExport} className="rounded-2xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">Export (JSON)</button>
-            <label className="rounded-2xl border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50 cursor-pointer">
+            <button onClick={handleExport} className="rounded-2xl bg-emerald-600 px-3 py-2 text-white text-sm hover:bg-emerald-700">Export</button>
+            <label className="rounded-2xl border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-700 cursor-pointer">
               Import
-              <input type="file" accept="application/json" onChange={(e)=> e.target.files && handleImport(e.target.files[0]) } className="hidden" />
+              <input type="file" accept="application/json" onChange={(e)=> e.target.files && handleImport(e.target.files[0])} className="hidden" />
             </label>
-            <button onClick={handleReset} className="rounded-2xl border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">Reset</button>
-            <label className="ml-3 flex items-center text-sm text-emerald-700"><input type="checkbox" checked={adviceMode} onChange={e=>setAdviceModeLocal(e.target.checked)} className="mr-2 h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500" /> Beratungsmodus</label>
+            <button onClick={handleSave} className="rounded-2xl bg-emerald-600 px-3 py-2 text-white text-sm hover:bg-emerald-700">Speichern</button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Kategorie Buttons (5) */}
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-6">
           {categories.map(cat => (
-            <div key={cat.id} className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-emerald-900">{cat.title}</h3>
-                  <p className="text-sm text-emerald-600 mt-1">Erfasse Positionen und Beträge (monatlich/jährlich).</p>
-                </div>
-                <div className="text-sm text-emerald-700 font-medium">{EUR_fmt(monthlyTotals[cat.id]||0)}/Monat</div>
-              </div>
-
-              <div className="space-y-3">
-                {(tempFixkosten[cat.id]||[]).map(it => (
-                  <div key={it.id} className="grid grid-cols-1 gap-2 rounded-xl border border-emerald-50 p-3 sm:grid-cols-12">
-                    <input aria-label="Bezeichnung" value={it.bezeichnung} onChange={e=> updateEntry(cat.id, it.id, { bezeichnung: e.target.value })} placeholder="Bezeichnung" className="sm:col-span-5 rounded-xl border border-emerald-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                    <input aria-label="Betrag" value={it.betrag} onChange={e=>{ const v=e.target.value.replace(',','.').replace(/[^\d.]/g,''); if(/^\d*\.?\d{0,2}$/.test(v)) updateEntry(cat.id, it.id, { betrag: v }); }} placeholder="Betrag" className="sm:col-span-3 rounded-xl border border-emerald-200 px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                    <select aria-label="Periode" value={it.periode||'monatlich'} onChange={e=> updateEntry(cat.id, it.id, { periode: e.target.value })} className="sm:col-span-2 rounded-xl border border-emerald-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      <option value="monatlich">monatlich</option>
-                      <option value="jährlich">jährlich</option>
-                    </select>
-                    <div className="sm:col-span-2 flex items-center justify-end gap-2">
-                      <span className="rounded-lg bg-emerald-50 px-2 py-1 text-sm text-emerald-700">{EUR_fmt(it.periode === 'jährlich' ? (Number(it.betrag||0)/12) : Number(it.betrag||0))}/Mo</span>
-                      <button onClick={()=> removeEntry(cat.id, it.id)} className="rounded-xl border border-emerald-200 px-3 py-2 text-sm hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">Entfernen</button>
-                    </div>
-
-                    <input aria-label="Notiz" value={it.note||''} onChange={e=> updateEntry(cat.id, it.id, { note: e.target.value })} placeholder="Notiz (optional)" className="sm:col-span-12 mt-2 rounded-xl border border-emerald-100 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                    {adviceMode && <div className="sm:col-span-12 mt-1 text-xs text-emerald-600">Tipp: jährliche Zahlungen bitte jährlich erfassen — das Tool rechnet monatlich um.</div>}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex items-center justify-between">
-                <button onClick={()=> addEntry(cat.id)} className="rounded-2xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">+ Position hinzufügen</button>
-                <div className="text-sm text-emerald-700 font-medium">{EUR_fmt(monthlyTotals[cat.id]||0)}/Monat</div>
-              </div>
+            <div key={cat.id} className={`rounded-2xl border p-4 cursor-pointer ${activeField===cat.id ? 'border-emerald-600 bg-emerald-50' : 'border-emerald-100 bg-white'}`} onClick={()=>openField(cat.id)}>
+              <h3 className="font-semibold text-emerald-900">{cat.label}</h3>
+              <p className="text-sm text-emerald-600 mt-1">{cat.hint}</p>
+              <div className="mt-3 text-sm text-emerald-700 font-medium">{EUR.format(monthlyTotals[cat.id] || 0)} / Monat</div>
             </div>
           ))}
         </div>
+
+        {/* Eingabefeld: wenn activeField gesetzt */}
+        {activeField && (
+          <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-emerald-900">Bearbeite: {categories.find(c=>c.id===activeField).label}</h3>
+              <div className="flex items-center gap-2">
+                <button onClick={handleCancel} className="rounded-xl border border-emerald-200 px-3 py-2 text-sm text-emerald-700">Abbrechen</button>
+                <button onClick={handleSave} className="rounded-2xl bg-emerald-600 px-4 py-2 text-white text-sm hover:bg-emerald-700">Speichern</button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {(tempFixkosten[activeField] || []).map((eintrag, idx) => (
+                <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                  <input value={eintrag.bezeichnung} onChange={(e)=> updateEintrag(activeField, idx, 'bezeichnung', e.target.value)} placeholder="Bezeichnung" className="sm:col-span-6 rounded-xl border border-emerald-100 px-3 py-2" />
+                  <input type="number" value={eintrag.betrag} onChange={(e)=> updateEintrag(activeField, idx, 'betrag', e.target.value)} className="sm:col-span-3 rounded-xl border border-emerald-100 px-3 py-2 text-right" />
+                  <div className="sm:col-span-3 flex items-center justify-end gap-2">
+                    <span className="text-sm text-emerald-700">{EUR.format(Number(eintrag.betrag)||0)}/Mo</span>
+                    <button onClick={()=> removeEintrag(activeField, idx)} className="rounded-xl border border-emerald-200 px-3 py-2 text-sm hover:bg-emerald-50">Entfernen</button>
+                  </div>
+                </div>
+              ))}
+              <div>
+                <button onClick={()=> addEintrag(activeField)} className="rounded-2xl bg-emerald-50 text-emerald-700 px-3 py-2">+ Position hinzufügen</button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
 };
+;
 ;
   // Lifestyle Page
   const LifestylePage = () => {
