@@ -1057,29 +1057,29 @@ const OverviewPage = () => (
       />
     </div>
 
-<div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-6">
-  <div className="flex items-center justify-between px-8 py-4">
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
-      <p className="text-slate-600 font-medium">Finanzberatungstool</p>
+    <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-6">
+      <div className="flex items-center justify-between px-8 py-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
+          <p className="text-slate-600 font-medium">Finanzberatungstool</p>
+        </div>
+        
+        {/* HIER DEN BUTTON EINFÜGEN */}
+        <button
+          onClick={() => setCurrentPage('zigaretten')}
+          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+        >
+          ⏮️
+        </button>
+      </div>
     </div>
-  </div>
-</div>
-    
-   {/* HIER DEN BUTTON EINFÜGEN */}
-<button
-  onClick={() => setCurrentPage('zigaretten')}
-  className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
->
-  ⏮️
-</button>
     
     <div className="text-right">
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
     </div>
   </div>
-</div>
+);
 
     <div className="flex h-full relative z-10">
       
