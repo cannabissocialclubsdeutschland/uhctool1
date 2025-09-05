@@ -3013,7 +3013,7 @@ const BasisAbsicherungPage = () => {
       default:
         return <OverviewPage />;
     }
-};
+
   return renderCurrentPage();
 };
 
