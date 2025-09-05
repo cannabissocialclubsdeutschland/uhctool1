@@ -1199,7 +1199,7 @@ const OverviewPage = () => (
           <div>
           
             {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
-            <svg width="450" height="450">
+            <svg width="100%" height="auto" viewBox="0 0 450 450">
               {createPieChart()}
               
               {/* Zentraler Kreis ebenfalls proportional vergrößert */}
@@ -1223,7 +1223,7 @@ const OverviewPage = () => (
           </div>
           
           {/* Legende-Box Position angepasst für größeres Diagramm */}
-          <div className="absolute top-8 -right-40 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
+          <div className="ml-6 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
             <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
             <div className="space-y-4">
               {[
@@ -1307,8 +1307,7 @@ const OverviewPage = () => (
         ))}
       </div>
     </div>
-    
-    <Sidebar /> 
+  
     <NavigationButtons />
     
     <style jsx>{`
@@ -2251,7 +2250,7 @@ const BasisAbsicherungPage = () => {
             </div>
           </div>
         </div>
-        <Sidebar /> 
+        <Sidebar />
         <NavigationButtons />
       </div>
     );
