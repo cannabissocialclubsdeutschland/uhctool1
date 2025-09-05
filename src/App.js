@@ -1246,12 +1246,12 @@ const OverviewPage = () => (
       </div>
 
       {/* Legende */}
-      <div className="w-1/4 p-4 flex items-start justify-center">
+       <div className="w-1/4 p-4 flex items-center justify-center">
         {/* Hier kommt deine Legende */}
       </div>
 
       {/* Sidebar */}
-     <div className="w-1/4 p-4 flex items-start justify-center">
+      <div className="w-1/4 p-4 flex items-center justify-center">
   <Sidebar />
       </div>
     </div>
