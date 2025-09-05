@@ -1072,14 +1072,6 @@ const OverviewPage = () => (
       <p className="text-slate-600 font-medium">Finanzberatungstool</p>
     </div>
     
-    {/* HIER DEN BUTTON EINFÜGEN */}
-    <button
-      onClick={() => setCurrentPage('zigaretten')}
-      className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-all flex items-center gap-2"
-    >
-      🚭 Zigaretten-Rechner
-    </button>
-    
     <div className="text-right">
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
@@ -1091,9 +1083,9 @@ const OverviewPage = () => (
       // In der Overview Page oder im Header
 <button
   onClick={() => setCurrentPage('zigaretten')}
-  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
+  className="px-4 py-2 bg-white-600 text-black rounded-lg hover:bg-purple-700 transition-all"
 >
-  🚭 Zigaretten-Investment-Rechner
+  🚭
 </button>
       
 {/* Basis Absicherung - mit Regenschirm Animation */}
