@@ -163,7 +163,17 @@ const FinanzTool = () => {
       importData(e.dataTransfer.files[0]);
     }
   };
-    
+
+// Basis-Absicherung Daten
+const [basisAbsicherungData, setBasisAbsicherungData] = useState({
+  krankenversicherung: { status: 'vorhanden', monatlich: 450, typ: 'gesetzlich' },
+  haftpflicht: { status: 'vorhanden', monatlich: 12, deckung: 10000000 },
+  berufsunfaehigkeit: { status: 'fehlt', monatlich: 0, empfohlen: 120 },
+  rechtsschutz: { status: 'teilweise', monatlich: 25, bereiche: ['privat'] },
+  hausrat: { status: 'fehlt', monatlich: 0, empfohlen: 15 },
+  kfzVersicherung: { status: 'vorhanden', monatlich: 85, typ: 'teilkasko' }
+});
+  
   // Page transition effect
   useEffect(() => {
     setPageTransition(true);
@@ -323,7 +333,7 @@ const Sidebar = () => {
 };
 
   // Seitenreihenfolge für Navigation
-  const pageOrder = ['overview', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche', 'kurzfristig', 'mittelfristig', 'langfristig'];
+  const pageOrder = ['overview', 'basisabsicherung', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche', 'kurzfristig', 'mittelfristig', 'langfristig'];
   
   const getNextPage = () => {
     const currentIndex = pageOrder.indexOf(currentPage);
@@ -1009,6 +1019,301 @@ const OverviewPage = () => (
   </div>
 );
 
+// Basis-Absicherung Page
+const BasisAbsicherungPage = () => {
+  const [selectedVersicherung, setSelectedVersicherung] = useState(null);
+  const [tempBasisData, setTempBasisData] = useState({...basisAbsicherungData});
+  
+  const versicherungsTypen = [
+    { 
+      id: 'krankenversicherung',
+      name: 'Krankenversicherung',
+      icon: '🏥',
+      pflicht: true,
+      beschreibung: 'Gesetzlich vorgeschrieben',
+      minBetrag: 200,
+      maxBetrag: 900
+    },
+    { 
+      id: 'haftpflicht',
+      name: 'Privathaftpflicht',
+      icon: '⚡',
+      pflicht: false,
+      wichtigkeit: 'SEHR HOCH',
+      beschreibung: 'Schützt vor existenzbedrohenden Forderungen',
+      empfohleneDecking: 10000000
+    },
+    { 
+      id: 'berufsunfaehigkeit',
+      name: 'Berufsunfähigkeit',
+      icon: '💼',
+      pflicht: false,
+      wichtigkeit: 'HOCH',
+      beschreibung: 'Absicherung der Arbeitskraft',
+      empfohlen: '70% des Nettoeinkommens'
+    },
+    { 
+      id: 'rechtsschutz',
+      name: 'Rechtsschutz',
+      icon: '⚖️',
+      pflicht: false,
+      wichtigkeit: 'MITTEL',
+      beschreibung: 'Hilfe bei rechtlichen Streitigkeiten'
+    },
+    { 
+      id: 'hausrat',
+      name: 'Hausrat',
+      icon: '🏠',
+      pflicht: false,
+      wichtigkeit: 'MITTEL',
+      beschreibung: 'Schutz für Ihr Eigentum'
+    },
+    { 
+      id: 'kfzVersicherung',
+      name: 'KFZ-Versicherung',
+      icon: '🚗',
+      pflicht: true,
+      beschreibung: 'Pflicht bei Fahrzeugbesitz'
+    }
+  ];
+  
+  // Berechne Absicherungsgrad
+  const calculateAbsicherungsgrad = () => {
+    let score = 0;
+    let maxScore = 0;
+    
+    versicherungsTypen.forEach(typ => {
+      if (typ.pflicht) {
+        maxScore += 30;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 30;
+      } else if (typ.wichtigkeit === 'SEHR HOCH') {
+        maxScore += 25;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 25;
+      } else if (typ.wichtigkeit === 'HOCH') {
+        maxScore += 20;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 20;
+      } else {
+        maxScore += 10;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 10;
+      }
+    });
+    
+    return (score / maxScore) * 100;
+  };
+  
+  const absicherungsgrad = calculateAbsicherungsgrad();
+  
+  // Monatliche Gesamtkosten
+  const calculateGesamtkosten = () => {
+    return Object.values(tempBasisData).reduce((sum, item) => 
+      sum + (parseFloat(item.monatlich) || 0), 0
+    );
+  };
+  
+  // Risiko-Score berechnen
+  const getRisikoLevel = () => {
+    if (absicherungsgrad >= 80) return { text: 'Gut abgesichert', color: '#10b981' };
+    if (absicherungsgrad >= 60) return { text: 'Basis vorhanden', color: '#f59e0b' };
+    if (absicherungsgrad >= 40) return { text: 'Lücken vorhanden', color: '#ef4444' };
+    return { text: 'Kritisch', color: '#dc2626' };
+  };
+  
+  const risikoLevel = getRisikoLevel();
+  
+  return (
+    <div className={`h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+      {/* Custom Header für Basis-Absicherung */}
+      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+        <div className="h-full flex items-center px-8 relative">
+          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
+            <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
+            <p className="text-sm text-slate-600">Basis-Absicherung - Ihr Sicherheitsnetz</p>
+            
+            <button
+              onClick={() => setCurrentPage('overview')}
+              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
+            >
+              🏠 Zur Übersicht
+            </button>
+          </div>
+          
+          {/* Risiko-Anzeige */}
+          <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
+            <div className="text-right">
+              <p className="text-sm text-slate-500">Absicherungsgrad</p>
+              <div className="flex items-center gap-3">
+                <div className="w-48 h-6 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all duration-500"
+                    style={{
+                      width: `${absicherungsgrad}%`,
+                      backgroundColor: risikoLevel.color
+                    }}
+                  />
+                </div>
+                <span className="text-2xl font-bold" style={{color: risikoLevel.color}}>
+                  {absicherungsgrad.toFixed(0)}%
+                </span>
+              </div>
+              <p className="text-sm mt-1" style={{color: risikoLevel.color}}>
+                {risikoLevel.text}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="h-screen flex flex-col pt-32">
+        <div className="flex-1 p-8 overflow-y-auto">
+          {/* Haupt-Dashboard */}
+          <div className="max-w-7xl mx-auto">
+            {/* Übersichtskarten */}
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Monatliche Kosten</span>
+                  <span className="text-2xl">💰</span>
+                </div>
+                <p className="text-3xl font-bold text-slate-800">
+                  {calculateGesamtkosten()}€
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {((calculateGesamtkosten() / calculateBudget()) * 100).toFixed(1)}% vom Budget
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Fehlende Absicherung</span>
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <p className="text-3xl font-bold text-orange-600">
+                  {Object.values(tempBasisData).filter(v => v.status === 'fehlt').length}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Versicherungen fehlen
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Empfohlene Aktion</span>
+                  <span className="text-2xl">📋</span>
+                </div>
+                <p className="text-lg font-bold text-blue-600">
+                  {tempBasisData.berufsunfaehigkeit.status === 'fehlt' 
+                    ? 'BU abschließen' 
+                    : tempBasisData.haftpflicht.status === 'fehlt'
+                    ? 'Haftpflicht prüfen'
+                    : 'Check komplett'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Versicherungs-Grid */}
+            <div className="grid grid-cols-3 gap-6">
+              {versicherungsTypen.map((versicherung, index) => {
+                const data = tempBasisData[versicherung.id];
+                const statusColor = 
+                  data?.status === 'vorhanden' ? '#10b981' : 
+                  data?.status === 'teilweise' ? '#f59e0b' : '#ef4444';
+                
+                return (
+                  <div 
+                    key={versicherung.id}
+                    className="bg-white/90 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 animate-fadeIn"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                    onClick={() => setSelectedVersicherung(versicherung.id)}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-3xl">{versicherung.icon}</span>
+                      {versicherung.pflicht && (
+                        <span className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full font-semibold">
+                          PFLICHT
+                        </span>
+                      )}
+                      {versicherung.wichtigkeit && (
+                        <span className={`px-2 py-1 text-xs rounded-full font-semibold ${
+                          versicherung.wichtigkeit === 'SEHR HOCH' ? 'bg-orange-100 text-orange-600' :
+                          versicherung.wichtigkeit === 'HOCH' ? 'bg-yellow-100 text-yellow-600' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {versicherung.wichtigkeit}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-bold text-lg text-slate-800 mb-2">
+                      {versicherung.name}
+                    </h3>
+                    
+                    <p className="text-sm text-gray-600 mb-3">
+                      {versicherung.beschreibung}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: statusColor }}
+                        />
+                        <span className="text-sm font-medium" style={{ color: statusColor }}>
+                          {data?.status === 'vorhanden' ? 'Aktiv' : 
+                           data?.status === 'teilweise' ? 'Teilweise' : 'Fehlt'}
+                        </span>
+                      </div>
+                      
+                      <span className="text-lg font-bold text-slate-700">
+                        {data?.monatlich || data?.empfohlen || 0}€/M
+                      </span>
+                    </div>
+                    
+                    {data?.status === 'fehlt' && data?.empfohlen && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-orange-600">
+                          💡 Empfohlener Beitrag: {data.empfohlen}€/Monat
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Handlungsempfehlungen */}
+            <div className="mt-8 bg-blue-50 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-blue-900 mb-4">
+                ✨ Ihre nächsten Schritte
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {tempBasisData.berufsunfaehigkeit.status === 'fehlt' && (
+                  <div className="flex items-start gap-3">
+                    <span className="text-red-500 text-xl">❗</span>
+                    <div>
+                      <p className="font-semibold text-slate-800">Berufsunfähigkeit abschließen</p>
+                      <p className="text-sm text-gray-600">Ihre Arbeitskraft ist Ihr wichtigstes Kapital</p>
+                    </div>
+                  </div>
+                )}
+                {tempBasisData.haftpflicht.status === 'fehlt' && (
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-500 text-xl">⚠️</span>
+                    <div>
+                      <p className="font-semibold text-slate-800">Haftpflichtversicherung prüfen</p>
+                      <p className="text-sm text-gray-600">Schützt vor existenzbedrohenden Schäden</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <NavigationButtons />
+    </div>
+  );
+};
 
   // Budget Input Page mit vergrößerten Kreisen und korrigierter Event-Behandlung
   const BudgetPage = () => {
