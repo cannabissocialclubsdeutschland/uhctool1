@@ -901,14 +901,6 @@ const HeaderBars = () => (
           🏠 Zur Übersicht
         </button>
 
-        {/* Zigaretten-Rechner Button - klein und dezent */}
-        <button
-          onClick={() => setCurrentPage('zigaretten')}
-          className="mt-2 ml-2 px-3 py-1 bg-emerald-700 text-white text-xs rounded-lg hover:bg-emerald-800 transition-all"
-        >
-          Zigaretten-Rechner
-        </button>
-
         {/* Import/Export Buttons daneben */}
         <div className="inline-flex gap-2 ml-2">
           <button
@@ -1052,10 +1044,10 @@ const HeaderBars = () => (
     });
   };
 
-// Overview Page mit Logo-Hintergrund
+ // Overview Page mit Logo-Hintergrund
 const OverviewPage = () => (
-  <div className={`h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
-    
+  <div className={h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300}>
+
     {/* Logo als Hintergrundbild - hinterste Ebene */}
     <div className="absolute inset-0 pointer-events-none z-0">
       <img 
@@ -1064,7 +1056,6 @@ const OverviewPage = () => (
         className="w-full h-full object-cover opacity-15"
       />
     </div>
-
 <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-6">
   <div className="flex items-center justify-between px-8 py-4">
     <div>
@@ -1073,179 +1064,177 @@ const OverviewPage = () => (
     </div>
   </div>
 </div>
-    
-   {/* HIER DEN BUTTON EINFÜGEN */}
-<button
-  onClick={() => setCurrentPage('zigaretten')}
-  className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
->
-  ⏮️
-</button>
+        
+        {/* HIER DEN BUTTON EINFÜGEN */}
+        <button
+          onClick={() => setCurrentPage('zigaretten')}
+          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+        >
+          ⏮️
+        </button>
+      </div>
+    </div>
     
     <div className="text-right">
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
     </div>
-  </div>
-</div>
 
-    <div className="flex h-full relative z-10">
-      
-{/* Basis Absicherung - mit Regenschirm Animation */}
-<div className="absolute left-12 top-24 animate-fadeIn">
-  <div 
-    className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
-    onClick={() => setCurrentPage('basisabsicherung')}
-  >
-    <svg width="180" height="180" className="overflow-visible">
-      
-      {/* Regentropfen Animation - stoppt am Schirm */}
-      {[...Array(8)].map((_, i) => (
-        <g key={`rain-${i}`}>
-          <line
-            x1={30 + i * 15}
-            y1={10}
-            x2={28 + i * 15}
-            y2={30}
-            stroke="#3b82f6"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity="0.6"
-            style={{
-              animation: `rain-fall-short 2s linear infinite`,
-              animationDelay: `${i * 0.3}s`
-            }}
-          />
-        </g>
-      ))}
-      
-      {/* Regenschirm über dem Text */}
-      <g style={{
-        animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
-        transformOrigin: '90px 40px'
-      }}>
-        {/* Schirm-Stoff */}
-        <path
-          d="M 55 40 Q 90 25 125 40 Q 105 35 90 35 Q 75 35 55 40"
-          fill="#dc2626"
-          stroke="#b91c1c"
-          strokeWidth="2"
-        />
-        <path
-          d="M 65 37 Q 90 28 115 37"
-          fill="none"
-          stroke="#991b1b"
-          strokeWidth="1"
-        />
-        {/* Griff */}
-        <line
-          x1="90"
-          y1="35"
-          x2="90"
-          y2="55"
-          stroke="#374151"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 90 55 Q 95 58 90 60"
-          fill="none"
-          stroke="#374151"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </g>
-      
-      {/* Tropfen, die vom Schirm abprallen (optional) */}
-      {[...Array(3)].map((_, i) => (
-        <circle
-          key={`splash-${i}`}
-          cx={60 + i * 30}
-          cy={42}
-          r="2"
-          fill="#3b82f6"
-          opacity="0"
-          style={{
-            animation: `splash 2s ease-out infinite`,
-            animationDelay: `${0.5 + i * 0.7}s`
-          }}
-        />
-      ))}
-      
-      {/* Schutz-Funken */}
-      {[...Array(4)].map((_, i) => (
-        <circle
-          key={`sparkle-${i}`}
-          cx={75 + i * 10}
-          cy={40 + Math.sin(i) * 3}
-          r="1.5"
-          fill="#10b981"
-          opacity="0"
-          style={{
-            animation: `protection-sparkle 3s ease-in-out infinite`,
-            animationDelay: `${i * 0.5}s`
-          }}
-        />
-      ))}
-      
-      {/* Text unter dem Schirm */}
-      <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-        Basis
-      </text>
-      <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-        Absicherung
-      </text>
-      
-    </svg>
-  </div>
-</div>
-      <div className="flex-1 flex justify-center items-start pt-12">
-        <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-          <div>
+    {/* Basis Absicherung - mit Regenschirm Animation */}
+    <div className="absolute left-12 top-24 animate-fadeIn">
+      <div 
+        className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+        onClick={() => setCurrentPage('basisabsicherung')}
+      >
+        <svg width="180" height="180" className="overflow-visible">
           
-            {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
-            <svg width="450" height="450">
-              {createPieChart()}
-              
-              {/* Zentraler Kreis ebenfalls proportional vergrößert */}
-              <circle
-                cx="225"
-                cy="225"
-                r="60"
-                fill="white"
-                stroke="#004225"
-                strokeWidth="3"
-                className="cursor-pointer transition-all hover:r-67"
-                onClick={() => setCurrentPage('budget')}
+          {/* Regentropfen Animation - stoppt am Schirm */}
+          {[...Array(8)].map((_, i) => (
+            <g key={`rain-${i}`}>
+              <line
+                x1={30 + i * 15}
+                y1={10}
+                x2={28 + i * 15}
+                y2={30}
+                stroke="#3b82f6"
+                strokeWidth="2"
+                strokeLinecap="round"
+                opacity="0.6"
+                style={{
+                  animation: `rain-fall-short 2s linear infinite`,
+                  animationDelay: `${i * 0.3}s`
+                }}
               />
-              <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-                Budget
-              </text>
-              <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
-                {calculateBudget().toLocaleString()}€
-              </text>
-            </svg>
-          </div>
+            </g>
+          ))}
           
-          {/* Legende-Box Position angepasst für größeres Diagramm */}
-          <div className="absolute top-8 -right-40 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
-            <div className="space-y-4">
-              {[
-                { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
-                { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
-                { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
-                { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
-              ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-1 rounded transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-sm" style={{backgroundColor: item.color}}></div>
-                    <span className="text-sm font-medium text-slate-700">{item.name}</span>
-                  </div>
-                  <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+          {/* Regenschirm über dem Text */}
+          <g style={{
+            animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
+            transformOrigin: '90px 40px'
+          }}>
+            {/* Schirm-Stoff */}
+            <path
+              d="M 55 40 Q 90 25 125 40 Q 105 35 90 35 Q 75 35 55 40"
+              fill="#dc2626"
+              stroke="#b91c1c"
+              strokeWidth="2"
+            />
+            <path
+              d="M 65 37 Q 90 28 115 37"
+              fill="none"
+              stroke="#991b1b"
+              strokeWidth="1"
+            />
+            {/* Griff */}
+            <line
+              x1="90"
+              y1="35"
+              x2="90"
+              y2="55"
+              stroke="#374151"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 90 55 Q 95 58 90 60"
+              fill="none"
+              stroke="#374151"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </g>
+          
+          {/* Tropfen, die vom Schirm abprallen (optional) */}
+          {[...Array(3)].map((_, i) => (
+            <circle
+              key={`splash-${i}`}
+              cx={60 + i * 30}
+              cy={42}
+              r="2"
+              fill="#3b82f6"
+              opacity="0"
+              style={{
+                animation: `splash 2s ease-out infinite`,
+                animationDelay: `${0.5 + i * 0.7}s`
+              }}
+            />
+          ))}
+          
+          {/* Schutz-Funken */}
+          {[...Array(4)].map((_, i) => (
+            <circle
+              key={`sparkle-${i}`}
+              cx={75 + i * 10}
+              cy={40 + Math.sin(i) * 3}
+              r="1.5"
+              fill="#10b981"
+              opacity="0"
+              style={{
+                animation: `protection-sparkle 3s ease-in-out infinite`,
+                animationDelay: `${i * 0.5}s`
+              }}
+            />
+          ))}
+          
+          {/* Text unter dem Schirm */}
+          <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+            Basis
+          </text>
+          <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+            Absicherung
+          </text>
+          
+        </svg>
+      </div>
+    </div>
+
+    <div className="flex-1 flex justify-center items-start pt-12">
+      <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+        <div>
+        
+          {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
+          <svg width="450" height="450">
+            {createPieChart()}
+            
+            {/* Zentraler Kreis ebenfalls proportional vergrößert */}
+            <circle
+              cx="225"
+              cy="225"
+              r="60"
+              fill="white"
+              stroke="#004225"
+              strokeWidth="3"
+              className="cursor-pointer transition-all hover:r-67"
+              onClick={() => setCurrentPage('budget')}
+            />
+            <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+              Budget
+            </text>
+            <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+              {calculateBudget().toLocaleString()}€
+            </text>
+          </svg>
+        </div>
+        
+        {/* Legende-Box Position angepasst für größeres Diagramm */}
+        <div className="absolute top-8 -right-40 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
+          <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
+          <div className="space-y-4">
+            {[
+              { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
+              { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
+              { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
+              { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+            ].map((item, index) => (
+              <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-1 rounded transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-sm" style={{backgroundColor: item.color}}></div>
+                  <span className="text-sm font-medium text-slate-700">{item.name}</span>
                 </div>
-              ))}
-            </div>
+                <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1302,6 +1291,7 @@ const OverviewPage = () => (
         ))}
       </div>
     </div>
+    
     <Sidebar /> 
     <NavigationButtons />
     
