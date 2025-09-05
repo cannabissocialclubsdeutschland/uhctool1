@@ -1080,12 +1080,12 @@ const OverviewPage = () => (
       </div>
     </div>
     
-    {/* Hauptcontainer für die drei Elemente in einer Reihe - ZENTRIERT */}
+    {/* Hauptcontainer für die vier Elemente in einer Reihe - ZENTRIERT */}
     <div className="flex h-[calc(100vh-250px)] items-center justify-center relative z-10 mt-4">
-      <div className="flex justify-center items-center px-8 gap-8">
+      <div className="flex w-full max-w-6xl justify-between items-center px-8 gap-6">
         {/* Basis Absicherung */}
         <div 
-          className="flex justify-center animate-fadeIn"
+          className="w-1/4 flex justify-center animate-fadeIn"
           onClick={() => setCurrentPage('basisabsicherung')}
         >
           <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
@@ -1160,11 +1160,11 @@ const OverviewPage = () => (
           </div>
         </div>
 
-        {/* Kuchen-Diagramm - DOPPELT SO GROSS */}
-        <div className="flex justify-center mx-8">
+        {/* Kuchen-Diagramm */}
+        <div className="w-1/4 flex justify-center">
           <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             <div className="flex justify-center">
-              <svg width="320" height="320" viewBox="0 0 450 450">
+              <svg width="220" height="220" viewBox="0 0 450 450">
                 {createPieChart()}
                 
                 <circle
@@ -1189,25 +1189,32 @@ const OverviewPage = () => (
         </div>
 
         {/* Budget-Verteilung Legende */}
-        <div className="flex justify-center">
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-full" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-bold mb-4 text-slate-900 text-center">Budget-Verteilung</h3>
-            <div className="space-y-3">
+        <div className="w-1/4 flex justify-center">
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-full" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
+            <div className="space-y-2">
               {[
                 { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
                 { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
                 { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
                 { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
               ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-2 rounded transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-sm" style={{backgroundColor: item.color}}></div>
-                    <span className="text-sm font-medium text-slate-700">{item.name}</span>
+                <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
+                    <span className="text-xs font-medium text-slate-700">{item.name}</span>
                   </div>
-                  <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+                  <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="w-1/4 flex justify-center">
+          <div className="w-full">
+            <Sidebar />
           </div>
         </div>
       </div>
@@ -1313,6 +1320,7 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
+
 // Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
   const [selectedVersicherung, setSelectedVersicherung] = useState(null);
