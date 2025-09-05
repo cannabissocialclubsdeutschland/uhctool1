@@ -552,7 +552,7 @@ const Sidebar = () => {
       <div 
         className="fixed right-8 z-[100]" 
         style={{ 
-          top: '50%', 
+          top: '54%', 
           transform: 'translateY(-50%)',
           pointerEvents: 'auto' 
         }}
@@ -1077,7 +1077,7 @@ const OverviewPage = () => (
       onClick={() => setCurrentPage('zigaretten')}
       className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all flex items-center gap-2"
     >
-      🚬
+      ⏮️
     </button>
     
     <div className="text-right">
