@@ -164,22 +164,59 @@ const FinanzTool = () => {
     }
   };
 
-// Basis-Absicherung Daten
+//Basis-Absicherung Daten - Optimiert 2025
 const [basisAbsicherungData, setBasisAbsicherungData] = useState({
-  krankenversicherung: { status: 'vorhanden', monatlich: 450, typ: 'gesetzlich' },
-  haftpflicht: { status: 'vorhanden', monatlich: 12, deckung: 10000000 },
-  berufsunfaehigkeit: { status: 'fehlt', monatlich: 0, empfohlen: 120 },
-  rechtsschutz: { status: 'teilweise', monatlich: 25, bereiche: ['privat'] },
-  hausrat: { status: 'fehlt', monatlich: 0, empfohlen: 15 },
-  kfzVersicherung: { status: 'vorhanden', monatlich: 85, typ: 'teilkasko' }
+  krankenversicherung: { 
+    status: 'vorhanden', 
+    monatlich: 450, 
+    typ: 'gesetzlich',
+    deckungssumme: 'Unbegrenzt',
+    zusatzbeitrag: 2.5
+  },
+  haftpflicht: { 
+    status: 'vorhanden', 
+    monatlich: 8,
+    deckung: 50000000,
+    empfohlen: 8
+  },
+  berufsunfaehigkeit: { 
+    status: 'fehlt', 
+    monatlich: 0, 
+    empfohlen: 120,
+    absicherung: '70% des Nettoeinkommens'
+  },
+  rechtsschutz: { 
+    status: 'teilweise', 
+    monatlich: 25, 
+    bereiche: ['privat'],
+    empfohleneBereiche: ['privat', 'beruf', 'verkehr']
+  },
+  hausrat: { 
+    status: 'fehlt', 
+    monatlich: 0, 
+    empfohlen: 15,
+    versicherungssumme: '650€/qm empfohlen'
+  },
+  kfzVersicherung: { 
+    status: 'vorhanden', 
+    monatlich: 85, 
+    typ: 'teilkasko',
+    schadenfreiheitsklasse: 'SF 5'
+  },
+  auslandskranken: {
+    status: 'fehlt',
+    monatlich: 0,
+    empfohlen: 2,
+    typ: 'Reisekrankenversicherung'
+  }
 });
-  
-  // Page transition effect
-  useEffect(() => {
-    setPageTransition(true);
-    const timer = setTimeout(() => setPageTransition(false), 300);
-    return () => clearTimeout(timer);
-  }, [currentPage]);
+
+// Page transition effect
+useEffect(() => {
+  setPageTransition(true);
+  const timer = setTimeout(() => setPageTransition(false), 300);
+  return () => clearTimeout(timer);
+}, [currentPage]);
 
 // Modal-Komponente (fügen Sie diese vor den Page-Komponenten ein)
 const Modal = ({ isOpen, onClose, children }) => {
@@ -1323,55 +1360,82 @@ const OverviewPage = () => (
   </div>
 );
 
-// Basis-Absicherung Page - Professioneller Look
+// Basis-Absicherung Page - Professioneller Look 2025
 const BasisAbsicherungPage = () => {
   const [selectedVersicherung, setSelectedVersicherung] = useState(null);
   const [tempBasisData, setTempBasisData] = useState({...basisAbsicherungData});
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [animateCards, setAnimateCards] = useState(false);
+  
+  useEffect(() => {
+    setAnimateCards(true);
+  }, []);
   
   const versicherungsTypen = [
     { 
       id: 'krankenversicherung',
       name: 'Krankenversicherung',
       pflicht: true,
-      beschreibung: 'Gesetzlich vorgeschrieben',
+      beschreibung: 'Gesetzlich vorgeschrieben für alle',
+      details: 'Beitragsbemessungsgrenze 2025: 66.150€/Jahr',
       minBetrag: 200,
-      maxBetrag: 900
+      maxBetrag: 900,
+      farbe: '#dc2626'
     },
     { 
       id: 'haftpflicht',
       name: 'Privathaftpflicht',
       pflicht: false,
-      wichtigkeit: 'SEHR HOCH',
+      wichtigkeit: 'KRITISCH',
       beschreibung: 'Schützt vor existenzbedrohenden Forderungen',
-      empfohleneDecking: 10000000
+      empfohleneDecking: 50000000,
+      details: 'Mindestens 10 Mio. €, besser 50-100 Mio. € Deckung',
+      farbe: '#dc2626'
     },
     { 
       id: 'berufsunfaehigkeit',
-      name: 'Berufsunfähigkeit',
+      name: 'Berufsunfähigkeit (BU)',
       pflicht: false,
-      wichtigkeit: 'HOCH',
-      beschreibung: 'Absicherung der Arbeitskraft',
-      empfohlen: '70% des Nettoeinkommens'
+      wichtigkeit: 'SEHR HOCH',
+      beschreibung: 'Sichert Ihre Arbeitskraft ab',
+      empfohlen: '70-80% des Nettoeinkommens',
+      details: 'Jeder 4. wird berufsunfähig. Staatliche EM-Rente nur ø 1.059€',
+      farbe: '#ea580c'
     },
     { 
       id: 'rechtsschutz',
       name: 'Rechtsschutz',
       pflicht: false,
       wichtigkeit: 'MITTEL',
-      beschreibung: 'Hilfe bei rechtlichen Streitigkeiten'
+      beschreibung: 'Hilfe bei rechtlichen Streitigkeiten',
+      details: 'Privat-, Berufs- und Verkehrsrechtsschutz empfohlen',
+      farbe: '#f59e0b'
     },
     { 
       id: 'hausrat',
-      name: 'Hausrat',
+      name: 'Hausratversicherung',
       pflicht: false,
       wichtigkeit: 'MITTEL',
-      beschreibung: 'Schutz für Ihr Eigentum'
+      beschreibung: 'Schutz für Ihr Eigentum',
+      details: 'Empfohlen ab Hausrat > 10.000€',
+      farbe: '#10b981'
     },
     { 
       id: 'kfzVersicherung',
       name: 'KFZ-Versicherung',
       pflicht: true,
-      beschreibung: 'Pflicht bei Fahrzeugbesitz'
+      beschreibung: 'Pflicht bei Fahrzeugbesitz',
+      details: 'Haftpflicht min. 100 Mio. € empfohlen',
+      farbe: '#6366f1'
+    },
+    {
+      id: 'auslandskranken',
+      name: 'Auslandskrankenversicherung',
+      pflicht: false,
+      wichtigkeit: 'NIEDRIG',
+      beschreibung: 'Wichtig für Reisen',
+      details: 'Sehr günstig (ca. 10-25€/Jahr)',
+      farbe: '#10b981'
     }
   ];
   
@@ -1379,19 +1443,25 @@ const BasisAbsicherungPage = () => {
     let score = 0;
     let maxScore = 0;
     
-    versicherungsTypen.forEach(typ => {
-      if (typ.pflicht) {
-        maxScore += 30;
-        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 30;
-      } else if (typ.wichtigkeit === 'SEHR HOCH') {
-        maxScore += 25;
-        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 25;
-      } else if (typ.wichtigkeit === 'HOCH') {
-        maxScore += 20;
-        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 20;
-      } else {
-        maxScore += 10;
-        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 10;
+    const gewichtung = {
+      krankenversicherung: 30,
+      haftpflicht: 25,
+      berufsunfaehigkeit: 25,
+      kfzVersicherung: 15,
+      rechtsschutz: 10,
+      hausrat: 8,
+      auslandskranken: 5
+    };
+    
+    Object.entries(gewichtung).forEach(([key, weight]) => {
+      const versicherung = versicherungsTypen.find(v => v.id === key);
+      if (versicherung) {
+        maxScore += weight;
+        if (tempBasisData[key]?.status === 'vorhanden') {
+          score += weight;
+        } else if (tempBasisData[key]?.status === 'teilweise') {
+          score += weight * 0.5;
+        }
       }
     });
     
@@ -1406,22 +1476,84 @@ const BasisAbsicherungPage = () => {
     );
   };
   
+  const calculateEmpfohleneKosten = () => {
+    return Object.values(tempBasisData).reduce((sum, item) => 
+      sum + (parseFloat(item.empfohlen) || 0), 0
+    );
+  };
+  
   const getRisikoLevel = () => {
-    if (absicherungsgrad >= 80) return { text: 'Gut abgesichert', color: '#004225' };
-    if (absicherungsgrad >= 60) return { text: 'Basis vorhanden', color: '#166534' };
-    if (absicherungsgrad >= 40) return { text: 'Lücken vorhanden', color: '#ea580c' };
-    return { text: 'Kritisch', color: '#dc2626' };
+    if (absicherungsgrad >= 85) return { 
+      text: 'Exzellent abgesichert', 
+      color: '#14532d',
+      bgColor: 'bg-green-50',
+      beschreibung: 'Sie sind optimal geschützt'
+    };
+    if (absicherungsgrad >= 70) return { 
+      text: 'Gut abgesichert', 
+      color: '#166534',
+      bgColor: 'bg-green-50',
+      beschreibung: 'Solide Grundabsicherung vorhanden'
+    };
+    if (absicherungsgrad >= 50) return { 
+      text: 'Lücken vorhanden', 
+      color: '#ea580c',
+      bgColor: 'bg-orange-50',
+      beschreibung: 'Wichtige Versicherungen fehlen'
+    };
+    return { 
+      text: 'Kritisch unterversichert', 
+      color: '#dc2626',
+      bgColor: 'bg-red-50',
+      beschreibung: 'Dringender Handlungsbedarf!'
+    };
   };
   
   const risikoLevel = getRisikoLevel();
   
+  const getHandlungsempfehlungen = () => {
+    const empfehlungen = [];
+    
+    if (tempBasisData.haftpflicht.status === 'fehlt') {
+      empfehlungen.push({
+        prioritaet: 'KRITISCH',
+        titel: 'Privathaftpflicht abschließen',
+        beschreibung: 'Absolut essentiell! Schützt vor existenzbedrohenden Kosten',
+        kosten: tempBasisData.haftpflicht.empfohlen
+      });
+    }
+    
+    if (tempBasisData.berufsunfaehigkeit.status === 'fehlt') {
+      empfehlungen.push({
+        prioritaet: 'HOCH',
+        titel: 'Berufsunfähigkeit absichern',
+        beschreibung: 'Jeder 4. wird berufsunfähig - sichern Sie Ihr Einkommen',
+        kosten: tempBasisData.berufsunfaehigkeit.empfohlen
+      });
+    }
+    
+    if (tempBasisData.haftpflicht.deckung < 10000000) {
+      empfehlungen.push({
+        prioritaet: 'MITTEL',
+        titel: 'Haftpflicht-Deckung erhöhen',
+        beschreibung: 'Auf mind. 50 Mio. € erhöhen (kostet kaum mehr)',
+        kosten: 2
+      });
+    }
+    
+    return empfehlungen;
+  };
+  
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 font-sans">
+      {/* Premium Header mit Glassmorphism */}
+      <div className="fixed top-0 left-0 right-0 h-32 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 z-50 shadow-lg">
         <div className="h-full flex items-center px-8 relative">
           <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
-            <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
-            <p className="text-sm text-slate-600">Basis-Absicherung - Ihr Sicherheitsnetz</p>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              United Hands Capital
+            </h1>
+            <p className="text-sm text-slate-600">Basis-Absicherung 2025 • Ihr professioneller Schutz</p>
             
             {/* Home Button */}
             <button
@@ -1432,27 +1564,36 @@ const BasisAbsicherungPage = () => {
             </button>
           </div>
           
-          {/* Risiko-Anzeige - professioneller */}
+          {/* Risiko-Dashboard */}
           <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-            <div className="text-right">
-              <p className="text-sm text-slate-500 uppercase tracking-wider">Absicherungsgrad</p>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="w-48 h-6 bg-gray-200 rounded overflow-hidden">
-                  <div 
-                    className="h-full transition-all duration-500"
-                    style={{
-                      width: `${absicherungsgrad}%`,
-                      backgroundColor: risikoLevel.color
-                    }}
-                  />
-                </div>
-                <span className="text-2xl font-bold" style={{color: risikoLevel.color}}>
-                  {absicherungsgrad.toFixed(0)}%
-                </span>
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <p className="text-xs text-slate-500 uppercase tracking-wider">Monatliche Kosten</p>
+                <p className="text-2xl font-bold text-slate-900">{calculateGesamtkosten()}€</p>
               </div>
-              <p className="text-sm mt-1 font-medium" style={{color: risikoLevel.color}}>
-                {risikoLevel.text}
-              </p>
+              
+              <div className="text-center">
+                <p className="text-xs text-slate-500 uppercase tracking-wider">Absicherungsgrad</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-1000 ease-out rounded-full"
+                      style={{
+                        width: `${absicherungsgrad}%`,
+                        background: `linear-gradient(90deg, ${risikoLevel.color} 0%, ${risikoLevel.color}dd 100%)`
+                      }}
+                    />
+                  </div>
+                  <span className="text-xl font-bold" style={{color: risikoLevel.color}}>
+                    {absicherungsgrad.toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+              
+              <div className={`px-4 py-2 rounded-lg ${risikoLevel.bgColor}`}>
+                <p className="text-xs uppercase tracking-wider" style={{color: risikoLevel.color}}>Status</p>
+                <p className="font-bold" style={{color: risikoLevel.color}}>{risikoLevel.text}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1461,23 +1602,25 @@ const BasisAbsicherungPage = () => {
       <div className="h-screen flex flex-col pt-32">
         <div className="flex-1 p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {/* Übersichtskarten - Grüntöne */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-emerald-100">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-4 gap-4 mb-8">
+              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Monatliche Kosten</span>
+                  <span className="text-gray-600 font-medium">Gesamtkosten</span>
+                  <span className="text-2xl">💰</span>
                 </div>
                 <p className="text-3xl font-bold text-emerald-800">
-                  {calculateGesamtkosten()}€
+                  {calculateGesamtkosten()}€/M
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
                   {((calculateGesamtkosten() / calculateBudget()) * 100).toFixed(1)}% vom Budget
                 </p>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-orange-100">
+              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-orange-100 hover:shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600 font-medium">Fehlende Absicherung</span>
+                  <span className="text-2xl">⚠️</span>
                 </div>
                 <p className="text-3xl font-bold text-orange-600">
                   {Object.values(tempBasisData).filter(v => v.status === 'fehlt').length}
@@ -1487,60 +1630,88 @@ const BasisAbsicherungPage = () => {
                 </p>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-emerald-100">
+              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-blue-100 hover:shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Empfohlene Aktion</span>
+                  <span className="text-gray-600 font-medium">Empfohlene Kosten</span>
+                  <span className="text-2xl">📈</span>
                 </div>
-                <p className="text-lg font-bold text-emerald-700">
+                <p className="text-3xl font-bold text-blue-700">
+                  +{calculateEmpfohleneKosten()}€/M
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Für vollständigen Schutz
+                </p>
+              </div>
+              
+              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-purple-100 hover:shadow-xl transition-all">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 font-medium">Priorität</span>
+                  <span className="text-2xl">⚡</span>
+                </div>
+                <p className="text-lg font-bold text-purple-700">
                   {tempBasisData.berufsunfaehigkeit.status === 'fehlt' 
-                    ? 'BU-Versicherung prüfen' 
+                    ? 'BU abschließen' 
                     : tempBasisData.haftpflicht.status === 'fehlt'
-                    ? 'Haftpflicht abschließen'
-                    : 'Status optimal'}
+                    ? 'Haftpflicht!'
+                    : 'Optimieren'}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Nächster Schritt
                 </p>
               </div>
             </div>
             
-            {/* Versicherungs-Grid - professioneller Look */}
-            <div className="grid grid-cols-3 gap-6">
-              {versicherungsTypen.map((versicherung, index) => {
+            {/* Versicherungs-Grid */}
+            <div className="grid grid-cols-3 gap-5">
+              {versicherungsTypen.map((versicherung) => {
                 const data = tempBasisData[versicherung.id];
                 const statusColor = 
-                  data?.status === 'vorhanden' ? '#004225' : 
-                  data?.status === 'teilweise' ? '#ea580c' : '#dc2626';
+                  data?.status === 'vorhanden' ? '#059669' : 
+                  data?.status === 'teilweise' ? '#f59e0b' : '#dc2626';
                 
                 return (
                   <div 
                     key={versicherung.id}
-                    className="bg-white/90 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-slate-200"
-                    onClick={() => setSelectedVersicherung(versicherung.id)}
+                    className="bg-white/90 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 hover:border-blue-300 border-transparent"
+                    onClick={() => {
+                      setSelectedVersicherung(versicherung);
+                      setShowDetailModal(true);
+                    }}
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      {versicherung.pflicht && (
-                        <span className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded font-semibold">
-                          PFLICHT
-                        </span>
-                      )}
-                      {versicherung.wichtigkeit && (
-                        <span className={`px-2 py-1 text-xs rounded font-semibold ${
-                          versicherung.wichtigkeit === 'SEHR HOCH' ? 'bg-orange-50 text-orange-700' :
-                          versicherung.wichtigkeit === 'HOCH' ? 'bg-yellow-50 text-yellow-700' :
-                          'bg-gray-50 text-gray-700'
-                        }`}>
-                          {versicherung.wichtigkeit}
-                        </span>
-                      )}
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="font-bold text-lg text-slate-800 mb-1">
+                          {versicherung.name}
+                        </h3>
+                        {versicherung.pflicht && (
+                          <span className="inline-block px-2 py-1 bg-red-50 text-red-700 text-xs rounded font-semibold">
+                            PFLICHT
+                          </span>
+                        )}
+                        {versicherung.wichtigkeit && (
+                          <span className={`inline-block px-2 py-1 text-xs rounded font-semibold ml-1 ${
+                            versicherung.wichtigkeit === 'KRITISCH' ? 'bg-red-50 text-red-700' :
+                            versicherung.wichtigkeit === 'SEHR HOCH' ? 'bg-orange-50 text-orange-700' :
+                            versicherung.wichtigkeit === 'HOCH' ? 'bg-yellow-50 text-yellow-700' :
+                            'bg-gray-50 text-gray-700'
+                          }`}>
+                            {versicherung.wichtigkeit}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
-                    <h3 className="font-bold text-lg text-slate-800 mb-2">
-                      {versicherung.name}
-                    </h3>
-                    
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-sm text-gray-600 mb-4">
                       {versicherung.beschreibung}
                     </p>
                     
-                    <div className="flex items-center justify-between">
+                    {versicherung.details && (
+                      <p className="text-xs text-gray-500 mb-3 italic">
+                        {versicherung.details}
+                      </p>
+                    )}
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       <div className="flex items-center gap-2">
                         <div 
                           className="w-3 h-3 rounded-full"
@@ -1553,7 +1724,7 @@ const BasisAbsicherungPage = () => {
                       </div>
                       
                       <span className="text-lg font-bold text-slate-700">
-                        {data?.monatlich || data?.empfohlen || 0}€/M
+                        {data?.monatlich || 0}€/M
                       </span>
                     </div>
                     
@@ -1569,32 +1740,142 @@ const BasisAbsicherungPage = () => {
               })}
             </div>
             
-            {/* Handlungsempfehlungen - professioneller */}
-            <div className="mt-8 bg-emerald-50 rounded-xl p-6 border border-emerald-200">
-              <h3 className="text-lg font-bold text-emerald-900 mb-4">
-                Ihre nächsten Schritte
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {tempBasisData.berufsunfaehigkeit.status === 'fehlt' && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5"></div>
-                    <div>
-                      <p className="font-semibold text-slate-800">Berufsunfähigkeit abschließen</p>
-                      <p className="text-sm text-gray-600">Ihre Arbeitskraft ist Ihr wichtigstes Kapital</p>
+            {/* Handlungsempfehlungen */}
+            {getHandlungsempfehlungen().length > 0 && (
+              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <span className="text-2xl">🎯</span>
+                  Ihre priorisierten Handlungsempfehlungen
+                </h3>
+                <div className="space-y-3">
+                  {getHandlungsempfehlungen().map((empfehlung, index) => (
+                    <div 
+                      key={index}
+                      className={`flex items-start gap-4 p-4 rounded-lg ${
+                        empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-50 border border-red-200' :
+                        empfehlung.prioritaet === 'HOCH' ? 'bg-orange-50 border border-orange-200' :
+                        'bg-white border border-gray-200'
+                      }`}
+                    >
+                      <div className={`w-2 h-2 rounded-full mt-2 ${
+                        empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-500' :
+                        empfehlung.prioritaet === 'HOCH' ? 'bg-orange-500' :
+                        'bg-blue-500'
+                      }`} />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-slate-900">{empfehlung.titel}</p>
+                          {empfehlung.prioritaet === 'KRITISCH' && (
+                            <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded-full">
+                              DRINGEND
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">{empfehlung.beschreibung}</p>
+                        {empfehlung.kosten && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Zusätzliche Kosten: ca. {empfehlung.kosten}€/Monat
+                          </p>
+                        )}
+                      </div>
+                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                        Jetzt handeln
+                      </button>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Experten-Tipp 2025 */}
+            <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+              <div className="flex items-start gap-4">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <h4 className="font-bold text-emerald-900 mb-2">Experten-Tipp 2025</h4>
+                  <p className="text-sm text-emerald-800">
+                    Der Höchstrechnungszins steigt 2025 erstmals seit 30 Jahren von 0,25% auf 1%. 
+                    Das macht BU-Versicherungen günstiger - idealer Zeitpunkt zum Abschluss! 
+                    Die durchschnittlichen GKV-Zusatzbeiträge steigen auf 2,5%. 
+                    Prüfen Sie jetzt Ihre Absicherung und nutzen Sie die günstigen Konditionen.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       
+      {/* Detail Modal */}
+      <Modal isOpen={showDetailModal} onClose={() => setShowDetailModal(false)}>
+        {selectedVersicherung && (
+          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-lg" style={{ backgroundColor: selectedVersicherung.farbe + '20' }}>
+                <div className="w-8 h-8" style={{ backgroundColor: selectedVersicherung.farbe }} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">{selectedVersicherung.name}</h2>
+                {selectedVersicherung.pflicht && (
+                  <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">PFLICHTVERSICHERUNG</span>
+                )}
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-gray-700">{selectedVersicherung.beschreibung}</p>
+                {selectedVersicherung.details && (
+                  <p className="text-sm text-gray-600 mt-2">{selectedVersicherung.details}</p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600">Aktueller Status</p>
+                  <p className="text-lg font-bold" style={{ 
+                    color: tempBasisData[selectedVersicherung.id].status === 'vorhanden' ? '#059669' : '#dc2626' 
+                  }}>
+                    {tempBasisData[selectedVersicherung.id].status === 'vorhanden' ? 'Aktiv' : 
+                     tempBasisData[selectedVersicherung.id].status === 'teilweise' ? 'Teilweise' : 'Fehlt'}
+                  </p>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600">Monatliche Kosten</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {tempBasisData[selectedVersicherung.id].monatlich || tempBasisData[selectedVersicherung.id].empfohlen || 0}€
+                  </p>
+                </div>
+              </div>
+              
+              {tempBasisData[selectedVersicherung.id].status === 'fehlt' && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-orange-600">⚠️</span>
+                    <p className="text-orange-800 font-medium">Empfohlene Maßnahme</p>
+                  </div>
+                  <p className="text-sm text-orange-700 mt-1">
+                    Schließen Sie diese Versicherung ab. Empfohlener Beitrag: {tempBasisData[selectedVersicherung.id].empfohlen}€/Monat
+                  </p>
+                </div>
+              )}
+              
+              <button 
+                onClick={() => setShowDetailModal(false)}
+                className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+      
       <NavigationButtons />
     </div>
   );
 };
-
   // Budget Input Page mit vergrößerten Kreisen und korrigierter Event-Behandlung
   const BudgetPage = () => {
     const [activeField, setActiveField] = useState(null);
