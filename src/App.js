@@ -1171,7 +1171,6 @@ const OverviewPage = () => (
       {/* Kuchendiagramm - MITTIG AUSGERICHTET */}
       <g transform="translate(225, 225)">
               {createPieChart()}
-              
               <circle
                 cx="225"
                 cy="225"
