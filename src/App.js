@@ -1057,7 +1057,6 @@ const OverviewPage = () => (
       />
     </div>
 
- // Header mit korrekter JSX-Struktur
 <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
   <div className="grid grid-cols-3 items-center px-8 py-4">
     {/* Linker Bereich */}
