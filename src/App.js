@@ -203,7 +203,341 @@ const Modal = ({ isOpen, onClose, children }) => {
     </div>
   );
 };
- 
+
+// Zigaretten-Investment-Vergleich Page
+const ZigarettenInvestmentPage = () => {
+  const [raucherProfil, setRaucherProfil] = useState({
+    zigarettenProTag: 20,
+    preisProSchachtel: 8,
+    jahreGeraucht: 10,
+    startJahr: 2014
+  });
+
+  const [selectedInvestment, setSelectedInvestment] = useState('mix');
+  const [showDetails, setShowDetails] = useState(false);
+
+  // Historische Renditen (realistische Durchschnittswerte)
+  const investmentRenditen = {
+    aktienMSCI: {
+      name: 'MSCI World ETF',
+      jahresrendite: 0.085, // 8.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.195, 2015: 0.102, 2016: 0.075, 2017: 0.078,
+        2018: -0.042, 2019: 0.276, 2020: 0.061, 2021: 0.218,
+        2022: -0.128, 2023: 0.197, 2024: 0.152
+      }
+    },
+    immobilien: {
+      name: 'Deutsche Immobilien',
+      jahresrendite: 0.065, // 6.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.045, 2015: 0.052, 2016: 0.068, 2017: 0.071,
+        2018: 0.084, 2019: 0.092, 2020: 0.078, 2021: 0.143,
+        2022: 0.035, 2023: -0.045, 2024: 0.022
+      }
+    },
+    bitcoin: {
+      name: 'Bitcoin',
+      jahresrendite: 0.73, // Sehr volatil
+      historisch: {
+        2014: -0.58, 2015: 0.35, 2016: 1.25, 2017: 13.0,
+        2018: -0.73, 2019: 0.87, 2020: 3.03, 2021: 0.59,
+        2022: -0.64, 2023: 1.56, 2024: 0.45
+      },
+      startPreis: 770, // USD in 2014
+      aktuellerPreis: 95000 // USD in 2024
+    },
+    tagesgeld: {
+      name: 'Tagesgeld/Sparbuch',
+      jahresrendite: 0.015, // 1.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.009, 2015: 0.006, 2016: 0.002, 2017: 0.001,
+        2018: 0.001, 2019: 0.001, 2020: 0.001, 2021: 0.001,
+        2022: 0.005, 2023: 0.032, 2024: 0.035
+      }
+    },
+    sp500: {
+      name: 'S&P 500',
+      jahresrendite: 0.102, // 10.2% p.a. Durchschnitt
+      historisch: {
+        2014: 0.115, 2015: -0.007, 2016: 0.096, 2017: 0.194,
+        2018: -0.064, 2019: 0.288, 2020: 0.162, 2021: 0.267,
+        2022: -0.181, 2023: 0.242, 2024: 0.233
+      }
+    }
+  };
+
+  // Berechnung der gesparten Summe
+  const berechneGespartesSumme = () => {
+    const zigarettenProTag = raucherProfil.zigarettenProTag;
+    const preisProZigarette = raucherProfil.preisProSchachtel / 20;
+    const täglicheKosten = zigarettenProTag * preisProZigarette;
+    const monatlicheKosten = täglicheKosten * 30;
+    const jährlicheKosten = täglicheKosten * 365;
+    const gesamtKosten = jährlicheKosten * raucherProfil.jahreGeraucht;
+
+    return {
+      täglich: täglicheKosten.toFixed(2),
+      monatlich: monatlicheKosten.toFixed(2),
+      jährlich: jährlicheKosten.toFixed(2),
+      gesamt: gesamtKosten.toFixed(2)
+    };
+  };
+
+  // Investment-Berechnung mit historischen Daten
+  const berechneInvestmentWert = (investmentTyp) => {
+    const monatlicheErsparnis = parseFloat(berechneGespartesSumme().monatlich);
+    let portfolioWert = 0;
+    const startJahr = raucherProfil.startJahr;
+    const endJahr = startJahr + raucherProfil.jahreGeraucht;
+
+    for (let jahr = startJahr; jahr < endJahr && jahr <= 2024; jahr++) {
+      const jahresErsparnis = monatlicheErsparnis * 12;
+      const rendite = investmentRenditen[investmentTyp].historisch[jahr] || 
+                     investmentRenditen[investmentTyp].jahresrendite;
+      
+      portfolioWert = (portfolioWert + jahresErsparnis) * (1 + rendite);
+    }
+
+    return portfolioWert;
+  };
+
+  // Mix-Portfolio berechnen (60% Aktien, 30% Immobilien, 10% Tagesgeld)
+  const berechneMixPortfolio = () => {
+    const aktienWert = berechneInvestmentWert('aktienMSCI') * 0.6;
+    const immobilienWert = berechneInvestmentWert('immobilien') * 0.3;
+    const tagesgeldWert = berechneInvestmentWert('tagesgeld') * 0.1;
+    
+    return aktienWert + immobilienWert + tagesgeldWert;
+  };
+
+  const gespartesSumme = berechneGespartesSumme();
+  
+  // Verschiedene Investment-Szenarien
+  const szenarien = [
+    {
+      typ: 'tagesgeld',
+      name: 'Sparbuch (Sicher)',
+      wert: berechneInvestmentWert('tagesgeld'),
+      risiko: 'Sehr niedrig',
+      color: '#10b981'
+    },
+    {
+      typ: 'mix',
+      name: 'Ausgewogenes Portfolio',
+      wert: berechneMixPortfolio(),
+      risiko: 'Mittel',
+      color: '#3b82f6'
+    },
+    {
+      typ: 'aktienMSCI',
+      name: 'MSCI World ETF',
+      wert: berechneInvestmentWert('aktienMSCI'),
+      risiko: 'Mittel-Hoch',
+      color: '#8b5cf6'
+    },
+    {
+      typ: 'sp500',
+      name: 'S&P 500',
+      wert: berechneInvestmentWert('sp500'),
+      risiko: 'Mittel-Hoch',
+      color: '#ec4899'
+    },
+    {
+      typ: 'immobilien',
+      name: 'Immobilien-Investment',
+      wert: berechneInvestmentWert('immobilien'),
+      risiko: 'Mittel',
+      color: '#f59e0b'
+    },
+    {
+      typ: 'bitcoin',
+      name: 'Bitcoin (Spekulativ)',
+      wert: berechneInvestmentWert('bitcoin'),
+      risiko: 'Sehr hoch',
+      color: '#ef4444'
+    }
+  ];
+
+  // Gesundheits-Fakten
+  const gesundheitsFakten = [
+    { zeit: '20 Minuten', effekt: 'Blutdruck normalisiert sich' },
+    { zeit: '8 Stunden', effekt: 'Sauerstoffgehalt im Blut normalisiert sich' },
+    { zeit: '1 Jahr', effekt: 'Herzinfarktrisiko halbiert' },
+    { zeit: '10 Jahre', effekt: 'Lungenkrebsrisiko halbiert' }
+  ];
+
+  return (
+    <div className={`h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+        <div className="h-full flex items-center px-8 relative">
+          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
+            <h1 className="text-xl font-bold text-slate-800">Zigaretten-Investment-Vergleich</h1>
+            <p className="text-sm text-slate-600">Was wäre wenn... Sie nicht geraucht hätten?</p>
+            
+            <button
+              onClick={() => setCurrentPage('overview')}
+              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
+            >
+              🏠 Zur Übersicht
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-screen flex flex-col pt-32">
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
+            
+            {/* Eingabe-Bereich */}
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-xl">
+              <h3 className="text-lg font-bold mb-4 text-slate-800">Ihr Raucherprofil</h3>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm text-gray-600">Zigaretten pro Tag</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.zigarettenProTag}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, zigarettenProTag: parseInt(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="60"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Preis pro Schachtel (€)</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.preisProSchachtel}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, preisProSchachtel: parseFloat(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="20"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Jahre geraucht</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.jahreGeraucht}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, jahreGeraucht: parseInt(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="50"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Start-Jahr</label>
+                  <select
+                    value={raucherProfil.startJahr}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, startJahr: parseInt(e.target.value)})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                  >
+                    {[...Array(11)].map((_, i) => (
+                      <option key={i} value={2014 + i}>{2014 + i}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Ersparnis-Übersicht */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+                <p className="text-sm text-red-600">Täglich verschwendet</p>
+                <p className="text-2xl font-bold text-red-700">{gespartesSumme.täglich}€</p>
+              </div>
+              <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
+                <p className="text-sm text-orange-600">Monatlich verschwendet</p>
+                <p className="text-2xl font-bold text-orange-700">{gespartesSumme.monatlich}€</p>
+              </div>
+              <div className="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
+                <p className="text-sm text-yellow-700">Jährlich verschwendet</p>
+                <p className="text-2xl font-bold text-yellow-800">{gespartesSumme.jährlich}€</p>
+              </div>
+              <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                <p className="text-sm text-green-600">Gesamt verschwendet</p>
+                <p className="text-2xl font-bold text-green-700">{gespartesSumme.gesamt}€</p>
+              </div>
+            </div>
+
+            {/* Investment-Vergleich */}
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl mb-6">
+              <h3 className="text-lg font-bold mb-4 text-slate-800">
+                💰 Was aus {gespartesSumme.gesamt}€ geworden wäre...
+              </h3>
+              <div className="space-y-3">
+                {szenarien.map((szenario) => (
+                  <div 
+                    key={szenario.typ}
+                    className="relative bg-gray-50 rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer"
+                    onClick={() => setSelectedInvestment(szenario.typ)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-slate-800">{szenario.name}</h4>
+                        <p className="text-sm text-gray-600">Risiko: {szenario.risiko}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold" style={{color: szenario.color}}>
+                          {szenario.wert.toLocaleString('de-DE', { 
+                            style: 'currency', 
+                            currency: 'EUR',
+                            maximumFractionDigits: 0 
+                          })}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Gewinn: {(szenario.wert - parseFloat(gespartesSumme.gesamt)).toLocaleString('de-DE', { 
+                            style: 'currency', 
+                            currency: 'EUR',
+                            maximumFractionDigits: 0 
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Fortschrittsbalken */}
+                    <div className="mt-3 w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div 
+                        className="h-full transition-all duration-1000"
+                        style={{
+                          width: `${Math.min((szenario.wert / Math.max(...szenarien.map(s => s.wert))) * 100, 100)}%`,
+                          backgroundColor: szenario.color
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Gesundheits-Benefits */}
+            <div className="bg-green-50 rounded-2xl p-6 shadow-xl">
+              <h3 className="text-lg font-bold mb-4 text-green-800">
+                ❤️ Zusätzliche Gesundheitsvorteile nach dem Rauchstopp
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {gesundheitsFakten.map((fakt, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                    <div>
+                      <p className="font-semibold text-green-800">{fakt.zeit}</p>
+                      <p className="text-sm text-gray-700">{fakt.effekt}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <NavigationButtons />
+    </div>
+  );
+};
+  
  // 1. SIDEBAR ohne Wackel-Effekt
 const Sidebar = () => {
   const sidebarItems = [
@@ -333,7 +667,7 @@ const Sidebar = () => {
 };
 
   // Seitenreihenfolge für Navigation
-  const pageOrder = ['overview', 'basisabsicherung', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche', 'kurzfristig', 'mittelfristig', 'langfristig'];
+  const pageOrder = ['overview', 'basisabsicherung', 'zigaretten', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche', 'kurzfristig', 'mittelfristig', 'langfristig'];
   
   const getNextPage = () => {
     const currentIndex = pageOrder.indexOf(currentPage);
@@ -738,6 +1072,13 @@ const OverviewPage = () => (
     </div>
 
     <div className="flex h-full relative z-10">
+      // In der Overview Page oder im Header
+<button
+  onClick={() => setCurrentPage('zigaretten')}
+  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
+>
+  🚭 Zigaretten-Investment-Rechner
+</button>
       
 {/* Basis Absicherung - mit Regenschirm Animation */}
 <div className="absolute left-12 top-24 animate-fadeIn">
@@ -2616,6 +2957,8 @@ const BasisAbsicherungPage = () => {
         return <BudgetPage />;
       case 'fixkosten':
         return <FixkostenPage />;
+      case 'zigaretten':
+        return <ZigarettenInvestmentPage />;
       case 'basisabsicherung':
         return <BasisAbsicherungPage />;
       case 'lifestyle':
