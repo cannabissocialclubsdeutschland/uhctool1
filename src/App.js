@@ -738,6 +738,7 @@ const OverviewPage = () => (
     </div>
 
     <div className="flex h-full relative z-10">
+      
       {/* Basis Absicherung - mittig zwischen linkem Rand und Kuchendiagramm */}
       <div className="absolute left-32 top-32 transform -translate-y-1/2 animate-fadeIn">
         <svg width="160" height="200" className="overflow-visible">
@@ -815,29 +816,40 @@ const OverviewPage = () => (
             />
           ))}
 
-          {/* Basis Absicherung Kreis - unten, geschützt */}
-          <circle
-            cx="80"
-            cy="100"
-            r="75"
-            fill="none"
-            stroke="#4d7c5f"
-            strokeWidth="2"
-            strokeDasharray="8,4"
-            style={{
-              strokeDashoffset: '0',
-              animation: 'dash-move 3s linear infinite'
-            }}
-          />
-          
-          <text x="80" y="90" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-            Basis
-          </text>
-          <text x="80" y="110" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-            Absicherung
-          </text>
-        </svg>
-      </div>
+         // In der OverviewPage, den Basis-Absicherung Kreis ersetzen:
+<div className="absolute left-12 top-24 animate-fadeIn">
+  <div 
+    className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+    onClick={() => setCurrentPage('basisabsicherung')}
+  >
+    <svg width="180" height="180">
+      <circle
+        cx="90"
+        cy="90"
+        r="85"
+        fill="none"
+        stroke="#e5e7eb"
+        strokeWidth="3"
+      />
+      <circle
+        cx="90"
+        cy="90"
+        r="65"
+        fill="#f9fafb"
+        stroke="#0B2E70"
+        strokeWidth="2"
+        strokeDasharray="5,5"
+        className="animate-spin-slow"
+      />
+      <text x="90" y="80" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+        Basis
+      </text>
+      <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+        Absicherung
+      </text>
+    </svg>
+  </div>
+</div>
 
       <div className="flex-1 flex justify-center items-start pt-12">
         <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
@@ -2601,6 +2613,8 @@ const BasisAbsicherungPage = () => {
         return <BudgetPage />;
       case 'fixkosten':
         return <FixkostenPage />;
+      case 'basisabsicherung':
+        return <BasisAbsicherungPage />;
       case 'lifestyle':
         return <LifestylePage />;
       case 'sicherheit':
