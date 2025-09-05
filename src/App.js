@@ -739,89 +739,103 @@ const OverviewPage = () => (
 
     <div className="flex h-full relative z-10">
       
-   {/* Basis Absicherung - mittig zwischen linkem Rand und Kuchendiagramm */}
-<div className="absolute left-32 top-32 transform -translate-y-1/2 animate-fadeIn">
-  <svg width="160" height="200" className="overflow-visible">
-    
-    {/* Regentropfen - weit oben */}
-    {[...Array(8)].map((_, i) => (
-      <g key={`rain-${i}`}>
+   {/* Basis Absicherung - mit Regenschirm Animation */}
+<div className="absolute left-12 top-24 animate-fadeIn">
+  <div 
+    className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+    onClick={() => setCurrentPage('basisabsicherung')}
+  >
+    <svg width="180" height="180" className="overflow-visible">
+      
+      {/* Regentropfen Animation */}
+      {[...Array(8)].map((_, i) => (
+        <g key={`rain-${i}`}>
+          <line
+            x1={30 + i * 15}
+            y1={15}
+            x2={28 + i * 15}
+            y2={25}
+            stroke="#3b82f6"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.6"
+            style={{
+              animation: `rain-fall 2s linear infinite`,
+              animationDelay: `${i * 0.3}s`
+            }}
+          />
+        </g>
+      ))}
+      
+      {/* Regenschirm über dem Text */}
+      <g style={{
+        animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
+        transformOrigin: '90px 40px'
+      }}>
+        {/* Schirm-Stoff */}
+        <path
+          d="M 55 40 Q 90 25 125 40 Q 105 35 90 35 Q 75 35 55 40"
+          fill="#dc2626"
+          stroke="#b91c1c"
+          strokeWidth="2"
+        />
+        <path
+          d="M 65 37 Q 90 28 115 37"
+          fill="none"
+          stroke="#991b1b"
+          strokeWidth="1"
+        />
+        {/* Griff */}
         <line
-          x1={30 + i * 15}
-          y1={-25}
-          x2={28 + i * 15}
-          y2={-5}
-          stroke="#3b82f6"
+          x1="90"
+          y1="35"
+          x2="90"
+          y2="55"
+          stroke="#374151"
           strokeWidth="2"
           strokeLinecap="round"
-          opacity="0.6"
-          style={{
-            animation: `rain-fall 2s linear infinite`,
-            animationDelay: `${i * 0.3}s`
-          }}
+        />
+        <path
+          d="M 90 55 Q 95 58 90 60"
+          fill="none"
+          stroke="#374151"
+          strokeWidth="2"
+          strokeLinecap="round"
         />
       </g>
-    ))}
-    
-    {/* Regenschirm - oberhalb des Kreises */}
-    <g style={{
-      animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
-      transformOrigin: '80px 15px'
-    }}>
-      {/* Schirm-Stoff */}
-      <path
-        d="M 45 15 Q 80 0 115 15 Q 95 10 80 10 Q 65 10 45 15"
-        fill="#dc2626"
-        stroke="#b91c1c"
-        strokeWidth="2"
-      />
-      <path
-        d="M 55 12 Q 80 3 105 12"
-        fill="none"
-        stroke="#991b1b"
-        strokeWidth="1"
-      />
-      {/* Griff */}
-      <line
-        x1="80"
-        y1="10"
-        x2="80"
-        y2="30"
-        stroke="#374151"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M 80 30 Q 85 33 80 35"
-        fill="none"
-        stroke="#374151"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </g>
-    
-    {/* Schutz-Funken - um den Regenschirm */}
-    {[...Array(4)].map((_, i) => (
-      <circle
-        key={`sparkle-${i}`}
-        cx={65 + i * 10}
-        cy={15 + Math.sin(i) * 3}
-        r="1.5"
-        fill="#10b981"
-        opacity="0"
-        style={{
-          animation: `protection-sparkle 3s ease-in-out infinite`,
-          animationDelay: `${i * 0.5}s`
-        }}
-      />
-    ))}
-  </svg>  {/* HIER MUSS DAS SCHLIESSENDE TAG HIN! */}
+      
+      {/* Schutz-Funken */}
+      {[...Array(4)].map((_, i) => (
+        <circle
+          key={`sparkle-${i}`}
+          cx={75 + i * 10}
+          cy={40 + Math.sin(i) * 3}
+          r="1.5"
+          fill="#10b981"
+          opacity="0"
+          style={{
+            animation: `protection-sparkle 3s ease-in-out infinite`,
+            animationDelay: `${i * 0.5}s`
+          }}
+        />
+      ))}
+      
+      {/* Text unter dem Schirm */}
+      <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+        Basis
+      </text>
+      <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+        Absicherung
+      </text>
+      
+    </svg>
+  </div>
 </div>
-
 
       <div className="flex-1 flex justify-center items-start pt-12">
         <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
           <div>
+          
             {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
             <svg width="450" height="450">
               {createPieChart()}
