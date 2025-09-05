@@ -739,7 +739,7 @@ const OverviewPage = () => (
 
     <div className="flex h-full relative z-10">
       
-   {/* Basis Absicherung - mit Regenschirm Animation */}
+{/* Basis Absicherung - mit Regenschirm Animation */}
 <div className="absolute left-12 top-24 animate-fadeIn">
   <div 
     className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
@@ -747,20 +747,20 @@ const OverviewPage = () => (
   >
     <svg width="180" height="180" className="overflow-visible">
       
-      {/* Regentropfen Animation */}
+      {/* Regentropfen Animation - stoppt am Schirm */}
       {[...Array(8)].map((_, i) => (
         <g key={`rain-${i}`}>
           <line
             x1={30 + i * 15}
-            y1={15}
+            y1={10}
             x2={28 + i * 15}
-            y2={25}
+            y2={30}
             stroke="#3b82f6"
             strokeWidth="2"
             strokeLinecap="round"
             opacity="0.6"
             style={{
-              animation: `rain-fall 2s linear infinite`,
+              animation: `rain-fall-short 2s linear infinite`,
               animationDelay: `${i * 0.3}s`
             }}
           />
@@ -804,6 +804,22 @@ const OverviewPage = () => (
         />
       </g>
       
+      {/* Tropfen, die vom Schirm abprallen (optional) */}
+      {[...Array(3)].map((_, i) => (
+        <circle
+          key={`splash-${i}`}
+          cx={60 + i * 30}
+          cy={42}
+          r="2"
+          fill="#3b82f6"
+          opacity="0"
+          style={{
+            animation: `splash 2s ease-out infinite`,
+            animationDelay: `${0.5 + i * 0.7}s`
+          }}
+        />
+      ))}
+      
       {/* Schutz-Funken */}
       {[...Array(4)].map((_, i) => (
         <circle
@@ -831,7 +847,6 @@ const OverviewPage = () => (
     </svg>
   </div>
 </div>
-
       <div className="flex-1 flex justify-center items-start pt-12">
         <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
           <div>
@@ -959,42 +974,48 @@ const OverviewPage = () => (
         to { stroke-dashoffset: 24; }
       }
 
-      @keyframes rain-fall {
-        0% {
-          transform: translateY(-30px);
-          opacity: 0;
-        }
-        10% {
-          opacity: 0.8;
-        }
-        90% {
-          opacity: 0.8;
-        }
-        100% {
-          transform: translateY(60px);
-          opacity: 0;
-        }
-      }
+@keyframes rain-fall-short {
+  0% { 
+    transform: translateY(-20px); 
+    opacity: 0; 
+  }
+  20% { 
+    opacity: 0.6; 
+  }
+  80% { 
+    transform: translateY(15px); 
+    opacity: 0.6; 
+  }
+  100% { 
+    transform: translateY(20px); 
+    opacity: 0; 
+  }
+}
 
-      @keyframes umbrella-gentle-sway {
-        0%, 100% {
-          transform: rotate(-0.5deg);
-        }
-        50% {
-          transform: rotate(0.5deg);
-        }
-      }
+@keyframes splash {
+  0% { 
+    opacity: 0; 
+    transform: scale(0) translateY(0); 
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(1.2) translateY(2px); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0.8) translateY(5px); 
+  }
+}
 
-      @keyframes protection-sparkle {
-        0%, 80%, 100% {
-          opacity: 0;
-          transform: scale(0);
-        }
-        40% {
-          opacity: 1;
-          transform: scale(1.2);
-        }
-      }
+@keyframes umbrella-gentle-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+@keyframes protection-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
       
       .animate-fadeIn {
         animation: fadeIn 0.5s ease-out forwards;
