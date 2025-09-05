@@ -1081,42 +1081,15 @@ const OverviewPage = () => (
       </div>
     </div>
     
-    {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM ALS ZENTRUM */}
+    {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM PERFEKT ZENTRIERT */}
     <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
-      <div className="relative w-full max-w-7xl px-8">
-        {/* Kuchen-Diagramm - ABSOLUTES ZENTRUM */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            <svg width="220" height="220" viewBox="0 0 450 450">
-              {createPieChart()}
-              
-              <circle
-                cx="225"
-                cy="225"
-                r="60"
-                fill="white"
-                stroke="#004225"
-                strokeWidth="3"
-                className="cursor-pointer transition-all hover:r-67"
-                onClick={() => setCurrentPage('budget')}
-              />
-              <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-                Budget
-              </text>
-              <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
-                {calculateBudget().toLocaleString()}€
-              </text>
-            </svg>
-          </div>
-        </div>
-
-        {/* Basis Absicherung - LINKS VOM ZENTRUM */}
+      <div className="flex w-full max-w-6xl justify-center items-center px-8 gap-8">
+        {/* Basis Absicherung - LINKS */}
         <div 
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-          style={{ marginLeft: '-280px' }}
+          className="flex justify-center animate-fadeIn"
           onClick={() => setCurrentPage('basisabsicherung')}
         >
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-60 flex items-center justify-center animate-fadeIn">
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-60 flex items-center justify-center">
             <svg width="160" height="160" className="overflow-visible">
               {/* Regentropfen Animation - stoppt am Schirm */}
               {[...Array(8)].map((_, i) => (
@@ -1188,11 +1161,34 @@ const OverviewPage = () => (
           </div>
         </div>
 
-        {/* Budget-Verteilung Legende - RECHTS VOM ZENTRUM */}
-        <div 
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-          style={{ marginLeft: '280px' }}
-        >
+        {/* Kuchen-Diagramm - ZENTRAL */}
+        <div className="flex justify-center">
+          <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+            <svg width="220" height="220" viewBox="0 0 450 450">
+              {createPieChart()}
+              
+              <circle
+                cx="225"
+                cy="225"
+                r="60"
+                fill="white"
+                stroke="#004225"
+                strokeWidth="3"
+                className="cursor-pointer transition-all hover:r-67"
+                onClick={() => setCurrentPage('budget')}
+              />
+              <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+                Budget
+              </text>
+              <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+                {calculateBudget().toLocaleString()}€
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        {/* Budget-Verteilung Legende - RECHTS */}
+        <div className="flex justify-center">
           <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
             <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
             <div className="space-y-2">
@@ -1213,13 +1209,11 @@ const OverviewPage = () => (
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Sidebar - GANZ RECHTS */}
-        <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-          <div className="w-60">
-            <Sidebar />
-          </div>
-        </div>
+      {/* Sidebar - AM RECHTEN RAND */}
+      <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
+        <Sidebar />
       </div>
     </div>
 
@@ -1324,7 +1318,6 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
-
 // Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
   const [selectedVersicherung, setSelectedVersicherung] = useState(null);
