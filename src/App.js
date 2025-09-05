@@ -552,7 +552,7 @@ const Sidebar = () => {
       <div 
         className="fixed right-8 z-[100]" 
         style={{ 
-          top: '32%', 
+          top: '40%', 
           transform: 'translateY(-50%)',
           pointerEvents: 'auto' 
         }}
@@ -1080,7 +1080,7 @@ const OverviewPage = () => (
     </div>
 
     {/* Basis Absicherung - mit Regenschirm Animation */}
-    <div className="absolute left-12 top-1/2 animate-fadeIn">
+    <div className="absolute left-12 top-8 animate-fadeIn">
       <div 
         className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
         onClick={() => setCurrentPage('basisabsicherung')}
