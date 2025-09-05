@@ -204,7 +204,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// Zigaretten-Investment-Vergleich Page mit echten Daten
+// Zigaretten-Investment-Vergleich Page
 const ZigarettenInvestmentPage = () => {
   const [raucherProfil, setRaucherProfil] = useState({
     zigarettenProTag: 20,
@@ -216,295 +216,150 @@ const ZigarettenInvestmentPage = () => {
   const [selectedInvestment, setSelectedInvestment] = useState('mix');
   const [showDetails, setShowDetails] = useState(false);
 
-  // ECHTE historische Renditen basierend auf Recherche
+  // Historische Renditen (realistische Durchschnittswerte)
   const investmentRenditen = {
     aktienMSCI: {
       name: 'MSCI World ETF',
+      jahresrendite: 0.085, // 8.5% p.a. Durchschnitt
       historisch: {
-        2014: 0.1431,  // 14.31%
-        2015: 0.1742,  // 17.42%
-        2016: 0.0411,  // 4.11%
-        2017: 0.1442,  // 14.42%
-        2018: -0.0151, // -1.51%
-        2019: 0.2145,  // 21.45%
-        2020: 0.1142,  // 11.42%
-        2021: 0.2188,  // 21.88%
-        2022: -0.1159, // -11.59%
-        2023: 0.2032,  // 20.32%
-        2024: 0.2808   // 28.08%
+        2014: 0.195, 2015: 0.102, 2016: 0.075, 2017: 0.078,
+        2018: -0.042, 2019: 0.276, 2020: 0.061, 2021: 0.218,
+        2022: -0.128, 2023: 0.197, 2024: 0.152
+      }
+    },
+    immobilien: {
+      name: 'Deutsche Immobilien',
+      jahresrendite: 0.065, // 6.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.045, 2015: 0.052, 2016: 0.068, 2017: 0.071,
+        2018: 0.084, 2019: 0.092, 2020: 0.078, 2021: 0.143,
+        2022: 0.035, 2023: -0.045, 2024: 0.022
       }
     },
     bitcoin: {
       name: 'Bitcoin',
+      jahresrendite: 0.73, // Sehr volatil
       historisch: {
-        2014: -0.58,   // Von ~$850 auf $318
-        2015: 0.35,    // Von $318 auf $430
-        2016: 1.25,    // Von $430 auf ~$1000
-        2017: 13.0,    // Von $1000 auf ~$14,000
-        2018: -0.73,   // Von $14,000 auf ~$3,700
-        2019: 0.87,    // Von $3,700 auf ~$7,160
-        2020: 3.03,    // Von $7,160 auf ~$29,000
-        2021: 0.59,    // Von $29,000 auf ~$46,000
-        2022: -0.64,   // Von $46,000 auf ~$16,500
-        2023: 1.56,    // Von $16,500 auf ~$42,000
-        2024: 1.45     // Von $42,000 auf über $100,000
+        2014: -0.58, 2015: 0.35, 2016: 1.25, 2017: 13.0,
+        2018: -0.73, 2019: 0.87, 2020: 3.03, 2021: 0.59,
+        2022: -0.64, 2023: 1.56, 2024: 0.45
       },
-      preise: {
-        2014: { start: 850, end: 318 },
-        2024: { start: 42000, end: 103000 }
-      }
-    },
-    immobilien: {
-      name: 'Deutsche Immobilien REITs',
-      historisch: {
-        2014: 0.052,
-        2015: 0.061,
-        2016: 0.073,
-        2017: 0.084,
-        2018: 0.092,
-        2019: 0.108,
-        2020: -0.052,  // COVID-Einbruch
-        2021: 0.143,
-        2022: -0.087,  // Zinsanstieg
-        2023: -0.045,
-        2024: 0.032
-      }
-    },
-    sp500: {
-      name: 'S&P 500 ETF',
-      historisch: {
-        2014: 0.136,
-        2015: 0.014,
-        2016: 0.119,
-        2017: 0.216,
-        2018: -0.044,
-        2019: 0.315,
-        2020: 0.184,
-        2021: 0.287,
-        2022: -0.181,
-        2023: 0.263,
-        2024: 0.248
-      }
-    },
-    gold: {
-      name: 'Gold',
-      historisch: {
-        2014: -0.015,
-        2015: -0.105,
-        2016: 0.084,
-        2017: 0.131,
-        2018: -0.011,
-        2019: 0.184,
-        2020: 0.248,
-        2021: -0.038,
-        2022: -0.001,
-        2023: 0.131,
-        2024: 0.267
-      }
-    },
-    dax: {
-      name: 'DAX (Deutscher Aktienindex)',
-      historisch: {
-        2014: 0.027,
-        2015: 0.096,
-        2016: 0.069,
-        2017: 0.125,
-        2018: -0.183,
-        2019: 0.254,
-        2020: 0.036,
-        2021: 0.157,
-        2022: -0.124,
-        2023: 0.203,
-        2024: 0.187
-      }
+      startPreis: 770, // USD in 2014
+      aktuellerPreis: 95000 // USD in 2024
     },
     tagesgeld: {
       name: 'Tagesgeld/Sparbuch',
+      jahresrendite: 0.015, // 1.5% p.a. Durchschnitt
       historisch: {
-        2014: 0.009,
-        2015: 0.006,
-        2016: 0.002,
-        2017: 0.001,
-        2018: 0.001,
-        2019: 0.001,
-        2020: 0.001,
-        2021: -0.005,  // Negativzinsen
-        2022: 0.005,
-        2023: 0.032,
-        2024: 0.035
+        2014: 0.009, 2015: 0.006, 2016: 0.002, 2017: 0.001,
+        2018: 0.001, 2019: 0.001, 2020: 0.001, 2021: 0.001,
+        2022: 0.005, 2023: 0.032, 2024: 0.035
+      }
+    },
+    sp500: {
+      name: 'S&P 500',
+      jahresrendite: 0.102, // 10.2% p.a. Durchschnitt
+      historisch: {
+        2014: 0.115, 2015: -0.007, 2016: 0.096, 2017: 0.194,
+        2018: -0.064, 2019: 0.288, 2020: 0.162, 2021: 0.267,
+        2022: -0.181, 2023: 0.242, 2024: 0.233
       }
     }
   };
 
-  // Zigarettenpreise historisch (Deutschland)
-  const zigarettenPreise = {
-    2014: 5.00,
-    2015: 5.20,
-    2016: 5.40,
-    2017: 5.60,
-    2018: 5.80,
-    2019: 6.20,
-    2020: 6.70,
-    2021: 7.00,
-    2022: 7.30,
-    2023: 7.80,
-    2024: 8.20
-  };
-
-  // Erweiterte Berechnung mit Inflation
-  const berechneInvestmentWertMitInflation = (investmentTyp) => {
-    const startJahr = raucherProfil.startJahr;
-    const endJahr = Math.min(startJahr + raucherProfil.jahreGeraucht, 2024);
-    let portfolioWert = 0;
-    let gesamtInvestiert = 0;
-
-    for (let jahr = startJahr; jahr < endJahr; jahr++) {
-      // Dynamische Zigarettenpreise
-      const preisProSchachtel = zigarettenPreise[jahr] || raucherProfil.preisProSchachtel;
-      const jahresKosten = (raucherProfil.zigarettenProTag / 20) * preisProSchachtel * 365;
-      gesamtInvestiert += jahresKosten;
-
-      // Monatliche Einzahlung (Dollar-Cost-Averaging)
-      const monatlicheEinzahlung = jahresKosten / 12;
-      
-      // Rendite anwenden
-      const rendite = investmentRenditen[investmentTyp].historisch[jahr] || 0;
-      
-      // Portfolio wächst mit bestehenden Investments + neue Einzahlungen
-      portfolioWert = portfolioWert * (1 + rendite) + jahresKosten;
-    }
+  // Berechnung der gesparten Summe
+  const berechneGespartesSumme = () => {
+    const zigarettenProTag = raucherProfil.zigarettenProTag;
+    const preisProZigarette = raucherProfil.preisProSchachtel / 20;
+    const täglicheKosten = zigarettenProTag * preisProZigarette;
+    const monatlicheKosten = täglicheKosten * 30;
+    const jährlicheKosten = täglicheKosten * 365;
+    const gesamtKosten = jährlicheKosten * raucherProfil.jahreGeraucht;
 
     return {
-      endwert: portfolioWert,
-      investiert: gesamtInvestiert,
-      gewinn: portfolioWert - gesamtInvestiert,
-      renditeGesamt: ((portfolioWert - gesamtInvestiert) / gesamtInvestiert) * 100
-    };
-  };
-
-  // Spezielle Bitcoin-Berechnung mit realen Preisen
-  const berechneBitcoinInvestment = () => {
-    const startJahr = raucherProfil.startJahr;
-    const endJahr = Math.min(startJahr + raucherProfil.jahreGeraucht, 2024);
-    let bitcoinMenge = 0;
-    let gesamtInvestiert = 0;
-
-    // Bitcoin-Preise (Jahresdurchschnitt in USD)
-    const bitcoinPreise = {
-      2014: 600,
-      2015: 400,
-      2016: 650,
-      2017: 4000,
-      2018: 7200,
-      2019: 7400,
-      2020: 11000,
-      2021: 47000,
-      2022: 28000,
-      2023: 30000,
-      2024: 95000
-    };
-
-    for (let jahr = startJahr; jahr < endJahr; jahr++) {
-      const preisProSchachtel = zigarettenPreise[jahr] || raucherProfil.preisProSchachtel;
-      const jahresKosten = (raucherProfil.zigarettenProTag / 20) * preisProSchachtel * 365;
-      gesamtInvestiert += jahresKosten;
-
-      // Bitcoin kaufen zum jeweiligen Jahrespreis
-      const btcPreis = bitcoinPreise[jahr] || 50000;
-      const gekaufteBTC = (jahresKosten * 0.9) / btcPreis; // 0.9 für Gebühren
-      bitcoinMenge += gekaufteBTC;
-    }
-
-    const aktuellerWert = bitcoinMenge * bitcoinPreise[2024];
-
-    return {
-      endwert: aktuellerWert,
-      investiert: gesamtInvestiert,
-      gewinn: aktuellerWert - gesamtInvestiert,
-      renditeGesamt: ((aktuellerWert - gesamtInvestiert) / gesamtInvestiert) * 100,
-      bitcoins: bitcoinMenge
-    };
-  };
-
-  // Berechnung der gesparten Summe mit historischen Preisen
-  const berechneGespartesSummeDynamisch = () => {
-    const startJahr = raucherProfil.startJahr;
-    const endJahr = Math.min(startJahr + raucherProfil.jahreGeraucht, 2024);
-    let gesamtKosten = 0;
-
-    for (let jahr = startJahr; jahr < endJahr; jahr++) {
-      const preisProSchachtel = zigarettenPreise[jahr] || raucherProfil.preisProSchachtel;
-      const jahresKosten = (raucherProfil.zigarettenProTag / 20) * preisProSchachtel * 365;
-      gesamtKosten += jahresKosten;
-    }
-
-    const aktuelleJahreskosten = (raucherProfil.zigarettenProTag / 20) * 
-                                  zigarettenPreise[2024] * 365;
-
-    return {
-      täglich: ((raucherProfil.zigarettenProTag / 20) * zigarettenPreise[2024]).toFixed(2),
-      monatlich: (aktuelleJahreskosten / 12).toFixed(2),
-      jährlich: aktuelleJahreskosten.toFixed(2),
+      täglich: täglicheKosten.toFixed(2),
+      monatlich: monatlicheKosten.toFixed(2),
+      jährlich: jährlicheKosten.toFixed(2),
       gesamt: gesamtKosten.toFixed(2)
     };
   };
 
-  const gespartesSumme = berechneGespartesSummeDynamisch();
+  // Investment-Berechnung mit historischen Daten
+  const berechneInvestmentWert = (investmentTyp) => {
+    const monatlicheErsparnis = parseFloat(berechneGespartesSumme().monatlich);
+    let portfolioWert = 0;
+    const startJahr = raucherProfil.startJahr;
+    const endJahr = startJahr + raucherProfil.jahreGeraucht;
 
-  // Verschiedene Investment-Szenarien mit echten Daten
+    for (let jahr = startJahr; jahr < endJahr && jahr <= 2024; jahr++) {
+      const jahresErsparnis = monatlicheErsparnis * 12;
+      const rendite = investmentRenditen[investmentTyp].historisch[jahr] || 
+                     investmentRenditen[investmentTyp].jahresrendite;
+      
+      portfolioWert = (portfolioWert + jahresErsparnis) * (1 + rendite);
+    }
+
+    return portfolioWert;
+  };
+
+  // Mix-Portfolio berechnen (60% Aktien, 30% Immobilien, 10% Tagesgeld)
+  const berechneMixPortfolio = () => {
+    const aktienWert = berechneInvestmentWert('aktienMSCI') * 0.6;
+    const immobilienWert = berechneInvestmentWert('immobilien') * 0.3;
+    const tagesgeldWert = berechneInvestmentWert('tagesgeld') * 0.1;
+    
+    return aktienWert + immobilienWert + tagesgeldWert;
+  };
+
+  const gespartesSumme = berechneGespartesSumme();
+  
+  // Verschiedene Investment-Szenarien
   const szenarien = [
     {
       typ: 'tagesgeld',
       name: 'Sparbuch (Sicher)',
-      data: berechneInvestmentWertMitInflation('tagesgeld'),
+      wert: berechneInvestmentWert('tagesgeld'),
       risiko: 'Sehr niedrig',
       color: '#10b981'
     },
     {
-      typ: 'gold',
-      name: 'Gold',
-      data: berechneInvestmentWertMitInflation('gold'),
-      risiko: 'Niedrig-Mittel',
-      color: '#fbbf24'
-    },
-    {
-      typ: 'dax',
-      name: 'DAX (Deutscher Aktienindex)',
-      data: berechneInvestmentWertMitInflation('dax'),
-      risiko: 'Mittel-Hoch',
-      color: '#1e40af'
-    },
-    {
-      typ: 'aktienMSCI',
-      name: 'MSCI World ETF',
-      data: berechneInvestmentWertMitInflation('aktienMSCI'),
+      typ: 'mix',
+      name: 'Ausgewogenes Portfolio',
+      wert: berechneMixPortfolio(),
       risiko: 'Mittel',
       color: '#3b82f6'
     },
     {
-      typ: 'sp500',
-      name: 'S&P 500 (USA)',
-      data: berechneInvestmentWertMitInflation('sp500'),
+      typ: 'aktienMSCI',
+      name: 'MSCI World ETF',
+      wert: berechneInvestmentWert('aktienMSCI'),
       risiko: 'Mittel-Hoch',
       color: '#8b5cf6'
     },
     {
+      typ: 'sp500',
+      name: 'S&P 500',
+      wert: berechneInvestmentWert('sp500'),
+      risiko: 'Mittel-Hoch',
+      color: '#ec4899'
+    },
+    {
       typ: 'immobilien',
-      name: 'Immobilien-REITs',
-      data: berechneInvestmentWertMitInflation('immobilien'),
+      name: 'Immobilien-Investment',
+      wert: berechneInvestmentWert('immobilien'),
       risiko: 'Mittel',
       color: '#f59e0b'
     },
     {
       typ: 'bitcoin',
-      name: 'Bitcoin (Hochriskant)',
-      data: berechneBitcoinInvestment(),
-      risiko: 'Extrem hoch',
+      name: 'Bitcoin (Spekulativ)',
+      wert: berechneInvestmentWert('bitcoin'),
+      risiko: 'Sehr hoch',
       color: '#ef4444'
     }
-  ].sort((a, b) => a.data.endwert - b.data.endwert);
+  ];
 
- // Gesundheits-Fakten
+  // Gesundheits-Fakten
   const gesundheitsFakten = [
     { zeit: '20 Minuten', effekt: 'Blutdruck normalisiert sich' },
     { zeit: '8 Stunden', effekt: 'Sauerstoffgehalt im Blut normalisiert sich' },
