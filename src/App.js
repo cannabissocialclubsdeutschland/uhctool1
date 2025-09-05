@@ -1080,8 +1080,6 @@ const OverviewPage = () => (
     </div>
   </div>
 );
-
-    <div className="flex h-full relative z-10">
       
 {/* Basis Absicherung - mit Regenschirm Animation */}
 <div className="absolute left-12 top-24 animate-fadeIn">
