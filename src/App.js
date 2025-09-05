@@ -1066,11 +1066,10 @@ const OverviewPage = () => (
     </div>
 
 <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
-  <div className="flex items-center justify-between px-8 py-4">
+    <div className="flex items-center justify-between px-8 pt-4 pb-8">
     <div>
       <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
       <p className="text-slate-600 font-medium">Finanzberatungstool</p>
-          <div className="flex items-center justify-between px-8 pt-4 pb-8">
     </div>
     
     {/* HIER DEN BUTTON EINFÜGEN */}
