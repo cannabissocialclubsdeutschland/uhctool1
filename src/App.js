@@ -1081,23 +1081,22 @@ const OverviewPage = () => (
     </div>
     
     {/* Hauptcontainer für die vier Elemente in einer Reihe - ZENTRIERT */}
-    <div className="flex h-[calc(100vh-180px)] items-center justify-center relative z-10">
-      <div className="flex w-full max-w-6xl justify-between items-stretch px-8">
-        {/* Basis Absicherung - mit Regenschirm Animation */}
+    <div className="flex h-[calc(100vh-250px)] items-center justify-center relative z-10 mt-4">
+      <div className="flex w-full max-w-6xl justify-between items-center px-8 gap-6">
+        {/* Basis Absicherung */}
         <div 
-          className="w-1/4 p-4 flex flex-col items-center justify-center animate-fadeIn"
+          className="w-1/4 flex justify-center animate-fadeIn"
           onClick={() => setCurrentPage('basisabsicherung')}
         >
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center h-full">
-            <svg width="180" height="180" className="overflow-visible">
-              
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
+            <svg width="160" height="160" className="overflow-visible">
               {/* Regentropfen Animation - stoppt am Schirm */}
               {[...Array(8)].map((_, i) => (
                 <g key={`rain-${i}`}>
                   <line
-                    x1={30 + i * 15}
+                    x1={25 + i * 15}
                     y1={10}
-                    x2={28 + i * 15}
+                    x2={23 + i * 15}
                     y2={30}
                     stroke="#3b82f6"
                     strokeWidth="2"
@@ -1114,33 +1113,33 @@ const OverviewPage = () => (
               {/* Regenschirm über dem Text */}
               <g style={{
                 animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
-                transformOrigin: '90px 40px'
+                transformOrigin: '80px 35px'
               }}>
                 {/* Schirm-Stoff */}
                 <path
-                  d="M 55 40 Q 90 25 125 40 Q 105 35 90 35 Q 75 35 55 40"
+                  d="M 45 35 Q 80 20 115 35 Q 95 30 80 30 Q 65 30 45 35"
                   fill="#dc2626"
                   stroke="#b91c1c"
                   strokeWidth="2"
                 />
                 <path
-                  d="M 65 37 Q 90 28 115 37"
+                  d="M 55 32 Q 80 23 105 32"
                   fill="none"
                   stroke="#991b1b"
                   strokeWidth="1"
                 />
                 {/* Griff */}
                 <line
-                  x1="90"
-                  y1="35"
-                  x2="90"
-                  y2="55"
+                  x1="80"
+                  y1="30"
+                  x2="80"
+                  y2="50"
                   stroke="#374151"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
                 <path
-                  d="M 90 55 Q 95 58 90 60"
+                  d="M 80 50 Q 85 53 80 55"
                   fill="none"
                   stroke="#374151"
                   strokeWidth="2"
@@ -1148,44 +1147,12 @@ const OverviewPage = () => (
                 />
               </g>
               
-              {/* Tropfen, die vom Schirm abprallen (optional) */}
-              {[...Array(3)].map((_, i) => (
-                <circle
-                  key={`splash-${i}`}
-                  cx={60 + i * 30}
-                  cy={42}
-                  r="2"
-                  fill="#3b82f6"
-                  opacity="0"
-                  style={{
-                    animation: `splash 2s ease-out infinite`,
-                    animationDelay: `${0.5 + i * 0.7}s`
-                  }}
-                />
-              ))}
-              
-              {/* Schutz-Funken */}
-              {[...Array(4)].map((_, i) => (
-                <circle
-                  key={`sparkle-${i}`}
-                  cx={75 + i * 10}
-                  cy={40 + Math.sin(i) * 3}
-                  r="1.5"
-                  fill="#10b981"
-                  opacity="0"
-                  style={{
-                    animation: `protection-sparkle 3s ease-in-out infinite`,
-                    animationDelay: `${i * 0.5}s`
-                  }}
-                />
-              ))}
-              
-              {/* Text-Elemente müssen in einer Gruppe zusammengefasst werden */}
+              {/* Text-Elemente */}
               <g>
-                <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                <text x="80" y="90" textAnchor="middle" className="text-lg font-bold fill-slate-800">
                   Basis
                 </text>
-                <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                <text x="80" y="110" textAnchor="middle" className="text-lg font-bold fill-slate-800">
                   Absicherung
                 </text>
               </g>
@@ -1194,14 +1161,12 @@ const OverviewPage = () => (
         </div>
 
         {/* Kuchen-Diagramm */}
-        <div className="w-1/4 p-4 flex flex-col items-center justify-center">
+        <div className="w-1/4 flex justify-center">
           <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             <div className="flex justify-center">
-              {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
-              <svg width="280" height="280" viewBox="0 0 450 450">
+              <svg width="220" height="220" viewBox="0 0 450 450">
                 {createPieChart()}
                 
-                {/* Zentraler Kreis ebenfalls proportional vergrößert */}
                 <circle
                   cx="225"
                   cy="225"
@@ -1220,48 +1185,43 @@ const OverviewPage = () => (
                 </text>
               </svg>
             </div>
-            
-            {/* Legende-Box Position angepasst für größeres Diagramm */}
-            <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 mt-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
-              <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
-              <div className="space-y-2">
-                {[
-                  { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
-                  { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
-                  { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
-                  { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
-                      <span className="text-xs font-medium text-slate-700">{item.name}</span>
-                    </div>
-                    <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+          </div>
+        </div>
+
+        {/* Budget-Verteilung Legende */}
+        <div className="w-1/4 flex justify-center">
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-full" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
+            <div className="space-y-2">
+              {[
+                { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
+                { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
+                { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
+                { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
+                    <span className="text-xs font-medium text-slate-700">{item.name}</span>
                   </div>
-                ))}
-              </div>
+                  <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Legende - Platzhalter */}
-        <div className="w-1/4 p-4 flex flex-col items-center justify-center">
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 w-full h-full flex items-center justify-center">
-            <p className="text-slate-600 text-center">Legende Platzhalter</p>
-          </div>
-        </div>
-
         {/* Sidebar */}
-        <div className="w-1/4 p-4 flex flex-col items-center justify-center">
-          <div className="w-full h-full">
+        <div className="w-1/4 flex justify-center">
+          <div className="w-full">
             <Sidebar />
           </div>
         </div>
       </div>
     </div>
 
-    <div className="absolute bottom-0 left-0 right-0 h-1/2 z-10">
-      <div className="flex h-full gap-6 p-6">
+    <div className="absolute bottom-0 left-0 right-0 h-1/3 z-10">
+      <div className="flex h-full gap-4 p-4">
         {[
           { 
             id: 'wuensche', 
@@ -1290,17 +1250,17 @@ const OverviewPage = () => (
         ].map((item, index) => (
           <div key={item.id} className="flex-1 flex flex-col justify-end animate-slideUp" style={{ animationDelay: `${index * 0.1}s` }}>
             <div 
-              className="h-3/4 rounded-t-xl flex flex-col items-center justify-center pb-8 relative overflow-hidden cursor-pointer transition-all hover:brightness-110 hover:scale-105 px-6"
+              className="h-3/4 rounded-t-xl flex flex-col items-center justify-center pb-6 relative overflow-hidden cursor-pointer transition-all hover:brightness-110 hover:scale-105 px-4"
               style={{backgroundColor: item.color}}
               onClick={() => setCurrentPage(item.id)}
             >
-              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-4 py-3 text-center">
-                <div className="text-white font-semibold mb-3">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-center">
+                <div className="text-white font-semibold mb-2">
                   {item.name.split(' ').map((word, i) => (
-                    <div key={i} className="text-lg">{word}</div>
+                    <div key={i} className="text-sm">{word}</div>
                   ))}
                 </div>
-                <div className="text-white/90 text-sm leading-relaxed">
+                <div className="text-white/90 text-xs leading-relaxed">
                   {item.description.map((line, i) => (
                     <div key={i} className="mb-1 last:mb-0">{line}</div>
                   ))}
@@ -1324,16 +1284,6 @@ const OverviewPage = () => (
         from { transform: translateY(100px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
       }
-      
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      
-      @keyframes dash-move {
-        from { stroke-dashoffset: 0; }
-        to { stroke-dashoffset: 24; }
-      }
 
       @keyframes rain-fall-short {
         0% { 
@@ -1353,29 +1303,9 @@ const OverviewPage = () => (
         }
       }
 
-      @keyframes splash {
-        0% { 
-          opacity: 0; 
-          transform: scale(0) translateY(0); 
-        }
-        50% { 
-          opacity: 0.5; 
-          transform: scale(1.2) translateY(2px); 
-        }
-        100% { 
-          opacity: 0; 
-          transform: scale(0.8) translateY(5px); 
-        }
-      }
-
       @keyframes umbrella-gentle-sway {
         0%, 100% { transform: rotate(-2deg); }
         50% { transform: rotate(2deg); }
-      }
-
-      @keyframes protection-sparkle {
-        0%, 100% { opacity: 0; transform: scale(0.5); }
-        50% { opacity: 1; transform: scale(1.2); }
       }
       
       .animate-fadeIn {
@@ -1386,10 +1316,6 @@ const OverviewPage = () => (
       .animate-slideUp {
         animation: slideUp 0.6s ease-out forwards;
         opacity: 0;
-      }
-      
-      .animate-spin-slow {
-        animation: spin-slow 20s linear infinite;
       }
     `}</style>
   </div>
