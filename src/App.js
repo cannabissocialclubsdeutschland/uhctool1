@@ -1057,7 +1057,8 @@ const OverviewPage = () => (
       />
     </div>
 
-    <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-0">
+    {/* Header */}
+    <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
       <div className="flex items-center justify-between px-8 py-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
@@ -1080,8 +1081,8 @@ const OverviewPage = () => (
       </div>
     </div>
     
-    {/* Hauptcontainer für die vier Elemente in einer Reihe - ZENTRIERT */}
-    <div className="flex h-[calc(100vh-250px)] items-center justify-center relative z-10 mt-4">
+    {/* Hauptcontainer für die vier Kernelemente - PERFEKT ZENTRIERT zwischen Header und Säulen */}
+    <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
       <div className="flex w-full max-w-6xl justify-between items-center px-8 gap-6">
         {/* Basis Absicherung */}
         <div 
@@ -1220,6 +1221,7 @@ const OverviewPage = () => (
       </div>
     </div>
 
+    {/* 4 Säulen am unteren Ende - UNVERÄNDERT */}
     <div className="absolute bottom-0 left-0 right-0 h-1/3 z-10">
       <div className="flex h-full gap-4 p-4">
         {[
