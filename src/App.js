@@ -1065,7 +1065,7 @@ const OverviewPage = () => (
         </div>
 
         {/* GESAMTBUDGET */}
-  <div className="text-right">
+  <div>
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
       <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
     </div>
