@@ -1226,28 +1226,25 @@ const OverviewPage = () => (
       {/* Kuchendiagramm */}
       {createPieChart()}
       
-    {/* Innerer Kreis - MIT SPLINE LOGO */}
-<foreignObject x="165" y="165" width="120" height="120">
-  <div className="w-full h-full flex items-center justify-center">
-    <SplineFloatingLogo
-      url="https://prod.spline.design/kU5LFbV84Y97j40y/scene.splinecode"
-      size={120}
-      interactive={false}
+   {/* Innerer Kreis - MIT SPLINE LOGO */}
+<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] flex items-center justify-center">
+  <SplineFloatingLogo
+    url="https://prod.spline.design/kU5LFbV84Y97j40y/scene.splinecode"
+    size={120}
+    interactive={false}
+  />
+  <svg className="absolute inset-0" width="120" height="120">
+    <circle
+      cx="60"
+      cy="60"
+      r="58"
+      fill="transparent"
+      stroke="#004225"
+      strokeWidth="3"
+      className="cursor-pointer transition-all hover:scale-105"
+      onClick={() => setCurrentPage('budget')}
     />
-  </div>
-</foreignObject>
-<circle
-  cx="225"
-  cy="225"
-  r="60"
-  fill="transparent"
-  stroke="#004225"
-  strokeWidth="3"
-  className="cursor-pointer transition-all hover:r-67"
-  onClick={() => setCurrentPage('budget')}
-/>
-    </svg>
-  </div>
+  </svg>
 </div>
 
         {/* Budget-Verteilung Legende - RECHTS */}
