@@ -1054,480 +1054,284 @@ const HeaderBars = () => (
     });
   };
 
-// Overview Page - Professionelles Dashboard für Finanzberatung
-const OverviewPage = () => {
-  const [activeCard, setActiveCard] = useState(null);
-  const [showRecommendations, setShowRecommendations] = useState(true);
-  
-  // Berechnungen für Dashboard
-  const totalBudget = calculateBudget();
-  const totalAusgaben = finanzData.fixkostenTotal + finanzData.lifestyleTotal + finanzData.sicherheit;
-  const verfugbar = totalBudget - totalAusgaben;
-  const sparquote = totalBudget > 0 ? (finanzData.sicherheit / totalBudget * 100) : 0;
-  
-  // Finanz-Gesundheits-Score berechnen
-  const calculateFinanzScore = () => {
-    let score = 0;
+// Overview Page mit Logo-Hintergrund
+const OverviewPage = () => (
+  <div className={`h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
     
-    // Budget-Verteilung (30%)
-    const fixkostenAnteil = (finanzData.fixkostenTotal / totalBudget) * 100;
-    if (fixkostenAnteil <= 50) score += 30;
-    else if (fixkostenAnteil <= 60) score += 20;
-    else if (fixkostenAnteil <= 70) score += 10;
+    {/* Logo als Hintergrundbild - hinterste Ebene */}
+    <div className="absolute inset-0 pointer-events-none z-0">
+      <img 
+        src="http://unitedhandscapital.de/wp-content/uploads/2025/07/Firefly_Ein-inspirierendes-modernes-Bild-das-ganzheitliche-Beratung-symbolisiert-Eine-Mann-827201-scaled.png"
+        alt="United Hands Capital Logo"
+        className="w-full h-full object-cover opacity-15"
+      />
+    </div>
+
+<div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
+  <div className="grid grid-cols-3 items-center px-8 py-4">
+    {/* Linker Bereich */}
+    <div>
+      <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
+      <p className="text-slate-600 font-medium">Finanzberatungstool</p>
+    </div>
+
+    {/* Mittlerer Bereich - ZENTRIERT */}
+    <div className="text-center">
+      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
+      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+    </div>
+
+    {/* Rechter Bereich */}
+    <div className="flex justify-end">
+      <button
+        onClick={() => setCurrentPage('zigaretten')}
+        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+      >
+        ⏮️
+      </button>
+    </div>
+  </div>
+</div>
     
-    // Sparquote (25%)
-    if (sparquote >= 20) score += 25;
-    else if (sparquote >= 15) score += 20;
-    else if (sparquote >= 10) score += 15;
-    else if (sparquote >= 5) score += 10;
-    
-    // Verfügbares Einkommen (20%)
-    if (verfugbar > 500) score += 20;
-    else if (verfugbar > 200) score += 15;
-    else if (verfugbar > 0) score += 10;
-    
-    // Diversifikation (15%)
-    const hasMultipleIncomes = Object.values(finanzData).filter(val => val > 0).length >= 3;
-    if (hasMultipleIncomes) score += 15;
-    else score += 5;
-    
-    // Lifestyle-Balance (10%)
-    const lifestyleAnteil = (finanzData.lifestyleTotal / totalBudget) * 100;
-    if (lifestyleAnteil >= 10 && lifestyleAnteil <= 25) score += 10;
-    else if (lifestyleAnteil <= 30) score += 5;
-    
-    return Math.round(score);
-  };
-
-  const finanzScore = calculateFinanzScore();
-  
-  const getScoreStatus = () => {
-    if (finanzScore >= 85) return { 
-      text: 'Exzellent', 
-      color: '#059669', 
-      bg: 'from-emerald-500 to-emerald-600',
-      icon: '🌟',
-      beschreibung: 'Ihre Finanzen sind vorbildlich strukturiert!'
-    };
-    if (finanzScore >= 70) return { 
-      text: 'Sehr gut', 
-      color: '#10b981', 
-      bg: 'from-emerald-400 to-emerald-500',
-      icon: '✅',
-      beschreibung: 'Solide finanzielle Basis mit Optimierungspotential'
-    };
-    if (finanzScore >= 55) return { 
-      text: 'Gut', 
-      color: '#f59e0b', 
-      bg: 'from-yellow-400 to-yellow-500',
-      icon: '⚡',
-      beschreibung: 'Grundsolide Finanzen, aber ausbaufähig'
-    };
-    if (finanzScore >= 40) return { 
-      text: 'Ausbaufähig', 
-      color: '#f97316', 
-      bg: 'from-orange-400 to-orange-500',
-      icon: '⚠️',
-      beschreibung: 'Wichtige Bereiche brauchen Aufmerksamkeit'
-    };
-    return { 
-      text: 'Kritisch', 
-      color: '#ef4444', 
-      bg: 'from-red-400 to-red-500',
-      icon: '🚨',
-      beschreibung: 'Dringender Handlungsbedarf bei der Finanzplanung'
-    };
-  };
-
-  const scoreStatus = getScoreStatus();
-
-  // Intelligente Empfehlungen basierend auf aktueller Situation
-  const getSmartRecommendations = () => {
-    const empfehlungen = [];
-    
-    const fixkostenAnteil = (finanzData.fixkostenTotal / totalBudget) * 100;
-    const lifestyleAnteil = (finanzData.lifestyleTotal / totalBudget) * 100;
-    
-    if (fixkostenAnteil > 60) {
-      empfehlungen.push({
-        prioritaet: 'HOCH',
-        titel: 'Fixkosten optimieren',
-        beschreibung: `${fixkostenAnteil.toFixed(0)}% für Fixkosten ist zu hoch. Ziel: unter 50%`,
-        aktion: () => setCurrentPage('fixkosten'),
-        kategorie: 'Ausgaben',
-        icon: '🏠'
-      });
-    }
-
-    if (sparquote < 10) {
-      empfehlungen.push({
-        prioritaet: 'HOCH',
-        titel: 'Sparquote erhöhen',
-        beschreibung: `Nur ${sparquote.toFixed(1)}% Sparquote. Minimum: 10%, optimal: 20%`,
-        aktion: () => setCurrentPage('sicherheit'),
-        kategorie: 'Sparen',
-        icon: '💰'
-      });
-    }
-
-    if (verfugbar < 100) {
-      empfehlungen.push({
-        prioritaet: 'KRITISCH',
-        titel: 'Notgroschen aufbauen',
-        beschreibung: 'Zu wenig verfügbares Einkommen für Notfälle',
-        aktion: () => setCurrentPage('budget'),
-        kategorie: 'Sicherheit',
-        icon: '🛡️'
-      });
-    }
-
-    if (lifestyleAnteil > 30) {
-      empfehlungen.push({
-        prioritaet: 'MITTEL',
-        titel: 'Lifestyle-Ausgaben prüfen',
-        beschreibung: `${lifestyleAnteil.toFixed(0)}% für Lifestyle. Empfohlen: unter 25%`,
-        aktion: () => setCurrentPage('lifestyle'),
-        kategorie: 'Balance',
-        icon: '🎭'
-      });
-    }
-
-    if (finanzData.zusatzeinkommen + finanzData.kapitalertraege === 0) {
-      empfehlungen.push({
-        prioritaet: 'NIEDRIG',
-        titel: 'Zweites Standbein aufbauen',
-        beschreibung: 'Diversifizieren Sie Ihre Einkommensquellen',
-        aktion: () => setCurrentPage('budget'),
-        kategorie: 'Einkommen',
-        icon: '📈'
-      });
-    }
-
-    return empfehlungen.sort((a, b) => {
-      const priorityOrder = { 'KRITISCH': 4, 'HOCH': 3, 'MITTEL': 2, 'NIEDRIG': 1 };
-      return priorityOrder[b.prioritaet] - priorityOrder[a.prioritaet];
-    });
-  };
-
-  const recommendations = getSmartRecommendations();
-
-  // Kategorie-Karten für Navigation
-  const kategorieKarten = [
-    {
-      id: 'budget',
-      name: 'Budget & Einkommen',
-      icon: '💼',
-      color: '#065f46',
-      wert: totalBudget,
-      einheit: '€',
-      status: totalBudget > 3000 ? 'Gut' : totalBudget > 2000 ? 'OK' : 'Knapp',
-      beschreibung: 'Ihr monatliches Gesamtbudget'
-    },
-    {
-      id: 'fixkosten',
-      name: 'Fixkosten',
-      icon: '🏠',
-      color: '#047857',
-      wert: finanzData.fixkostenTotal,
-      einheit: '€',
-      anteil: (finanzData.fixkostenTotal / totalBudget * 100),
-      status: (finanzData.fixkostenTotal / totalBudget * 100) <= 50 ? 'Optimal' : 
-              (finanzData.fixkostenTotal / totalBudget * 100) <= 60 ? 'OK' : 'Hoch',
-      beschreibung: 'Feste monatliche Ausgaben'
-    },
-    {
-      id: 'lifestyle',
-      name: 'Lifestyle',
-      icon: '🎭',
-      color: '#059669',
-      wert: finanzData.lifestyleTotal,
-      einheit: '€',
-      anteil: (finanzData.lifestyleTotal / totalBudget * 100),
-      status: (finanzData.lifestyleTotal / totalBudget * 100) <= 25 ? 'Ausgewogen' : 
-              (finanzData.lifestyleTotal / totalBudget * 100) <= 35 ? 'Hoch' : 'Sehr hoch',
-      beschreibung: 'Freizeit und Genuss'
-    },
-    {
-      id: 'sicherheit',
-      name: 'Sicherheit & Sparen',
-      icon: '🛡️',
-      color: '#10b981',
-      wert: finanzData.sicherheit,
-      einheit: '€',
-      anteil: sparquote,
-      status: sparquote >= 20 ? 'Exzellent' : sparquote >= 15 ? 'Sehr gut' : 
-              sparquote >= 10 ? 'Gut' : sparquote >= 5 ? 'Ausbaufähig' : 'Kritisch',
-      beschreibung: 'Vorsorge und Absicherung'
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-blue-50">
-      {/* Premium Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-emerald-200/50">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-800 to-emerald-600 bg-clip-text text-transparent">
-                United Hands Capital
-              </h1>
-              <p className="text-emerald-600 text-lg mt-1">Professionelle Finanzberatung & Vermögensplanung</p>
-            </div>
-            
-            {/* Finanz-Score Badge */}
-            <div className="relative">
-              <div className={`px-6 py-4 rounded-2xl bg-gradient-to-r ${scoreStatus.bg} text-white shadow-xl`}>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{scoreStatus.icon}</span>
-                  <div>
-                    <div className="text-2xl font-bold">{finanzScore}/100</div>
-                    <div className="text-sm opacity-90">{scoreStatus.text}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-md">
-                <span className="text-xs font-semibold text-gray-600">Finanz-Score</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-8 py-8">
-        {/* Schnellübersicht KPIs */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-emerald-600 font-semibold">Gesamtbudget</span>
-              <span className="text-3xl">💼</span>
-            </div>
-            <div className="text-3xl font-bold text-emerald-800 mb-1">
-              {totalBudget.toLocaleString()}€
-            </div>
-            <div className="text-sm text-gray-600">
-              {totalBudget > 3000 ? '✅ Komfortabel' : totalBudget > 2000 ? '⚡ Solide' : '⚠️ Knapp'}
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-emerald-600 font-semibold">Verfügbar</span>
-              <span className="text-3xl">{verfugbar >= 0 ? '💚' : '❌'}</span>
-            </div>
-            <div className={`text-3xl font-bold mb-1 ${verfugbar >= 0 ? 'text-emerald-800' : 'text-red-600'}`}>
-              {verfugbar.toLocaleString()}€
-            </div>
-            <div className="text-sm text-gray-600">
-              Nach allen Ausgaben
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-emerald-600 font-semibold">Sparquote</span>
-              <span className="text-3xl">📊</span>
-            </div>
-            <div className="text-3xl font-bold text-emerald-800 mb-1">
-              {sparquote.toFixed(1)}%
-            </div>
-            <div className="text-sm text-gray-600">
-              {sparquote >= 20 ? '🌟 Exzellent' : sparquote >= 10 ? '✅ Gut' : '⚠️ Zu niedrig'}
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-emerald-600 font-semibold">Ausgaben</span>
-              <span className="text-3xl">📈</span>
-            </div>
-            <div className="text-3xl font-bold text-emerald-800 mb-1">
-              {totalAusgaben.toLocaleString()}€
-            </div>
-            <div className="text-sm text-gray-600">
-              {((totalAusgaben / totalBudget) * 100).toFixed(0)}% vom Budget
-            </div>
-          </div>
-        </div>
-
-        {/* Hauptkategorien Navigation */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {kategorieKarten.map((kategorie) => (
-            <div
-              key={kategorie.id}
-              className="group bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-emerald-100 hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
-              onClick={() => setCurrentPage(kategorie.id)}
-              onMouseEnter={() => setActiveCard(kategorie.id)}
-              onMouseLeave={() => setActiveCard(null)}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shadow-md"
-                  style={{ backgroundColor: kategorie.color }}
-                >
-                  {kategorie.icon}
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  kategorie.status === 'Optimal' || kategorie.status === 'Exzellent' || kategorie.status === 'Gut' ? 
-                  'bg-emerald-100 text-emerald-700' :
-                  kategorie.status === 'OK' || kategorie.status === 'Sehr gut' || kategorie.status === 'Ausgewogen' ?
-                  'bg-blue-100 text-blue-700' :
-                  kategorie.status === 'Hoch' || kategorie.status === 'Ausbaufähig' ?
-                  'bg-yellow-100 text-yellow-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
-                  {kategorie.status}
-                </div>
-              </div>
-              
-              <h3 className="font-bold text-gray-800 mb-2 group-hover:text-emerald-700 transition-colors">
-                {kategorie.name}
-              </h3>
-              
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-2xl font-bold text-gray-800">
-                  {kategorie.wert.toLocaleString()}
-                </span>
-                <span className="text-sm text-gray-600">{kategorie.einheit}</span>
-                {kategorie.anteil && (
-                  <span className="text-sm text-gray-500 ml-auto">
-                    ({kategorie.anteil.toFixed(0)}%)
-                  </span>
-                )}
-              </div>
-              
-              <p className="text-sm text-gray-600 mb-3">{kategorie.beschreibung}</p>
-              
-              {kategorie.anteil && (
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-1000"
+    {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM PERFEKT ZENTRIERT */}
+    <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
+      <div className="flex w-full max-w-6xl justify-center items-center px-8 gap-8">
+        {/* Basis Absicherung - LINKS */}
+        <div 
+          className="flex justify-center animate-fadeIn"
+          onClick={() => setCurrentPage('basisabsicherung')}
+        >
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-60 flex items-center justify-center">
+            <svg width="160" height="160" className="overflow-visible">
+              {/* Regentropfen Animation - stoppt am Schirm */}
+              {[...Array(8)].map((_, i) => (
+                <g key={`rain-${i}`}>
+                  <line
+                    x1={25 + i * 15}
+                    y1={10}
+                    x2={23 + i * 15}
+                    y2={30}
+                    stroke="#3b82f6"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    opacity="0.6"
                     style={{
-                      width: `${Math.min(kategorie.anteil, 100)}%`,
-                      backgroundColor: kategorie.color
+                      animation: `rain-fall-short 2s linear infinite`,
+                      animationDelay: `${i * 0.3}s`
                     }}
                   />
-                </div>
-              )}
+                </g>
+              ))}
               
-              {activeCard === kategorie.id && (
-                <div className="mt-3 text-xs text-emerald-600 font-semibold animate-pulse">
-                  → Klicken zum Bearbeiten
-                </div>
-              )}
-            </div>
-          ))}
+              {/* Regenschirm über dem Text */}
+              <g style={{
+                animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
+                transformOrigin: '80px 35px'
+              }}>
+                {/* Schirm-Stoff */}
+                <path
+                  d="M 45 35 Q 80 20 115 35 Q 95 30 80 30 Q 65 30 45 35"
+                  fill="#dc2626"
+                  stroke="#b91c1c"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M 55 32 Q 80 23 105 32"
+                  fill="none"
+                  stroke="#991b1b"
+                  strokeWidth="1"
+                />
+                {/* Griff */}
+                <line
+                  x1="80"
+                  y1="30"
+                  x2="80"
+                  y2="50"
+                  stroke="#374151"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M 80 50 Q 85 53 80 55"
+                  fill="none"
+                  stroke="#374151"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </g>
+              
+              {/* Text-Elemente */}
+              <g>
+                <text x="80" y="90" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                  Basis
+                </text>
+                <text x="80" y="110" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                  Absicherung
+                </text>
+              </g>
+            </svg>
+          </div>
         </div>
 
-        {/* Intelligente Empfehlungen */}
-        {showRecommendations && recommendations.length > 0 && (
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-emerald-200 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
-                🎯 Ihre personalisierten Empfehlungen
-              </h2>
-              <button
-                onClick={() => setShowRecommendations(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="grid gap-4">
-              {recommendations.slice(0, 3).map((empfehlung, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-xl cursor-pointer hover:shadow-md transition-all ${
-                    empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-50 border-2 border-red-200 hover:bg-red-100' :
-                    empfehlung.prioritaet === 'HOCH' ? 'bg-orange-50 border-2 border-orange-200 hover:bg-orange-100' :
-                    empfehlung.prioritaet === 'MITTEL' ? 'bg-yellow-50 border-2 border-yellow-200 hover:bg-yellow-100' :
-                    'bg-blue-50 border-2 border-blue-200 hover:bg-blue-100'
-                  }`}
-                  onClick={empfehlung.aktion}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl">{empfehlung.icon}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-bold text-gray-800">{empfehlung.titel}</h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-600 text-white' :
-                          empfehlung.prioritaet === 'HOCH' ? 'bg-orange-600 text-white' :
-                          empfehlung.prioritaet === 'MITTEL' ? 'bg-yellow-600 text-white' :
-                          'bg-blue-600 text-white'
-                        }`}>
-                          {empfehlung.prioritaet}
-                        </span>
-                        <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                          {empfehlung.kategorie}
-                        </span>
-                      </div>
-                      <p className="text-gray-700 text-sm">{empfehlung.beschreibung}</p>
-                    </div>
-                    <div className="text-emerald-600 font-bold text-sm">
-                      Jetzt handeln →
-                    </div>
+ {/* Kuchen-Diagramm - ZENTRAL - VERGRÖßERT */}
+<div className="flex justify-center">
+  <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+    <svg width="450" height="450" viewBox="0 0 450 450">
+      {/* Kuchendiagramm */}
+      {createPieChart()}
+      
+      {/* Innerer Kreis - MITTIG AUSGERICHTET */}
+      <circle
+        cx="225"
+        cy="225"
+        r="60"
+        fill="white"
+        stroke="#004225"
+        strokeWidth="3"
+        className="cursor-pointer transition-all hover:r-67"
+        onClick={() => setCurrentPage('budget')}
+      />
+      <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+        Budget
+      </text>
+      <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+        {calculateBudget().toLocaleString()}€
+      </text>
+    </svg>
+  </div>
+</div>
+
+        {/* Budget-Verteilung Legende - RECHTS */}
+        <div className="flex justify-center">
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
+            <div className="space-y-2">
+              {[
+                { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
+                { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
+                { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
+                { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
+                    <span className="text-xs font-medium text-slate-700">{item.name}</span>
                   </div>
+                  <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
           </div>
-        )}
-
-        {/* Zusätzliche Tools */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div 
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 shadow-xl text-white cursor-pointer hover:scale-105 transition-all"
-            onClick={() => setCurrentPage('basisabsicherung')}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl">🛡️</span>
-              <h3 className="text-xl font-bold">Basis-Absicherung</h3>
-            </div>
-            <p className="text-emerald-100 text-sm mb-3">
-              Prüfen Sie Ihre Versicherungen und schaffen Sie ein solides Sicherheitsnetz
-            </p>
-            <div className="bg-white/20 px-3 py-1 rounded-full text-xs inline-block">
-              Jetzt prüfen →
-            </div>
-          </div>
-
-          <div 
-            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 shadow-xl text-white cursor-pointer hover:scale-105 transition-all"
-            onClick={() => setCurrentPage('wuensche')}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl">✨</span>
-              <h3 className="text-xl font-bold">Wünsche & Ziele</h3>
-            </div>
-            <p className="text-purple-100 text-sm mb-3">
-              Definieren Sie Ihre Träume und erstellen Sie einen konkreten Sparplan
-            </p>
-            <div className="bg-white/20 px-3 py-1 rounded-full text-xs inline-block">
-              Träume planen →
-            </div>
-          </div>
-
-          <div 
-            className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 shadow-xl text-white cursor-pointer hover:scale-105 transition-all"
-            onClick={() => setCurrentPage('zigaretten')}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl">📊</span>
-              <h3 className="text-xl font-bold">Investment-Vergleich</h3>
-            </div>
-            <p className="text-orange-100 text-sm mb-3">
-              Sehen Sie, was aus Ihren "verschwendeten" Ausgaben hätte werden können
-            </p>
-            <div className="bg-white/20 px-3 py-1 rounded-full text-xs inline-block">
-              Vergleich starten →
-            </div>
-          </div>
         </div>
       </div>
+
+      {/* Sidebar - AM RECHTEN RAND */}
+      <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
+        <Sidebar />
+      </div>
     </div>
-  );
-};
+
+    {/* 4 Säulen am unteren Ende - UNVERÄNDERT */}
+    <div className="absolute bottom-0 left-0 right-0 h-1/3 z-10">
+      <div className="flex h-full gap-4 p-4">
+        {[
+          { 
+            id: 'wuensche', 
+            name: 'Wünsche & Ziele', 
+            color: '#004225',
+            description: ['Persönliche Träume', '& Lebensziele', 'verwirklichen']
+          },
+          { 
+            id: 'kurzfristig', 
+            name: 'Kurzfristiges Kapital', 
+            color: '#1f5f3f',
+            description: ['Flexibles Geld', 'für spontane', 'Anschaffungen']
+          },
+          { 
+            id: 'mittelfristig', 
+            name: 'Mittelfristiges Kapital', 
+            color: '#4d7c5f',
+            description: ['Geplante Ausgaben', 'der nächsten', '1-2 Jahre']
+          },
+          { 
+            id: 'langfristig', 
+            name: 'Langfristiges Kapital', 
+            color: '#6b8e6b',
+            description: ['Großes Vermögen', 'für die Zukunft', 'aufbauen']
+          }
+        ].map((item, index) => (
+          <div key={item.id} className="flex-1 flex flex-col justify-end animate-slideUp" style={{ animationDelay: `${index * 0.1}s` }}>
+            <div 
+              className="h-3/4 rounded-t-xl flex flex-col items-center justify-center pb-6 relative overflow-hidden cursor-pointer transition-all hover:brightness-110 hover:scale-105 px-4"
+              style={{backgroundColor: item.color}}
+              onClick={() => setCurrentPage(item.id)}
+            >
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-center">
+                <div className="text-white font-semibold mb-2">
+                  {item.name.split(' ').map((word, i) => (
+                    <div key={i} className="text-sm">{word}</div>
+                  ))}
+                </div>
+                <div className="text-white/90 text-xs leading-relaxed">
+                  {item.description.map((line, i) => (
+                    <div key={i} className="mb-1 last:mb-0">{line}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  
+    <NavigationButtons />
+    
+    <style jsx>{`
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes slideUp {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      @keyframes rain-fall-short {
+        0% { 
+          transform: translateY(-20px); 
+          opacity: 0; 
+        }
+        20% { 
+          opacity: 0.6; 
+        }
+        80% { 
+          transform: translateY(15px); 
+          opacity: 0.6; 
+        }
+        100% { 
+          transform: translateY(20px); 
+          opacity: 0; 
+        }
+      }
+
+      @keyframes umbrella-gentle-sway {
+        0%, 100% { transform: rotate(-2deg); }
+        50% { transform: rotate(2deg); }
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out forwards;
+        opacity: 0;
+      }
+      
+      .animate-slideUp {
+        animation: slideUp 0.6s ease-out forwards;
+        opacity: 0;
+      }
+    `}</style>
+  </div>
+);
 
 // Basis-Absicherung Page - Professioneller Look 2025
 const BasisAbsicherungPage = () => {
