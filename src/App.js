@@ -697,7 +697,7 @@ const Sidebar = () => {
 const createMiniPieChart = () => {
   const radius = headerHovered ? 95 : 65;
   const centerX = 120;
-  const centerY = 120;
+  const centerY = 200;
   
   let cumulativePercentage = 0;
   // Korrigierte Farben im Grünschema (dunkler für bessere Sichtbarkeit)
