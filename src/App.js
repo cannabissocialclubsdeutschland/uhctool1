@@ -718,12 +718,11 @@ const Sidebar = () => {
 
   const percentages = calculatePercentages();
 
-
-// Mini-Kuchendiagramm für Header - VOLLSTÄNDIG KORRIGIERT
+// Mini-Kuchendiagramm für Header - KORRIGIERT mit Grünschema
 const createMiniPieChart = () => {
-  const radius = headerHovered ? 85 : 60;
+  const radius = headerHovered ? 95 : 65;
   const centerX = 120;
-  const centerY = 120; // KORRIGIERT: Zentriert im SVG
+  const centerY = 200;
   
   let cumulativePercentage = 0;
   // Korrigierte Farben im Grünschema (dunkler für bessere Sichtbarkeit)
@@ -759,13 +758,13 @@ const createMiniPieChart = () => {
   ];
 
   return (
-    <svg 
-      width="240" 
-      height="240" // KORRIGIERT: Reduziert auf 240px
-      className="transition-all duration-500 ease-out"
-      onMouseEnter={() => setHeaderHovered(true)}
-      onMouseLeave={() => setHeaderHovered(false)}
-    >
+  <svg 
+  width="240" 
+  height="280"  // Von 240 auf 280 erhöht
+  className="transition-all duration-500 ease-out"
+  onMouseEnter={() => setHeaderHovered(true)}
+  onMouseLeave={() => setHeaderHovered(false)}
+>
       {slices.map((slice, index) => {
         const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
         const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
@@ -843,7 +842,7 @@ const createMiniPieChart = () => {
       <circle
         cx={centerX}
         cy={centerY}
-        r={headerHovered ? 28 : 24} // KORRIGIERT: Angepasste Größe
+        r={headerHovered ? 32 : 28}
         fill="white"
         stroke="#065f46" // Konsistentes Dunkelgrün
         strokeWidth="2"
@@ -872,7 +871,7 @@ const createMiniPieChart = () => {
       {headerHovered && (
         <text
           x={centerX}
-          y={centerY + 45} // KORRIGIERT: Angepasste Position
+          y={centerY + 55}
           textAnchor="middle"
           className="text-[8px] fill-slate-500 pointer-events-none animate-fadeIn"
         >
@@ -882,7 +881,6 @@ const createMiniPieChart = () => {
     </svg>
   );
 };
-
   // Navigation Buttons mit einheitlichem Grünschema
 const NavigationButtons = () => {
   const prevPage = getPrevPage();
