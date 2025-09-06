@@ -913,9 +913,9 @@ const createMiniPieChart = () => {
     );
   };
 
-// Header mit Balken und Import/Export
+// Header mit korrigierter Höhe und einheitlichem Grünschema
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-47 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
@@ -928,26 +928,28 @@ const HeaderBars = () => (
           {currentPage === 'kurzfristig' && 'Kurzfristige Anschaffungen'}
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
+          {currentPage === 'basisabsicherung' && 'Basis-Absicherung'}
+          {currentPage === 'zigaretten' && 'Investment-Vergleich'}
         </p>
 
-         {/* Home Button hinzufügen */}
+         {/* Home Button mit Grünschema */}
         <button
           onClick={() => setCurrentPage('overview')}
-          className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all inline-flex items-center gap-1"
+          className="mt-2 px-3 py-1 bg-emerald-700 text-white text-xs rounded-lg hover:bg-emerald-800 transition-all inline-flex items-center gap-1"
         >
           🏠 Zur Übersicht
         </button>
 
-        {/* Import/Export Buttons daneben */}
+        {/* Import/Export Buttons mit Grünschema */}
         <div className="inline-flex gap-2 ml-2">
           <button
             onClick={exportData}
-            className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-all"
+            className="px-3 py-1 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-all"
           >
             📥 Export
           </button>
           
-          <label className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
+          <label className="px-3 py-1 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-all cursor-pointer">
             📤 Import
             <input
               type="file"
@@ -962,7 +964,7 @@ const HeaderBars = () => (
       {/* Drag & Drop Zone */}
       <div 
         className={`absolute right-8 top-1/2 transform -translate-y-1/2 w-48 h-20 border-2 border-dashed rounded-lg transition-all ${
-          dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+          dragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 bg-gray-50'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -977,23 +979,22 @@ const HeaderBars = () => (
         </div>
       </div>
       
-      {/* Bestehende Navigation Balken */}
+      {/* Navigation Balken mit korrigierten Farben */}
       <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-6">
-        {/* Hier bleibt der Rest Ihrer Navigation wie gehabt */}
         <div className="flex flex-col items-center">
           <div 
             className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#0B2E70'}}
+            style={{backgroundColor: '#065f46'}} // Dunkelgrün für Wünsche
             onClick={() => setCurrentPage('wuensche')}
           >
             <span className="text-xs text-white font-medium">Wünsche</span>
           </div>
         </div>
         
-        {/* Rest der Balken... */}
         <div className="flex flex-col items-center">
           <div 
-            className="bg-slate-500 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{backgroundColor: '#047857'}} // Mittelgrün für Kurz
             onClick={() => setCurrentPage('kurzfristig')}
           >
             <span className="text-xs text-white font-medium">Kurz</span>
@@ -1013,7 +1014,8 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="bg-slate-400 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{backgroundColor: '#059669'}} // Helleres Grün für Mittel
             onClick={() => setCurrentPage('mittelfristig')}
           >
             <span className="text-xs text-white font-medium">Mittel</span>
@@ -1022,7 +1024,8 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="bg-slate-600 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{backgroundColor: '#10b981'}} // Sehr helles Grün für Lang
             onClick={() => setCurrentPage('langfristig')}
           >
             <span className="text-xs text-white font-medium">Lang</span>
