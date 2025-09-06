@@ -1225,7 +1225,8 @@ const OverviewPage = () => (
     <svg width="450" height="450" viewBox="0 0 450 450">
       {/* Kuchendiagramm */}
       {createPieChart()}
-      
+  </svg>
+
    {/* Innerer Kreis - MIT SPLINE LOGO */}
 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] flex items-center justify-center">
   <SplineFloatingLogo
