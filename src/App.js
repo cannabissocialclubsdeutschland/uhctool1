@@ -1874,12 +1874,18 @@ const BasisAbsicherungPage = () => {
     </div>
   );
 };
- // BudgetPage - OPTIMIERT mit verbesserter UX und Validierungen
+// BudgetPage - ÜBERARBEITET im Fixkosten-Stil mit Kreisen
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempValues, setTempValues] = useState({...finanzData});
   const [errors, setErrors] = useState({});
   const [showSummary, setShowSummary] = useState(false);
+  const [gehaltExpanded, setGehaltExpanded] = useState(false);
+  const [gehaltDetails, setGehaltDetails] = useState({
+    brutto: 0,
+    netto: 2500,
+    zusatzleistungen: 0
+  });
 
   const handleInputChange = (field, value) => {
     const numValue = parseFloat(value) || 0;
@@ -1925,57 +1931,47 @@ const BudgetPage = () => {
            tempValues.kapitalertraege + tempValues.mieteinnahmen + tempValues.individuell;
   };
 
-  const einkommensfelder = [
+  const einkommensKategorien = [
     { 
-      id: 'gehalt', 
+      id: 'gehaltNetto', 
       name: 'Netto-Gehalt', 
-      value: tempValues.gehaltNetto, 
-      field: 'gehaltNetto',
-      hasExpanded: true,
-      icon: '💼',
+      icon: '💼', 
       color: '#065f46',
-      placeholder: 'z.B. 2500€',
-      beschreibung: 'Ihr monatliches Netto-Einkommen'
+      beschreibung: 'Ihr monatliches Netto-Einkommen',
+      wert: tempValues.gehaltNetto,
+      hasExpanded: true
     },
     { 
-      id: 'zusatz', 
-      name: 'Zusatz-einkommen', 
-      value: tempValues.zusatzeinkommen, 
-      field: 'zusatzeinkommen',
-      icon: '💰',
+      id: 'zusatzeinkommen', 
+      name: 'Zusatzeinkommen', 
+      icon: '💰', 
       color: '#047857',
-      placeholder: 'z.B. 500€',
-      beschreibung: 'Nebentätigkeit, Freelancing, etc.'
+      beschreibung: 'Nebentätigkeit, Freelancing, etc.',
+      wert: tempValues.zusatzeinkommen
     },
     { 
-      id: 'kapital', 
-      name: 'Kapital-erträge', 
-      value: tempValues.kapitalertraege, 
-      field: 'kapitalertraege',
-      icon: '📈',
+      id: 'kapitalertraege', 
+      name: 'Kapitalerträge', 
+      icon: '📈', 
       color: '#059669',
-      placeholder: 'z.B. 150€',
-      beschreibung: 'Dividenden, Zinsen, Mieteinnahmen'
+      beschreibung: 'Dividenden, Zinsen, Mieteinnahmen',
+      wert: tempValues.kapitalertraege
     },
     { 
-      id: 'miete', 
-      name: 'Miet-einnahmen', 
-      value: tempValues.mieteinnahmen, 
-      field: 'mieteinnahmen',
-      icon: '🏠',
+      id: 'mieteinnahmen', 
+      name: 'Mieteinnahmen', 
+      icon: '🏠', 
       color: '#10b981',
-      placeholder: 'z.B. 800€',
-      beschreibung: 'Einnahmen aus Vermietung'
+      beschreibung: 'Einnahmen aus Vermietung',
+      wert: tempValues.mieteinnahmen
     },
     { 
       id: 'individuell', 
       name: 'Sonstige Einnahmen', 
-      value: tempValues.individuell, 
-      field: 'individuell',
-      icon: '📊',
+      icon: '📊', 
       color: '#34d399',
-      placeholder: 'z.B. 200€',
-      beschreibung: 'Unterhalt, Kindergeld, etc.'
+      beschreibung: 'Unterhalt, Kindergeld, etc.',
+      wert: tempValues.individuell
     }
   ];
 
@@ -2010,30 +2006,36 @@ const BudgetPage = () => {
       )}
       
       <div className="h-screen flex flex-col pt-32">
-        {/* Budget-Status-Banner */}
-        <div className="flex-shrink-0 bg-white/90 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-200">
+        {/* Budget-Dashboard */}
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
-                💼 Budget-Eingabe
-              </h2>
-              <p className="text-emerald-600 flex items-center gap-2">
-                <span>Aktuelles Budget: <span className="font-bold">{calculateTempBudget().toLocaleString()}€</span></span>
-                <span className="flex items-center gap-1" style={{color: budgetStatus.color}}>
-                  {budgetStatus.icon} {budgetStatus.text}
-                </span>
+              <h2 className="text-2xl font-bold text-emerald-800">💼 Budget-Eingabe</h2>
+              <p className="text-emerald-600">
+                Gesamtbudget: <span className="font-bold">{calculateTempBudget().toLocaleString()}€</span> | 
+                Status: <span className="font-bold" style={{color: budgetStatus.color}}>{budgetStatus.text}</span>
               </p>
             </div>
-            
-            {/* Schnell-Tipps */}
-            <div className="bg-emerald-50 p-3 rounded-lg max-w-sm">
-              <div className="text-sm text-emerald-800 font-semibold">💡 Tipp</div>
-              <div className="text-xs text-emerald-700 mt-1">
-                {calculateTempBudget() < 2000 
-                  ? 'Fokussieren Sie sich auf Fixkosten-Optimierung'
-                  : calculateTempBudget() < 3500
-                  ? 'Bauen Sie einen Notgroschen auf'
-                  : 'Perfekt für diversifizierte Geldanlage'}
+            <div className="flex items-center gap-6">
+              <div className={`px-4 py-2 rounded-lg ${budgetStatus.color === '#ef4444' ? 'bg-red-50' : budgetStatus.color === '#f59e0b' ? 'bg-yellow-50' : 'bg-emerald-50'}`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{budgetStatus.icon}</span>
+                  <div>
+                    <p className="font-bold" style={{color: budgetStatus.color}}>
+                      {budgetStatus.text}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-emerald-50 p-3 rounded-lg">
+                <div className="text-sm text-emerald-800 font-semibold">💡 Tipp</div>
+                <div className="text-xs text-emerald-700 mt-1">
+                  {calculateTempBudget() < 2000 
+                    ? 'Fokussieren Sie sich auf Fixkosten-Optimierung'
+                    : calculateTempBudget() < 3500
+                    ? 'Bauen Sie einen Notgroschen auf'
+                    : 'Perfekt für diversifizierte Geldanlage'}
+                </div>
               </div>
             </div>
           </div>
@@ -2043,45 +2045,45 @@ const BudgetPage = () => {
           <div className="h-full flex flex-col">
             
             <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="grid grid-cols-3 gap-8 max-w-5xl">
-                {einkommensfelder.map((feld, index) => (
-                  <div key={feld.id} className="flex flex-col items-center">
+              <div className="flex space-x-12">
+                {einkommensKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
                     <div 
-                      className={`w-52 h-52 rounded-2xl border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                        activeField === feld.id 
+                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === kategorie.id 
                           ? 'text-white shadow-2xl transform scale-105' 
                           : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
                       }`}
                       style={{
-                        backgroundColor: activeField === feld.id ? feld.color : 'white',
-                        borderColor: activeField === feld.id ? feld.color : errors[feld.field] ? '#ef4444' : '#cbd5e1'
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                        borderColor: activeField === kategorie.id ? kategorie.color : errors[kategorie.id] ? '#ef4444' : '#cbd5e1'
                       }}
                       onClick={() => {
-                        if (activeField !== feld.id) {
-                          setActiveField(feld.id);
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
                           setTempValues({...finanzData});
                           setErrors({});
                         }
                       }}
                     >
-                      <span className="text-4xl mb-2">{feld.icon}</span>
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
                       <span className="text-base font-bold text-center px-4 leading-tight">
-                        {feld.name}
+                        {kategorie.name}
                       </span>
                       <span className="text-xl font-bold mt-2">
-                        {feld.value.toLocaleString()}€
+                        {kategorie.wert.toLocaleString()}€
                       </span>
                       
                       {/* Error Indicator */}
-                      {errors[feld.field] && (
+                      {errors[kategorie.id] && (
                         <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">
                           !
                         </div>
                       )}
                       
                       {/* Hover-Info */}
-                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                        {feld.beschreibung}
+                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        {kategorie.beschreibung}
                       </div>
                     </div>
                   </div>
@@ -2092,19 +2094,19 @@ const BudgetPage = () => {
             <div className="flex-1 flex items-start justify-center pt-6">
               {activeField && (
                 <div 
-                  className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-2xl shadow-2xl"
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(() => {
-                    const aktivesFeld = einkommensfelder.find(f => f.id === activeField);
+                    const aktiveKategorie = einkommensKategorien.find(k => k.id === activeField);
                     return (
                       <div className="space-y-6">
                         <div className="text-center border-b border-emerald-200 pb-4">
                           <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktivesFeld.icon}</span>
-                            {aktivesFeld.name}
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
                           </h3>
-                          <p className="text-emerald-600 mt-1">{aktivesFeld.beschreibung}</p>
+                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
                         </div>
                         
                         <div className="flex flex-col items-center space-y-4">
@@ -2115,14 +2117,20 @@ const BudgetPage = () => {
                             <div className="relative">
                               <input 
                                 type="number" 
-                                value={tempValues[aktivesFeld.field]}
-                                onChange={(e) => handleInputChange(aktivesFeld.field, e.target.value)}
+                                value={tempValues[aktiveKategorie.id]}
+                                onChange={(e) => handleInputChange(aktiveKategorie.id, e.target.value)}
                                 className={`w-full p-4 bg-white border-2 rounded-xl outline-none text-center text-xl font-semibold pr-8 ${
-                                  errors[aktivesFeld.field] 
+                                  errors[aktiveKategorie.id] 
                                     ? 'border-red-500 focus:ring-2 focus:ring-red-500' 
                                     : 'border-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
                                 }`}
-                                placeholder={aktivesFeld.placeholder}
+                                placeholder={`z.B. ${
+                                  aktiveKategorie.id === 'gehaltNetto' ? '2500' :
+                                  aktiveKategorie.id === 'zusatzeinkommen' ? '500' :
+                                  aktiveKategorie.id === 'kapitalertraege' ? '150' :
+                                  aktiveKategorie.id === 'mieteinnahmen' ? '800' :
+                                  '200'
+                                }€`}
                                 autoFocus
                                 min="0"
                                 max="50000"
@@ -2131,14 +2139,14 @@ const BudgetPage = () => {
                                 €
                               </span>
                             </div>
-                            {errors[aktivesFeld.field] && (
+                            {errors[aktiveKategorie.id] && (
                               <p className="text-red-500 text-sm mt-2 text-center">
-                                {errors[aktivesFeld.field]}
+                                {errors[aktiveKategorie.id]}
                               </p>
                             )}
                           </div>
                           
-                          {activeField === 'gehalt' && (
+                          {activeField === 'gehaltNetto' && (
                             <div className="w-full max-w-sm">
                               <button 
                                 onClick={() => setGehaltExpanded(!gehaltExpanded)}
