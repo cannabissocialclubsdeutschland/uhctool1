@@ -910,7 +910,7 @@ const NavigationButtons = () => {
 
 // Header mit korrigierter Höhe und einheitlichem Grünschema
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-44 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
@@ -975,10 +975,10 @@ const HeaderBars = () => (
       </div>
       
       {/* Navigation Balken mit korrigierten Farben */}
-      <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-6">
+      <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-4">
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             style={{backgroundColor: '#065f46'}} // Dunkelgrün für Wünsche
             onClick={() => setCurrentPage('wuensche')}
           >
@@ -988,7 +988,7 @@ const HeaderBars = () => (
         
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             style={{backgroundColor: '#047857'}} // Mittelgrün für Kurz
             onClick={() => setCurrentPage('kurzfristig')}
           >
@@ -1009,7 +1009,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             style={{backgroundColor: '#059669'}} // Helleres Grün für Mittel
             onClick={() => setCurrentPage('mittelfristig')}
           >
@@ -1019,7 +1019,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             style={{backgroundColor: '#10b981'}} // Sehr helles Grün für Lang
             onClick={() => setCurrentPage('langfristig')}
           >
@@ -1030,6 +1030,7 @@ const HeaderBars = () => (
     </div>
   </div>
 );
+
   // Kuchendiagramm erstellen
   const createPieChart = () => {
     const radius = 180;
