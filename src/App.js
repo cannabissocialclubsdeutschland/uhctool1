@@ -575,17 +575,16 @@ const ZigarettenInvestmentPage = () => {
   );
 };
   
- // 1. SIDEBAR ohne Wackel-Effekt
+// Sidebar mit korrigiertem Grünschema und verbesserter Stabilität
 const Sidebar = () => {
   const sidebarItems = [
-    { id: 'fixkosten', name: 'Fixkosten', icon: '🏠', color: '#004225' },
-    { id: 'lifestyle', name: 'Lifestyle', icon: '🎭', color: '#1f5f3f' },
-    { id: 'sicherheit', name: 'Sicherheit', icon: '🛡️', color: '#4d7c5f' }
+    { id: 'fixkosten', name: 'Fixkosten', icon: '🏠', color: '#065f46' },
+    { id: 'lifestyle', name: 'Lifestyle', icon: '🎭', color: '#047857' },
+    { id: 'sicherheit', name: 'Sicherheit', icon: '🛡️', color: '#059669' }
   ];
 
   return (
     <>
-      {/* ERHÖHTER Z-INDEX + ABSOLUTE POSITIONIERUNG */}
       <div 
         className="fixed right-8 z-[100]" 
         style={{ 
@@ -594,7 +593,7 @@ const Sidebar = () => {
           pointerEvents: 'auto' 
         }}
       >
-        {/* Kontinuierlich bewegender Farbverlauf */}
+        {/* Kontinuierlich bewegender Grün-Farbverlauf */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden">
           <div className="w-full h-full animate-flowing-gradient opacity-75"></div>
         </div>
@@ -628,70 +627,27 @@ const Sidebar = () => {
 
       <style jsx>{`
         @keyframes flowing-gradient {
-          0% {
+          0%, 100% {
             background: linear-gradient(
               45deg,
-              #004225 0%,
-              #1f5f3f 20%,
-              #4d7c5f 40%,
-              #6b8e6b 60%,
-              #004225 80%,
-              #1f5f3f 100%
+              #065f46 0%,
+              #047857 20%,
+              #059669 40%,
+              #10b981 60%,
+              #34d399 80%,
+              #065f46 100%
             );
             background-size: 200% 200%;
             background-position: 0% 0%;
           }
           25% {
-            background: linear-gradient(
-              45deg,
-              #004225 0%,
-              #1f5f3f 20%,
-              #4d7c5f 40%,
-              #6b8e6b 60%,
-              #004225 80%,
-              #1f5f3f 100%
-            );
-            background-size: 200% 200%;
             background-position: 100% 0%;
           }
           50% {
-            background: linear-gradient(
-              45deg,
-              #004225 0%,
-              #1f5f3f 20%,
-              #4d7c5f 40%,
-              #6b8e6b 60%,
-              #004225 80%,
-              #1f5f3f 100%
-            );
-            background-size: 200% 200%;
             background-position: 100% 100%;
           }
           75% {
-            background: linear-gradient(
-              45deg,
-              #004225 0%,
-              #1f5f3f 20%,
-              #4d7c5f 40%,
-              #6b8e6b 60%,
-              #004225 80%,
-              #1f5f3f 100%
-            );
-            background-size: 200% 200%;
             background-position: 0% 100%;
-          }
-          100% {
-            background: linear-gradient(
-              45deg,
-              #004225 0%,
-              #1f5f3f 20%,
-              #4d7c5f 40%,
-              #6b8e6b 60%,
-              #004225 80%,
-              #1f5f3f 100%
-            );
-            background-size: 200% 200%;
-            background-position: 0% 0%;
           }
         }
 
@@ -885,33 +841,32 @@ const createMiniPieChart = () => {
   );
 };
 
-  // Navigation Buttons
-  const NavigationButtons = () => {
-    const prevPage = getPrevPage();
-    const nextPage = getNextPage();
-    
-    return (
-      <div className="fixed bottom-8 right-8 flex gap-4 z-50">
-        {prevPage && (
-          <button
-            onClick={() => setCurrentPage(prevPage)}
-            className="px-6 py-3 bg-white/90 backdrop-blur-lg border-2 border-slate-300 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:scale-105 transition-all duration-200 shadow-lg"
-          >
-            ← Zurück
-          </button>
-        )}
-        {nextPage && (
-          <button
-            onClick={() => setCurrentPage(nextPage)}
-            className="px-6 py-3 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-            style={{backgroundColor: '#004225'}}
-          >
-            Weiter →
-          </button>
-        )}
-      </div>
-    );
-  };
+  // Navigation Buttons mit einheitlichem Grünschema
+const NavigationButtons = () => {
+  const prevPage = getPrevPage();
+  const nextPage = getNextPage();
+  
+  return (
+    <div className="fixed bottom-8 right-8 flex gap-4 z-50">
+      {prevPage && (
+        <button
+          onClick={() => setCurrentPage(prevPage)}
+          className="px-6 py-3 bg-white/90 backdrop-blur-lg border-2 border-emerald-300 rounded-xl font-semibold text-emerald-700 hover:bg-emerald-50 hover:scale-105 transition-all duration-200 shadow-lg"
+        >
+          ← Zurück
+        </button>
+      )}
+      {nextPage && (
+        <button
+          onClick={() => setCurrentPage(nextPage)}
+          className="px-6 py-3 bg-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 hover:bg-emerald-800"
+        >
+          Weiter →
+        </button>
+      )}
+    </div>
+  );
+};
 
 // Header mit korrigierter Höhe und einheitlichem Grünschema
 const HeaderBars = () => (
