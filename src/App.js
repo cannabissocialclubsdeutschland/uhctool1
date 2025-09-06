@@ -1358,522 +1358,396 @@ const OverviewPage = () => (
   </div>
 );
 
-// Basis-Absicherung Page - Professioneller Look 2025
+// Basis-Absicherung Page - KOMPLETT ÜBERARBEITET im einheitlichen Design
 const BasisAbsicherungPage = () => {
-  const [selectedVersicherung, setSelectedVersicherung] = useState(null);
+  const [activeField, setActiveField] = useState(null);
   const [tempBasisData, setTempBasisData] = useState({...basisAbsicherungData});
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [animateCards, setAnimateCards] = useState(false);
-  
-  useEffect(() => {
-    setAnimateCards(true);
-  }, []);
-  
-  const versicherungsTypen = [
+
+  const calculateVersicherungskosten = (kategorie) => {
+    return tempBasisData[kategorie]?.monatlich || 0;
+  };
+
+  const updateVersicherung = (kategorie, field, value) => {
+    setTempBasisData(prev => ({
+      ...prev,
+      [kategorie]: {
+        ...prev[kategorie],
+        [field]: field === 'monatlich' ? (parseFloat(value) || 0) : value
+      }
+    }));
+  };
+
+  const handleSave = () => {
+    setBasisAbsicherungData(tempBasisData);
+    const newTotal = Object.keys(tempBasisData).reduce((total, key) => {
+      return total + calculateVersicherungskosten(key);
+    }, 0);
+    setFinanzData(prev => ({ ...prev, versicherungenTotal: newTotal }));
+    setActiveField(null);
+  };
+
+  const handleCancel = () => {
+    setTempBasisData({...basisAbsicherungData});
+    setActiveField(null);
+  };
+
+  const versicherungsKategorien = [
     { 
-      id: 'krankenversicherung',
-      name: 'Krankenversicherung',
-      pflicht: true,
-      beschreibung: 'Gesetzlich vorgeschrieben für alle',
-      details: 'Beitragsbemessungsgrenze 2025: 66.150€/Jahr',
-      minBetrag: 200,
-      maxBetrag: 900,
-      farbe: '#dc2626'
+      id: 'krankenversicherung', 
+      name: 'Krankenversicherung', 
+      icon: '🏥', 
+      color: '#065f46',
+      beschreibung: 'Gesetzlich vorgeschrieben',
+      prioritaet: 'PFLICHT',
+      empfehlung: 'Basis-Schutz für alle'
     },
     { 
-      id: 'haftpflicht',
-      name: 'Privathaftpflicht',
-      pflicht: false,
-      wichtigkeit: 'KRITISCH',
-      beschreibung: 'Schützt vor existenzbedrohenden Forderungen',
-      empfohleneDecking: 50000000,
-      details: 'Mindestens 10 Mio. €, besser 50-100 Mio. € Deckung',
-      farbe: '#dc2626'
+      id: 'haftpflicht', 
+      name: 'Privathaftpflicht', 
+      icon: '🛡️', 
+      color: '#047857',
+      beschreibung: 'Schutz vor Schadenersatz',
+      prioritaet: 'KRITISCH',
+      empfehlung: 'Existenziell wichtig!'
     },
     { 
-      id: 'berufsunfaehigkeit',
-      name: 'Berufsunfähigkeit (BU)',
-      pflicht: false,
-      wichtigkeit: 'SEHR HOCH',
-      beschreibung: 'Sichert Ihre Arbeitskraft ab',
-      empfohlen: '70-80% des Nettoeinkommens',
-      details: 'Jeder 4. wird berufsunfähig. Staatliche EM-Rente nur ø 1.059€',
-      farbe: '#ea580c'
+      id: 'berufsunfaehigkeit', 
+      name: 'Berufsunfähigkeit', 
+      icon: '💼', 
+      color: '#059669',
+      beschreibung: 'Schutz der Arbeitskraft',
+      prioritaet: 'SEHR HOCH',
+      empfehlung: 'Jeder 4. wird BU'
     },
     { 
-      id: 'rechtsschutz',
-      name: 'Rechtsschutz',
-      pflicht: false,
-      wichtigkeit: 'MITTEL',
-      beschreibung: 'Hilfe bei rechtlichen Streitigkeiten',
-      details: 'Privat-, Berufs- und Verkehrsrechtsschutz empfohlen',
-      farbe: '#f59e0b'
+      id: 'rechtsschutz', 
+      name: 'Rechtsschutz', 
+      icon: '⚖️', 
+      color: '#10b981',
+      beschreibung: 'Hilfe bei Rechtsstreit',
+      prioritaet: 'MITTEL',
+      empfehlung: 'Schutz vor Anwaltskosten'
     },
     { 
-      id: 'hausrat',
-      name: 'Hausratversicherung',
-      pflicht: false,
-      wichtigkeit: 'MITTEL',
-      beschreibung: 'Schutz für Ihr Eigentum',
-      details: 'Empfohlen ab Hausrat > 10.000€',
-      farbe: '#10b981'
-    },
-    { 
-      id: 'kfzVersicherung',
-      name: 'KFZ-Versicherung',
-      pflicht: true,
-      beschreibung: 'Pflicht bei Fahrzeugbesitz',
-      details: 'Haftpflicht min. 100 Mio. € empfohlen',
-      farbe: '#6366f1'
-    },
-    {
-      id: 'auslandskranken',
-      name: 'Auslandskrankenversicherung',
-      pflicht: false,
-      wichtigkeit: 'NIEDRIG',
-      beschreibung: 'Wichtig für Reisen',
-      details: 'Sehr günstig (ca. 10-25€/Jahr)',
-      farbe: '#10b981'
+      id: 'hausrat', 
+      name: 'Hausratversicherung', 
+      icon: '🏠', 
+      color: '#34d399',
+      beschreibung: 'Schutz für Eigentum',
+      prioritaet: 'NIEDRIG',
+      empfehlung: 'Bei wertigem Hausrat'
     }
   ];
-  
+
   const calculateAbsicherungsgrad = () => {
     let score = 0;
     let maxScore = 0;
     
     const gewichtung = {
-      krankenversicherung: 30,
-      haftpflicht: 25,
+      krankenversicherung: 25,
+      haftpflicht: 30,
       berufsunfaehigkeit: 25,
-      kfzVersicherung: 15,
-      rechtsschutz: 10,
-      hausrat: 8,
-      auslandskranken: 5
+      rechtsschutz: 15,
+      hausrat: 10
     };
     
     Object.entries(gewichtung).forEach(([key, weight]) => {
-      const versicherung = versicherungsTypen.find(v => v.id === key);
-      if (versicherung) {
-        maxScore += weight;
-        if (tempBasisData[key]?.status === 'vorhanden') {
-          score += weight;
-        } else if (tempBasisData[key]?.status === 'teilweise') {
-          score += weight * 0.5;
-        }
+      maxScore += weight;
+      if (tempBasisData[key]?.status === 'vorhanden') {
+        score += weight;
+      } else if (tempBasisData[key]?.status === 'teilweise') {
+        score += weight * 0.5;
       }
     });
     
     return (score / maxScore) * 100;
   };
-  
-  const absicherungsgrad = calculateAbsicherungsgrad();
-  
+
   const calculateGesamtkosten = () => {
-    return Object.values(tempBasisData).reduce((sum, item) => 
-      sum + (parseFloat(item.monatlich) || 0), 0
+    return Object.keys(tempBasisData).reduce((sum, key) => 
+      sum + calculateVersicherungskosten(key), 0
     );
   };
-  
-  const calculateEmpfohleneKosten = () => {
-    return Object.values(tempBasisData).reduce((sum, item) => 
-      sum + (parseFloat(item.empfohlen) || 0), 0
-    );
+
+  const getAbsicherungsStatus = () => {
+    const grad = calculateAbsicherungsgrad();
+    if (grad >= 80) return { text: 'Exzellent', color: '#059669', icon: '🌟' };
+    if (grad >= 60) return { text: 'Gut', color: '#10b981', icon: '✅' };
+    if (grad >= 40) return { text: 'Ausbaufähig', color: '#f59e0b', icon: '⚡' };
+    return { text: 'Kritisch', color: '#ef4444', icon: '⚠️' };
   };
-  
-  const getRisikoLevel = () => {
-    if (absicherungsgrad >= 85) return { 
-      text: 'Exzellent abgesichert', 
-      color: '#14532d',
-      bgColor: 'bg-green-50',
-      beschreibung: 'Sie sind optimal geschützt'
-    };
-    if (absicherungsgrad >= 70) return { 
-      text: 'Gut abgesichert', 
-      color: '#166534',
-      bgColor: 'bg-green-50',
-      beschreibung: 'Solide Grundabsicherung vorhanden'
-    };
-    if (absicherungsgrad >= 50) return { 
-      text: 'Lücken vorhanden', 
-      color: '#ea580c',
-      bgColor: 'bg-orange-50',
-      beschreibung: 'Wichtige Versicherungen fehlen'
-    };
-    return { 
-      text: 'Kritisch unterversichert', 
-      color: '#dc2626',
-      bgColor: 'bg-red-50',
-      beschreibung: 'Dringender Handlungsbedarf!'
-    };
-  };
-  
-  const risikoLevel = getRisikoLevel();
-  
-  const getHandlungsempfehlungen = () => {
-    const empfehlungen = [];
-    
-    if (tempBasisData.haftpflicht.status === 'fehlt') {
-      empfehlungen.push({
-        prioritaet: 'KRITISCH',
-        titel: 'Privathaftpflicht abschließen',
-        beschreibung: 'Absolut essentiell! Schützt vor existenzbedrohenden Kosten',
-        kosten: tempBasisData.haftpflicht.empfohlen
-      });
-    }
-    
-    if (tempBasisData.berufsunfaehigkeit.status === 'fehlt') {
-      empfehlungen.push({
-        prioritaet: 'HOCH',
-        titel: 'Berufsunfähigkeit absichern',
-        beschreibung: 'Jeder 4. wird berufsunfähig - sichern Sie Ihr Einkommen',
-        kosten: tempBasisData.berufsunfaehigkeit.empfohlen
-      });
-    }
-    
-    if (tempBasisData.haftpflicht.deckung < 10000000) {
-      empfehlungen.push({
-        prioritaet: 'MITTEL',
-        titel: 'Haftpflicht-Deckung erhöhen',
-        beschreibung: 'Auf mind. 50 Mio. € erhöhen (kostet kaum mehr)',
-        kosten: 2
-      });
-    }
-    
-    return empfehlungen;
-  };
-  
+
+  const absicherungsStatus = getAbsicherungsStatus();
+
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 font-sans">
-      {/* Premium Header mit Glassmorphism */}
-      <div className="fixed top-0 left-0 right-0 h-32 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 z-50 shadow-lg">
-        <div className="h-full flex items-center px-8 relative">
-          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              United Hands Capital
-            </h1>
-            <p className="text-sm text-slate-600">Basis-Absicherung 2025 • Ihr professioneller Schutz</p>
-            
-            {/* Home Button */}
-            <button
-              onClick={() => setCurrentPage('overview')}
-              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
-            >
-              🏠 Zur Übersicht
-            </button>
-          </div>
-          
-          {/* Risiko-Dashboard */}
-          <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-            <div className="flex items-center gap-8">
-              <div className="text-center">
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Monatliche Kosten</p>
-                <p className="text-2xl font-bold text-slate-900">{calculateGesamtkosten()}€</p>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Absicherungsgrad</p>
-                <div className="flex items-center gap-3 mt-1">
-                  <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full transition-all duration-1000 ease-out rounded-full"
-                      style={{
-                        width: `${absicherungsgrad}%`,
-                        background: `linear-gradient(90deg, ${risikoLevel.color} 0%, ${risikoLevel.color}dd 100%)`
-                      }}
-                    />
-                  </div>
-                  <span className="text-xl font-bold" style={{color: risikoLevel.color}}>
-                    {absicherungsgrad.toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-              
-              <div className={`px-4 py-2 rounded-lg ${risikoLevel.bgColor}`}>
-                <p className="text-xs uppercase tracking-wider" style={{color: risikoLevel.color}}>Status</p>
-                <p className="font-bold" style={{color: risikoLevel.color}}>{risikoLevel.text}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
       
       <div className="h-screen flex flex-col pt-32">
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
-              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-emerald-100 hover:shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Gesamtkosten</span>
-                  <span className="text-2xl">💰</span>
-                </div>
-                <p className="text-3xl font-bold text-emerald-800">
-                  {calculateGesamtkosten()}€/M
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {((calculateGesamtkosten() / calculateBudget()) * 100).toFixed(1)}% vom Budget
-                </p>
-              </div>
-              
-              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-orange-100 hover:shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Fehlende Absicherung</span>
-                  <span className="text-2xl">⚠️</span>
-                </div>
-                <p className="text-3xl font-bold text-orange-600">
-                  {Object.values(tempBasisData).filter(v => v.status === 'fehlt').length}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Versicherungen fehlen
-                </p>
-              </div>
-              
-              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-blue-100 hover:shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Empfohlene Kosten</span>
-                  <span className="text-2xl">📈</span>
-                </div>
-                <p className="text-3xl font-bold text-blue-700">
-                  +{calculateEmpfohleneKosten()}€/M
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Für vollständigen Schutz
-                </p>
-              </div>
-              
-              <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-purple-100 hover:shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 font-medium">Priorität</span>
-                  <span className="text-2xl">⚡</span>
-                </div>
-                <p className="text-lg font-bold text-purple-700">
-                  {tempBasisData.berufsunfaehigkeit.status === 'fehlt' 
-                    ? 'BU abschließen' 
-                    : tempBasisData.haftpflicht.status === 'fehlt'
-                    ? 'Haftpflicht!'
-                    : 'Optimieren'}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Nächster Schritt
-                </p>
-              </div>
+        {/* Absicherungs-Dashboard */}
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-800">🛡️ Basis-Absicherung</h2>
+              <p className="text-emerald-600">
+                Monatliche Kosten: <span className="font-bold">{calculateGesamtkosten().toLocaleString()}€</span> | 
+                Absicherungsgrad: <span className="font-bold">{calculateAbsicherungsgrad().toFixed(0)}%</span>
+              </p>
             </div>
-            
-            {/* Versicherungs-Grid */}
-            <div className="grid grid-cols-3 gap-5">
-              {versicherungsTypen.map((versicherung) => {
-                const data = tempBasisData[versicherung.id];
-                const statusColor = 
-                  data?.status === 'vorhanden' ? '#059669' : 
-                  data?.status === 'teilweise' ? '#f59e0b' : '#dc2626';
-                
-                return (
-                  <div 
-                    key={versicherung.id}
-                    className="bg-white/90 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 hover:border-blue-300 border-transparent"
-                    onClick={() => {
-                      setSelectedVersicherung(versicherung);
-                      setShowDetailModal(true);
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="font-bold text-lg text-slate-800 mb-1">
-                          {versicherung.name}
-                        </h3>
-                        {versicherung.pflicht && (
-                          <span className="inline-block px-2 py-1 bg-red-50 text-red-700 text-xs rounded font-semibold">
-                            PFLICHT
-                          </span>
-                        )}
-                        {versicherung.wichtigkeit && (
-                          <span className={`inline-block px-2 py-1 text-xs rounded font-semibold ml-1 ${
-                            versicherung.wichtigkeit === 'KRITISCH' ? 'bg-red-50 text-red-700' :
-                            versicherung.wichtigkeit === 'SEHR HOCH' ? 'bg-orange-50 text-orange-700' :
-                            versicherung.wichtigkeit === 'HOCH' ? 'bg-yellow-50 text-yellow-700' :
-                            'bg-gray-50 text-gray-700'
-                          }`}>
-                            {versicherung.wichtigkeit}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-4">
-                      {versicherung.beschreibung}
+            <div className="flex items-center gap-6">
+              <div className={`px-4 py-2 rounded-lg ${absicherungsStatus.color === '#ef4444' ? 'bg-red-50' : absicherungsStatus.color === '#f59e0b' ? 'bg-yellow-50' : 'bg-emerald-50'}`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{absicherungsStatus.icon}</span>
+                  <div>
+                    <p className="font-bold" style={{color: absicherungsStatus.color}}>
+                      {absicherungsStatus.text}
                     </p>
-                    
-                    {versicherung.details && (
-                      <p className="text-xs text-gray-500 mb-3 italic">
-                        {versicherung.details}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: statusColor }}
-                        />
-                        <span className="text-sm font-medium" style={{ color: statusColor }}>
-                          {data?.status === 'vorhanden' ? 'Aktiv' : 
-                           data?.status === 'teilweise' ? 'Teilweise' : 'Fehlt'}
-                        </span>
-                      </div>
-                      
-                      <span className="text-lg font-bold text-slate-700">
-                        {data?.monatlich || 0}€/M
-                      </span>
-                    </div>
-                    
-                    {data?.status === 'fehlt' && data?.empfohlen && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-orange-600 font-medium">
-                          Empfohlener Beitrag: {data.empfohlen}€/Monat
-                        </p>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-            
-            {/* Handlungsempfehlungen */}
-            {getHandlungsempfehlungen().length > 0 && (
-              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🎯</span>
-                  Ihre priorisierten Handlungsempfehlungen
-                </h3>
-                <div className="space-y-3">
-                  {getHandlungsempfehlungen().map((empfehlung, index) => (
-                    <div 
-                      key={index}
-                      className={`flex items-start gap-4 p-4 rounded-lg ${
-                        empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-50 border border-red-200' :
-                        empfehlung.prioritaet === 'HOCH' ? 'bg-orange-50 border border-orange-200' :
-                        'bg-white border border-gray-200'
-                      }`}
-                    >
-                      <div className={`w-2 h-2 rounded-full mt-2 ${
-                        empfehlung.prioritaet === 'KRITISCH' ? 'bg-red-500' :
-                        empfehlung.prioritaet === 'HOCH' ? 'bg-orange-500' :
-                        'bg-blue-500'
-                      }`} />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-slate-900">{empfehlung.titel}</p>
-                          {empfehlung.prioritaet === 'KRITISCH' && (
-                            <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded-full">
-                              DRINGEND
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{empfehlung.beschreibung}</p>
-                        {empfehlung.kosten && (
-                          <p className="text-xs text-gray-500 mt-2">
-                            Zusätzliche Kosten: ca. {empfehlung.kosten}€/Monat
-                          </p>
-                        )}
-                      </div>
-                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        Jetzt handeln
-                      </button>
-                    </div>
-                  ))}
                 </div>
               </div>
-            )}
-            
-            {/* Experten-Tipp 2025 */}
-            <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
-              <div className="flex items-start gap-4">
-                <span className="text-2xl">💡</span>
-                <div>
-                  <h4 className="font-bold text-emerald-900 mb-2">Experten-Tipp 2025</h4>
-                  <p className="text-sm text-emerald-800">
-                    Der Höchstrechnungszins steigt 2025 erstmals seit 30 Jahren von 0,25% auf 1%. 
-                    Das macht BU-Versicherungen günstiger - idealer Zeitpunkt zum Abschluss! 
-                    Die durchschnittlichen GKV-Zusatzbeiträge steigen auf 2,5%. 
-                    Prüfen Sie jetzt Ihre Absicherung und nutzen Sie die günstigen Konditionen.
-                  </p>
+              <div className="bg-emerald-50 p-3 rounded-lg">
+                <div className="text-sm text-emerald-800 font-semibold">💡 Priorität</div>
+                <div className="text-xs text-emerald-700 mt-1">
+                  {tempBasisData.haftpflicht?.status === 'fehlt' 
+                    ? 'Haftpflicht sofort abschließen!'
+                    : tempBasisData.berufsunfaehigkeit?.status === 'fehlt'
+                    ? 'BU-Versicherung prüfen'
+                    : 'Basis-Schutz vorhanden'}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Detail Modal */}
-      <Modal isOpen={showDetailModal} onClose={() => setShowDetailModal(false)}>
-        {selectedVersicherung && (
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 rounded-lg" style={{ backgroundColor: selectedVersicherung.farbe + '20' }}>
-                <div className="w-8 h-8" style={{ backgroundColor: selectedVersicherung.farbe }} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">{selectedVersicherung.name}</h2>
-                {selectedVersicherung.pflicht && (
-                  <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">PFLICHTVERSICHERUNG</span>
-                )}
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-12">
+                {versicherungsKategorien.map((kategorie) => {
+                  const istVorhanden = tempBasisData[kategorie.id]?.status === 'vorhanden';
+                  const istTeilweise = tempBasisData[kategorie.id]?.status === 'teilweise';
+                  const kosten = calculateVersicherungskosten(kategorie.id);
+                  
+                  return (
+                    <div key={kategorie.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                          activeField === kategorie.id 
+                            ? 'text-white shadow-2xl transform scale-105' 
+                            : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                          borderColor: activeField === kategorie.id ? kategorie.color : 
+                                      istVorhanden ? '#059669' : 
+                                      istTeilweise ? '#f59e0b' : '#ef4444'
+                        }}
+                        onClick={() => {
+                          if (activeField !== kategorie.id) {
+                            setActiveField(kategorie.id);
+                            setTempBasisData({...basisAbsicherungData});
+                          }
+                        }}
+                      >
+                        {/* Status-Indikator */}
+                        <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                          istVorhanden ? 'bg-green-500' : istTeilweise ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}>
+                          {istVorhanden ? '✓' : istTeilweise ? '◐' : '✗'}
+                        </div>
+
+                        <span className="text-3xl mb-2">{kategorie.icon}</span>
+                        <span className="text-base font-bold text-center px-4 leading-tight">
+                          {kategorie.name}
+                        </span>
+                        <span className="text-xl font-bold mt-2">
+                          {kosten > 0 ? `${kosten}€` : '-'}
+                        </span>
+                        
+                        {/* Prioritäts-Badge */}
+                        <div className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded text-xs font-semibold ${
+                          kategorie.prioritaet === 'PFLICHT' ? 'bg-gray-600 text-white' :
+                          kategorie.prioritaet === 'KRITISCH' ? 'bg-red-600 text-white' :
+                          kategorie.prioritaet === 'SEHR HOCH' ? 'bg-orange-600 text-white' :
+                          kategorie.prioritaet === 'MITTEL' ? 'bg-yellow-600 text-white' :
+                          'bg-green-600 text-white'
+                        }`}>
+                          {kategorie.prioritaet}
+                        </div>
+                        
+                        {/* Hover-Info */}
+                        <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none max-w-48 text-center z-10">
+                          <div className="font-semibold">{kategorie.beschreibung}</div>
+                          <div className="text-emerald-300 mt-1">{kategorie.empfehlung}</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-gray-700">{selectedVersicherung.beschreibung}</p>
-                {selectedVersicherung.details && (
-                  <p className="text-sm text-gray-600 mt-2">{selectedVersicherung.details}</p>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">Aktueller Status</p>
-                  <p className="text-lg font-bold" style={{ 
-                    color: tempBasisData[selectedVersicherung.id].status === 'vorhanden' ? '#059669' : '#dc2626' 
-                  }}>
-                    {tempBasisData[selectedVersicherung.id].status === 'vorhanden' ? 'Aktiv' : 
-                     tempBasisData[selectedVersicherung.id].status === 'teilweise' ? 'Teilweise' : 'Fehlt'}
-                  </p>
-                </div>
-                
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">Monatliche Kosten</p>
-                  <p className="text-lg font-bold text-gray-900">
-                    {tempBasisData[selectedVersicherung.id].monatlich || tempBasisData[selectedVersicherung.id].empfohlen || 0}€
-                  </p>
-                </div>
-              </div>
-              
-              {tempBasisData[selectedVersicherung.id].status === 'fehlt' && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-orange-600">⚠️</span>
-                    <p className="text-orange-800 font-medium">Empfohlene Maßnahme</p>
-                  </div>
-                  <p className="text-sm text-orange-700 mt-1">
-                    Schließen Sie diese Versicherung ab. Empfohlener Beitrag: {tempBasisData[selectedVersicherung.id].empfohlen}€/Monat
-                  </p>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = versicherungsKategorien.find(k => k.id === activeField);
+                    const aktuelleVersicherung = tempBasisData[activeField];
+                    
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-emerald-200 pb-4">
+                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
+                          </h3>
+                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                          <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 ${
+                            aktiveKategorie.prioritaet === 'PFLICHT' ? 'bg-gray-100 text-gray-800' :
+                            aktiveKategorie.prioritaet === 'KRITISCH' ? 'bg-red-100 text-red-800' :
+                            aktiveKategorie.prioritaet === 'SEHR HOCH' ? 'bg-orange-100 text-orange-800' :
+                            aktiveKategorie.prioritaet === 'MITTEL' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            Priorität: {aktiveKategorie.prioritaet}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {/* Status-Auswahl */}
+                          <div>
+                            <label className="block text-sm font-semibold text-emerald-700 mb-3">
+                              Versicherungsstatus
+                            </label>
+                            <div className="grid grid-cols-3 gap-3">
+                              {['vorhanden', 'teilweise', 'fehlt'].map((status) => (
+                                <button
+                                  key={status}
+                                  onClick={() => updateVersicherung(activeField, 'status', status)}
+                                  className={`p-3 rounded-lg border-2 text-center font-semibold transition-all ${
+                                    aktuelleVersicherung?.status === status
+                                      ? status === 'vorhanden' ? 'bg-green-500 text-white border-green-500'
+                                        : status === 'teilweise' ? 'bg-yellow-500 text-white border-yellow-500'
+                                        : 'bg-red-500 text-white border-red-500'
+                                      : 'bg-white text-gray-700 border-gray-300 hover:border-emerald-400'
+                                  }`}
+                                >
+                                  {status === 'vorhanden' ? '✅ Vorhanden' 
+                                   : status === 'teilweise' ? '⚡ Teilweise'
+                                   : '❌ Fehlt'}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Monatliche Kosten */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-semibold text-emerald-700 mb-2">
+                                Aktuelle Kosten (€/Monat)
+                              </label>
+                              <input 
+                                type="number"
+                                value={aktuelleVersicherung?.monatlich || 0}
+                                onChange={(e) => updateVersicherung(activeField, 'monatlich', e.target.value)}
+                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center font-semibold"
+                                placeholder="0"
+                                min="0"
+                                max="1000"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold text-emerald-700 mb-2">
+                                Empfohlener Betrag (€/Monat)
+                              </label>
+                              <div className="p-3 bg-emerald-50 border-2 border-emerald-200 rounded-lg text-center font-semibold text-emerald-800">
+                                {aktuelleVersicherung?.empfohlen || 'Individuell'}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Versicherungsdetails */}
+                          {activeField === 'haftpflicht' && (
+                            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                              <h4 className="font-semibold text-red-800 mb-2">🚨 Warum so wichtig?</h4>
+                              <p className="text-sm text-red-700">
+                                Ein einziger Schaden kann Sie finanziell ruinieren. Schon ein Fahrradunfall mit Personenschaden 
+                                kann Millionen kosten. Diese Versicherung ist existenziell wichtig!
+                              </p>
+                            </div>
+                          )}
+
+                          {activeField === 'berufsunfaehigkeit' && (
+                            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                              <h4 className="font-semibold text-orange-800 mb-2">💼 Ihr wertvollstes Gut</h4>
+                              <p className="text-sm text-orange-700">
+                                Ihre Arbeitskraft ist Ihr wertvollstes Vermögen. Statistisch wird jeder 4. Deutsche 
+                                berufsunfähig. Die gesetzliche EM-Rente reicht nicht zum Leben.
+                              </p>
+                            </div>
+                          )}
+
+                          {activeField === 'krankenversicherung' && (
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                              <h4 className="font-semibold text-blue-800 mb-2">🏥 Gesetzliche Pflicht</h4>
+                              <p className="text-sm text-blue-700">
+                                In Deutschland besteht Krankenversicherungspflicht. Wählen Sie zwischen 
+                                gesetzlicher (ca. 14,6% + Zusatzbeitrag) oder privater Krankenversicherung.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Kosten-Übersicht */}
+                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold text-emerald-800">Aktuelle Kosten:</span>
+                            <span className="text-xl font-bold text-emerald-700">
+                              {calculateVersicherungskosten(activeField)}€/Monat
+                            </span>
+                          </div>
+                          <div className="text-sm text-emerald-600">
+                            Status: <span className="font-semibold">
+                              {aktuelleVersicherung?.status === 'vorhanden' ? 'Vollständig abgesichert' :
+                               aktuelleVersicherung?.status === 'teilweise' ? 'Teilweise abgesichert' :
+                               'Nicht abgesichert - Handlungsbedarf!'}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
+                          >
+                            🛡️ Absicherung speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                          >
+                            ↶ Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
-              
-              <button 
-                onClick={() => setShowDetailModal(false)}
-                className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors"
-              >
-                Schließen
-              </button>
             </div>
           </div>
-        )}
-      </Modal>
-      
+        </div>
+      </div>
+      <Sidebar /> 
       <NavigationButtons />
     </div>
   );
 };
+
 // BudgetPage - ÜBERARBEITET im Fixkosten-Stil mit Kreisen
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
