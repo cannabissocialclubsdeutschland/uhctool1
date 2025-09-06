@@ -2030,213 +2030,372 @@ const BasisAbsicherungPage = () => {
     </div>
   );
 };
-  // Budget Input Page mit vergrößerten Kreisen und korrigierter Event-Behandlung
-  const BudgetPage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempValues, setTempValues] = useState({...finanzData});
+ // BudgetPage - OPTIMIERT mit verbesserter UX und Validierungen
+const BudgetPage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempValues, setTempValues] = useState({...finanzData});
+  const [errors, setErrors] = useState({});
+  const [showSummary, setShowSummary] = useState(false);
 
-    const handleInputChange = (field, value) => {
-      setTempValues(prev => ({
-        ...prev,
-        [field]: parseFloat(value) || 0
-      }));
-    };
+  const handleInputChange = (field, value) => {
+    const numValue = parseFloat(value) || 0;
+    
+    // Validierung
+    let newErrors = {...errors};
+    if (numValue < 0) {
+      newErrors[field] = 'Negative Werte sind nicht erlaubt';
+    } else if (numValue > 50000) {
+      newErrors[field] = 'Wert scheint unrealistisch hoch';
+    } else {
+      delete newErrors[field];
+    }
+    setErrors(newErrors);
+    
+    setTempValues(prev => ({
+      ...prev,
+      [field]: numValue
+    }));
+  };
 
-    const handleSave = () => {
+  const handleSave = () => {
+    if (Object.keys(errors).length === 0) {
       setFinanzData(tempValues);
       setActiveField(null);
       setGehaltExpanded(false);
-    };
+      setShowSummary(true);
+      
+      // Auto-hide Summary nach 3 Sekunden
+      setTimeout(() => setShowSummary(false), 3000);
+    }
+  };
 
-    const handleCancel = () => {
-      setTempValues({...finanzData});
-      setActiveField(null);
-      setGehaltExpanded(false);
-    };
+  const handleCancel = () => {
+    setTempValues({...finanzData});
+    setActiveField(null);
+    setGehaltExpanded(false);
+    setErrors({});
+  };
 
-    const einkommensfelder = [
-      { 
-        id: 'gehalt', 
-        name: 'Gehalt', 
-        value: tempValues.gehaltNetto, 
-        field: 'gehaltNetto',
-        hasExpanded: true
-      },
-      { 
-        id: 'zusatz', 
-        name: 'Zusatzeinkommen', 
-        value: tempValues.zusatzeinkommen, 
-        field: 'zusatzeinkommen'
-      },
-      { 
-        id: 'kapital', 
-        name: 'Kapitalerträge', 
-        value: tempValues.kapitalertraege, 
-        field: 'kapitalertraege'
-      },
-      { 
-        id: 'miete', 
-        name: 'Mieteinnahmen', 
-        value: tempValues.mieteinnahmen, 
-        field: 'mieteinnahmen'
-      },
-      { 
-        id: 'individuell', 
-        name: 'Individuell', 
-        value: tempValues.individuell, 
-        field: 'individuell'
-      }
-    ];
+  const calculateTempBudget = () => {
+    return tempValues.gehaltNetto + tempValues.zusatzeinkommen + 
+           tempValues.kapitalertraege + tempValues.mieteinnahmen + tempValues.individuell;
+  };
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-        <HeaderBars />
-        
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {einkommensfelder.map((feld) => (
-                    <div key={feld.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          activeField === feld.id 
-                            ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === feld.id ? '#004225' : 'white',
-                          borderColor: activeField === feld.id ? '#004225' : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== feld.id) {
-                            setActiveField(feld.id);
-                            setTempValues({...finanzData});
-                          }
-                        }}
-                      >
-                        <span className="text-lg font-semibold text-center px-4 leading-tight">
-                          {feld.name}
-                        </span>
-                        <span className="text-2xl font-bold mt-2">
-                          {feld.value.toLocaleString()}€
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  const einkommensfelder = [
+    { 
+      id: 'gehalt', 
+      name: 'Netto-Gehalt', 
+      value: tempValues.gehaltNetto, 
+      field: 'gehaltNetto',
+      hasExpanded: true,
+      icon: '💼',
+      color: '#065f46',
+      placeholder: 'z.B. 2500€',
+      beschreibung: 'Ihr monatliches Netto-Einkommen'
+    },
+    { 
+      id: 'zusatz', 
+      name: 'Zusatz-einkommen', 
+      value: tempValues.zusatzeinkommen, 
+      field: 'zusatzeinkommen',
+      icon: '💰',
+      color: '#047857',
+      placeholder: 'z.B. 500€',
+      beschreibung: 'Nebentätigkeit, Freelancing, etc.'
+    },
+    { 
+      id: 'kapital', 
+      name: 'Kapital-erträge', 
+      value: tempValues.kapitalertraege, 
+      field: 'kapitalertraege',
+      icon: '📈',
+      color: '#059669',
+      placeholder: 'z.B. 150€',
+      beschreibung: 'Dividenden, Zinsen, Mieteinnahmen'
+    },
+    { 
+      id: 'miete', 
+      name: 'Miet-einnahmen', 
+      value: tempValues.mieteinnahmen, 
+      field: 'mieteinnahmen',
+      icon: '🏠',
+      color: '#10b981',
+      placeholder: 'z.B. 800€',
+      beschreibung: 'Einnahmen aus Vermietung'
+    },
+    { 
+      id: 'individuell', 
+      name: 'Sonstige Einnahmen', 
+      value: tempValues.individuell, 
+      field: 'individuell',
+      icon: '📊',
+      color: '#34d399',
+      placeholder: 'z.B. 200€',
+      beschreibung: 'Unterhalt, Kindergeld, etc.'
+    }
+  ];
 
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-2xl shadow-xl"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {(() => {
-                      const aktivesFeld = einkommensfelder.find(f => f.id === activeField);
-                      return (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-bold text-slate-800 text-center">
-                            {aktivesFeld.name} eingeben
-                          </h3>
-                          
-                          <div className="flex flex-col items-center space-y-4">
-                            <div className="w-full max-w-sm">
-                              <label className="block text-base font-semibold text-slate-700 mb-3 text-center">
-                                {activeField === 'gehalt' ? 'Netto-Gehalt' : 'Monatlicher Betrag'}
-                              </label>
-                              <input 
-                                type="number" 
-                                value={tempValues[aktivesFeld.field]}
-                                onChange={(e) => handleInputChange(aktivesFeld.field, e.target.value)}
-                                className="w-full p-4 bg-white border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-xl font-semibold"
-                                placeholder="0"
-                                autoFocus
-                              />
-                            </div>
-                            
-                            {activeField === 'gehalt' && (
-                              <div className="w-full max-w-sm">
-                                <button 
-                                  onClick={() => setGehaltExpanded(!gehaltExpanded)}
-                                  className="text-base font-semibold transition-colors w-full py-3 px-4 rounded-xl border-2 border-slate-300 hover:bg-slate-50"
-                                  style={{color: '#004225'}}
-                                >
-                                  {gehaltExpanded ? 'Weniger Details' : 'Erweitert'}
-                                </button>
-                                
-                                {gehaltExpanded && (
-                                  <div className="mt-4 space-y-3 pt-4 border-t-2 border-slate-200">
-                                    <div>
-                                      <label className="block text-sm font-semibold text-slate-700 mb-2 text-center">
-                                        Brutto-Gehalt
-                                      </label>
-                                      <input 
-                                        type="number" 
-                                        value={gehaltDetails.brutto}
-                                        onChange={(e) => setGehaltDetails(prev => ({
-                                          ...prev, 
-                                          brutto: parseFloat(e.target.value) || 0
-                                        }))}
-                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
-                                        placeholder="0"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-sm font-semibold text-slate-700 mb-2 text-center">
-                                        Zusatzleistungen
-                                      </label>
-                                      <input 
-                                        type="number" 
-                                        value={gehaltDetails.zusatzleistungen}
-                                        onChange={(e) => setGehaltDetails(prev => ({
-                                          ...prev, 
-                                          zusatzleistungen: parseFloat(e.target.value) || 0
-                                        }))}
-                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
-                                        placeholder="0"
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            <div className="flex space-x-4 mt-6">
-                              <button 
-                                onClick={handleSave}
-                                className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
-                                style={{backgroundColor: '#004225'}}
-                              >
-                                Speichern
-                              </button>
-                              <button 
-                                onClick={handleCancel}
-                                className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                              >
-                                Zurück
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                )}
+  const getBudgetStatus = () => {
+    const budget = calculateTempBudget();
+    if (budget < 1000) return { text: 'Sehr knapp', color: '#ef4444', icon: '⚠️' };
+    if (budget < 2000) return { text: 'Grundversorgung', color: '#f59e0b', icon: '⚡' };
+    if (budget < 3500) return { text: 'Solide Basis', color: '#10b981', icon: '✅' };
+    if (budget < 5000) return { text: 'Komfortabel', color: '#059669', icon: '💎' };
+    return { text: 'Sehr gut situiert', color: '#065f46', icon: '🌟' };
+  };
+
+  const budgetStatus = getBudgetStatus();
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
+      {/* Success Summary */}
+      {showSummary && (
+        <div className="fixed top-40 left-1/2 transform -translate-x-1/2 z-50 animate-pulse">
+          <div className="bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">✅</span>
+              <div>
+                <div className="font-bold">Budget gespeichert!</div>
+                <div className="text-sm">Gesamtbudget: {calculateTempBudget().toLocaleString()}€</div>
               </div>
             </div>
           </div>
         </div>
-        <Sidebar /> 
-        <NavigationButtons />
+      )}
+      
+      <div className="h-screen flex flex-col pt-32">
+        {/* Budget-Status-Banner */}
+        <div className="flex-shrink-0 bg-white/90 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
+                💼 Budget-Eingabe
+              </h2>
+              <p className="text-emerald-600 flex items-center gap-2">
+                <span>Aktuelles Budget: <span className="font-bold">{calculateTempBudget().toLocaleString()}€</span></span>
+                <span className="flex items-center gap-1" style={{color: budgetStatus.color}}>
+                  {budgetStatus.icon} {budgetStatus.text}
+                </span>
+              </p>
+            </div>
+            
+            {/* Schnell-Tipps */}
+            <div className="bg-emerald-50 p-3 rounded-lg max-w-sm">
+              <div className="text-sm text-emerald-800 font-semibold">💡 Tipp</div>
+              <div className="text-xs text-emerald-700 mt-1">
+                {calculateTempBudget() < 2000 
+                  ? 'Fokussieren Sie sich auf Fixkosten-Optimierung'
+                  : calculateTempBudget() < 3500
+                  ? 'Bauen Sie einen Notgroschen auf'
+                  : 'Perfekt für diversifizierte Geldanlage'}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="grid grid-cols-3 gap-8 max-w-5xl">
+                {einkommensfelder.map((feld, index) => (
+                  <div key={feld.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-52 h-52 rounded-2xl border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === feld.id 
+                          ? 'text-white shadow-2xl transform scale-105' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === feld.id ? feld.color : 'white',
+                        borderColor: activeField === feld.id ? feld.color : errors[feld.field] ? '#ef4444' : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== feld.id) {
+                          setActiveField(feld.id);
+                          setTempValues({...finanzData});
+                          setErrors({});
+                        }
+                      }}
+                    >
+                      <span className="text-4xl mb-2">{feld.icon}</span>
+                      <span className="text-base font-bold text-center px-4 leading-tight">
+                        {feld.name}
+                      </span>
+                      <span className="text-xl font-bold mt-2">
+                        {feld.value.toLocaleString()}€
+                      </span>
+                      
+                      {/* Error Indicator */}
+                      {errors[feld.field] && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">
+                          !
+                        </div>
+                      )}
+                      
+                      {/* Hover-Info */}
+                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        {feld.beschreibung}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-2xl shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktivesFeld = einkommensfelder.find(f => f.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-emerald-200 pb-4">
+                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktivesFeld.icon}</span>
+                            {aktivesFeld.name}
+                          </h3>
+                          <p className="text-emerald-600 mt-1">{aktivesFeld.beschreibung}</p>
+                        </div>
+                        
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="w-full max-w-sm">
+                            <label className="block text-base font-semibold text-emerald-700 mb-3 text-center">
+                              Monatlicher Betrag in Euro
+                            </label>
+                            <div className="relative">
+                              <input 
+                                type="number" 
+                                value={tempValues[aktivesFeld.field]}
+                                onChange={(e) => handleInputChange(aktivesFeld.field, e.target.value)}
+                                className={`w-full p-4 bg-white border-2 rounded-xl outline-none text-center text-xl font-semibold pr-8 ${
+                                  errors[aktivesFeld.field] 
+                                    ? 'border-red-500 focus:ring-2 focus:ring-red-500' 
+                                    : 'border-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
+                                }`}
+                                placeholder={aktivesFeld.placeholder}
+                                autoFocus
+                                min="0"
+                                max="50000"
+                              />
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-700 font-bold">
+                                €
+                              </span>
+                            </div>
+                            {errors[aktivesFeld.field] && (
+                              <p className="text-red-500 text-sm mt-2 text-center">
+                                {errors[aktivesFeld.field]}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {activeField === 'gehalt' && (
+                            <div className="w-full max-w-sm">
+                              <button 
+                                onClick={() => setGehaltExpanded(!gehaltExpanded)}
+                                className="w-full py-3 px-4 rounded-xl border-2 border-emerald-300 hover:bg-emerald-50 transition-all text-emerald-700 font-semibold"
+                              >
+                                {gehaltExpanded ? '📊 Weniger Details' : '📊 Brutto-Details anzeigen'}
+                              </button>
+                              
+                              {gehaltExpanded && (
+                                <div className="mt-4 space-y-3 pt-4 border-t-2 border-emerald-200">
+                                  <div>
+                                    <label className="block text-sm font-semibold text-emerald-700 mb-2 text-center">
+                                      Brutto-Gehalt (optional)
+                                    </label>
+                                    <input 
+                                      type="number" 
+                                      value={gehaltDetails.brutto}
+                                      onChange={(e) => setGehaltDetails(prev => ({
+                                        ...prev, 
+                                        brutto: parseFloat(e.target.value) || 0
+                                      }))}
+                                      className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center text-base"
+                                      placeholder="z.B. 3500€"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-semibold text-emerald-700 mb-2 text-center">
+                                      Zusatzleistungen (optional)
+                                    </label>
+                                    <input 
+                                      type="number" 
+                                      value={gehaltDetails.zusatzleistungen}
+                                      onChange={(e) => setGehaltDetails(prev => ({
+                                        ...prev, 
+                                        zusatzleistungen: parseFloat(e.target.value) || 0
+                                      }))}
+                                      className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center text-base"
+                                      placeholder="z.B. Dienstwagen 200€"
+                                    />
+                                  </div>
+                                  
+                                  {/* Steuer-Tipp */}
+                                  <div className="bg-blue-50 p-3 rounded-lg text-sm">
+                                    <div className="font-semibold text-blue-800">💡 Steuer-Tipp:</div>
+                                    <div className="text-blue-700">
+                                      Abzüge: ca. {gehaltDetails.brutto > 0 ? 
+                                        Math.round((gehaltDetails.brutto - tempValues.gehaltNetto) / gehaltDetails.brutto * 100) : 0}%
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Live Budget Preview */}
+                          <div className="w-full bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            <div className="text-center">
+                              <div className="text-sm text-emerald-600 font-semibold">Vorschau Gesamtbudget</div>
+                              <div className="text-2xl font-bold text-emerald-800 mt-1">
+                                {calculateTempBudget().toLocaleString()}€
+                              </div>
+                              <div className="text-xs text-emerald-600 flex items-center justify-center gap-1 mt-1">
+                                {budgetStatus.icon} {budgetStatus.text}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex space-x-4 mt-6">
+                            <button 
+                              onClick={handleSave}
+                              disabled={Object.keys(errors).length > 0}
+                              className={`px-8 py-3 text-base font-semibold text-white rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105 ${
+                                Object.keys(errors).length > 0 
+                                  ? 'bg-gray-400 cursor-not-allowed' 
+                                  : 'bg-emerald-600 hover:bg-emerald-700'
+                              }`}
+                            >
+                              💾 Speichern
+                            </button>
+                            <button 
+                              onClick={handleCancel}
+                              className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                            >
+                              ↶ Abbrechen
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    );
-  };
+      <Sidebar /> 
+      <NavigationButtons />
+    </div>
+  );
+};
 
 // FixkostenPage - VOLLSTÄNDIG KORRIGIERT mit richtigen State-Variablen und Grünschema
 const FixkostenPage = () => {
@@ -2486,392 +2645,690 @@ const FixkostenPage = () => {
     </div>
   );
 };
-  // Lifestyle Page
-  const LifestylePage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempLifestyle, setTempLifestyle] = useState({...lifestyleData});
+  // LifestylePage - VOLLSTÄNDIG FERTIGGESTELLT mit Grünschema
+const LifestylePage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempLifestyle, setTempLifestyle] = useState({...lifestyleData});
+  const [showBudgetWarning, setShowBudgetWarning] = useState(false);
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempLifestyle[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const calculateKategorieTotal = (kategorie) => {
+    return tempLifestyle[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
 
-    const addEintrag = (kategorie) => {
-      setTempLifestyle(prev => ({
-        ...prev,
-        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-      }));
-    };
+  const addEintrag = (kategorie) => {
+    setTempLifestyle(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
 
-    const removeEintrag = (kategorie, index) => {
-      setTempLifestyle(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-      }));
-    };
+  const removeEintrag = (kategorie, index) => {
+    setTempLifestyle(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
 
-    const updateEintrag = (kategorie, index, field, value) => {
-      setTempLifestyle(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].map((item, i) => 
-          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-        )
-      }));
-    };
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempLifestyle(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
 
-    const handleSave = () => {
-      setLifestyleData(tempLifestyle);
-      const newTotal = Object.keys(tempLifestyle).reduce((total, key) => {
-        return total + calculateKategorieTotal(key);
-      }, 0);
-      setFinanzData(prev => ({ ...prev, lifestyleTotal: newTotal }));
-      setActiveField(null);
-    };
+  const handleSave = () => {
+    setLifestyleData(tempLifestyle);
+    const newTotal = Object.keys(tempLifestyle).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+    
+    // Budget-Warnung prüfen
+    const budgetAnteil = (newTotal / calculateBudget()) * 100;
+    if (budgetAnteil > 30) {
+      setShowBudgetWarning(true);
+      setTimeout(() => setShowBudgetWarning(false), 5000);
+    }
+    
+    setFinanzData(prev => ({ ...prev, lifestyleTotal: newTotal }));
+    setActiveField(null);
+  };
 
-    const handleCancel = () => {
-      setTempLifestyle({...lifestyleData});
-      setActiveField(null);
-    };
+  const handleCancel = () => {
+    setTempLifestyle({...lifestyleData});
+    setActiveField(null);
+  };
 
-    const lifestyleKategorien = [
-      { id: 'freizeit', name: 'Freizeit', icon: '🎭' },
-      { id: 'restaurant', name: 'Restaurant', icon: '🍽️' },
-      { id: 'shopping', name: 'Shopping', icon: '🛍️' },
-      { id: 'wellness', name: 'Wellness', icon: '💆' },
-      { id: 'hobbies', name: 'Hobbies', icon: '🎨' }
-    ];
+  const lifestyleKategorien = [
+    { 
+      id: 'freizeit', 
+      name: 'Freizeit & Entertainment', 
+      icon: '🎭', 
+      color: '#065f46',
+      beschreibung: 'Kino, Konzerte, Events, Streaming'
+    },
+    { 
+      id: 'restaurant', 
+      name: 'Restaurants & Ausgehen', 
+      icon: '🍽️', 
+      color: '#047857',
+      beschreibung: 'Essen gehen, Bars, Cafés'
+    },
+    { 
+      id: 'shopping', 
+      name: 'Shopping & Mode', 
+      icon: '🛍️', 
+      color: '#059669',
+      beschreibung: 'Kleidung, Accessoires, Schuhe'
+    },
+    { 
+      id: 'wellness', 
+      name: 'Wellness & Fitness', 
+      icon: '💆', 
+      color: '#10b981',
+      beschreibung: 'Fitnessstudio, Spa, Massage'
+    },
+    { 
+      id: 'hobbies', 
+      name: 'Hobbies & Interessen', 
+      icon: '🎨', 
+      color: '#34d399',
+      beschreibung: 'Sport, Kunst, Musik, Sammeln'
+    }
+  ];
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-        <HeaderBars />
-        
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-slate-800">Lifestyle</h2>
-                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.lifestyleTotal.toLocaleString()}€</p>
+  const calculateLifestyleBudgetAnteil = () => {
+    const total = Object.keys(tempLifestyle).reduce((sum, key) => sum + calculateKategorieTotal(key), 0);
+    return (total / calculateBudget()) * 100;
+  };
+
+  const getLifestyleStatus = () => {
+    const anteil = calculateLifestyleBudgetAnteil();
+    if (anteil < 15) return { text: 'Sparsam', color: '#059669', icon: '💚' };
+    if (anteil < 25) return { text: 'Ausgewogen', color: '#10b981', icon: '⚖️' };
+    if (anteil < 35) return { text: 'Komfortabel', color: '#f59e0b', icon: '🌟' };
+    return { text: 'Luxuriös', color: '#ef4444', icon: '⚠️' };
+  };
+
+  const lifestyleStatus = getLifestyleStatus();
+
+  const getKategorieStats = () => {
+    const stats = lifestyleKategorien.map(kat => ({
+      ...kat,
+      betrag: calculateKategorieTotal(kat.id),
+      prozent: finanzData.lifestyleTotal > 0 ? 
+        (calculateKategorieTotal(kat.id) / finanzData.lifestyleTotal * 100) : 0
+    }));
+    
+    return stats.sort((a, b) => b.betrag - a.betrag);
+  };
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-teal-50 font-sans">
+      <HeaderBars />
+      
+      {/* Budget Warning */}
+      {showBudgetWarning && (
+        <div className="fixed top-40 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-yellow-500 text-white px-6 py-3 rounded-xl shadow-2xl animate-pulse">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <div className="font-bold">Lifestyle-Budget hoch!</div>
+                <div className="text-sm">Über 30% Ihres Budgets. Überprüfen Sie Ihre Ausgaben.</div>
               </div>
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {lifestyleKategorien.map((kategorie) => (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-slate-500 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? '#64748b' : 'white',
-                          borderColor: activeField === kategorie.id ? '#64748b' : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id) {
-                            setActiveField(kategorie.id);
-                            setTempLifestyle({...lifestyleData});
-                          }
-                        }}
-                      >
-                        <span className="text-3xl mb-2">{kategorie.icon}</span>
-                        <span className="text-lg font-semibold text-center px-4 leading-tight">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-2xl font-bold mt-2">
-                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="h-screen flex flex-col pt-32">
+        {/* Lifestyle-Dashboard */}
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-800">Lifestyle-Übersicht</h2>
+              <p className="text-emerald-600">
+                Gesamtsumme: <span className="font-bold">{finanzData.lifestyleTotal.toLocaleString()}€</span> | 
+                Budget-Anteil: <span className="font-bold">{calculateLifestyleBudgetAnteil().toFixed(1)}%</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className={`px-4 py-2 rounded-lg ${lifestyleStatus.color === '#ef4444' ? 'bg-red-50' : lifestyleStatus.color === '#f59e0b' ? 'bg-yellow-50' : 'bg-emerald-50'}`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{lifestyleStatus.icon}</span>
+                  <div>
+                    <p className="font-bold" style={{color: lifestyleStatus.color}}>
+                      {lifestyleStatus.text}
+                    </p>
+                  </div>
                 </div>
               </div>
+              <div className="flex gap-4">
+                {getKategorieStats().slice(0, 3).map((kat) => (
+                  <div key={kat.id} className="text-center">
+                    <div className="text-2xl">{kat.icon}</div>
+                    <div className="text-xs text-gray-600">{kat.name}</div>
+                    <div className="font-bold text-emerald-700">{kat.betrag}€</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-12">
+                {lifestyleKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl transform scale-105' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempLifestyle({...lifestyleData});
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
+                      <span className="text-base font-bold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-xl font-bold mt-2">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
+                      
+                      {/* Hover-Info */}
+                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        {kategorie.beschreibung}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {(() => {
-                      const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
-                      return (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-bold text-slate-800 text-center">
-                            {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-emerald-200 pb-4">
+                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
                           </h3>
-                          
-                          <div className="space-y-4">
-                            {tempLifestyle[activeField].map((eintrag, index) => (
-                              <div key={index} className="flex gap-3 items-center">
+                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {tempLifestyle[activeField].map((eintrag, index) => (
+                            <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                              <div className="flex-1">
                                 <input 
                                   type="text"
                                   value={eintrag.bezeichnung}
                                   onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                  placeholder="Bezeichnung"
-                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none"
+                                  placeholder={`${aktiveKategorie.name === 'Freizeit & Entertainment' ? 'z.B. Netflix, Kino, Konzerte' : 
+                                               aktiveKategorie.name === 'Restaurants & Ausgehen' ? 'z.B. Restaurant, Bar, Café' : 
+                                               aktiveKategorie.name === 'Shopping & Mode' ? 'z.B. Kleidung, Schuhe, Accessoires' :
+                                               aktiveKategorie.name === 'Wellness & Fitness' ? 'z.B. Fitnessstudio, Massage, Spa' :
+                                               'z.B. Sportausrüstung, Musikinstrument'}`}
+                                  className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
                                 />
+                              </div>
+                              <div className="flex items-center gap-2">
                                 <input 
                                   type="number"
                                   value={eintrag.betrag}
                                   onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                                   placeholder="0"
-                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none text-right"
+                                  className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
                                 />
-                                <span className="text-lg font-semibold">€</span>
-                                {tempLifestyle[activeField].length > 1 && (
-                                  <button
-                                    onClick={() => removeEintrag(activeField, index)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                  >
-                                    ✕
-                                  </button>
-                                )}
+                                <span className="text-lg font-semibold text-emerald-700">€</span>
                               </div>
-                            ))}
-                            
-                            <button
-                              onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <span className="text-2xl">+</span>
-                              <span className="font-semibold">Neue Ausgabe hinzufügen</span>
-                            </button>
-                          </div>
-                          
-                          <div className="border-t-2 border-slate-200 pt-4">
-                            <div className="flex justify-between items-center text-lg font-bold">
-                              <span>Gesamtsumme:</span>
-                              <span className="text-slate-700">
-                                {calculateKategorieTotal(activeField).toLocaleString()}€
-                              </span>
+                              {tempLifestyle[activeField].length > 1 && (
+                                <button
+                                  onClick={() => removeEintrag(activeField, index)}
+                                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
+                                  title="Eintrag löschen"
+                                >
+                                  ✕
+                                </button>
+                              )}
                             </div>
-                          </div>
+                          ))}
                           
-                          <div className="flex space-x-4 justify-center">
-                            <button 
-                              onClick={handleSave}
-                              className="px-8 py-3 text-base font-semibold text-white bg-slate-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-700"
-                            >
-                              Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                            >
-                              Zurück
-                            </button>
+                          <button
+                            onClick={() => addEintrag(activeField)}
+                            className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
+                              +
+                            </div>
+                            <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Lifestyle-Eintrag hinzufügen</span>
+                          </button>
+                        </div>
+                        
+                        {/* Kategorie-Statistiken */}
+                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
+                            <span className="text-xl font-bold text-emerald-700">
+                              {calculateKategorieTotal(activeField).toLocaleString()}€
+                            </span>
+                          </div>
+                          <div className="text-sm text-emerald-600">
+                            Anteil an Lifestyle-Budget: {finanzData.lifestyleTotal > 0 ? 
+                              ((calculateKategorieTotal(activeField) / finanzData.lifestyleTotal) * 100).toFixed(1) : 0}%
+                          </div>
+                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${finanzData.lifestyleTotal > 0 ? 
+                                  (calculateKategorieTotal(activeField) / finanzData.lifestyleTotal) * 100 : 0}%`
+                              }}
+                            />
                           </div>
                         </div>
-                      );
-                    })()}
-                  </div>
-                )}
-              </div>
+                        
+                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
+                          >
+                            💾 Lifestyle speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                          >
+                            ↶ Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <Sidebar />
-        <NavigationButtons />
       </div>
-    );
+      <Sidebar />
+      <NavigationButtons />
+    </div>
+  );
+};
+
+// SicherheitPage - VOLLSTÄNDIG KORRIGIERT mit richtigen State-Variablen und professionellem Design
+const SicherheitPage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempSicherheit, setTempSicherheit] = useState({...sicherheitData}); // KORRIGIERT: richtige Variable
+
+  const calculateKategorieTotal = (kategorie) => {
+    return tempSicherheit[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
   };
-// Sicherheit Page
-  const SicherheitPage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempSicherheit, setTempSicherheit] = useState({...sicherheitData});
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempSicherheit[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const addEintrag = (kategorie) => {
+    setTempSicherheit(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
 
-    const addEintrag = (kategorie) => {
-      setTempSicherheit(prev => ({
-        ...prev,
-        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-      }));
-    };
+  const removeEintrag = (kategorie, index) => {
+    setTempSicherheit(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
 
-    const removeEintrag = (kategorie, index) => {
-      setTempSicherheit(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-      }));
-    };
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempSicherheit(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
 
-    const updateEintrag = (kategorie, index, field, value) => {
-      setTempSicherheit(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].map((item, i) => 
-          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-        )
-      }));
-    };
+  const handleSave = () => {
+    setSicherheitData(tempSicherheit);
+    const newTotal = Object.keys(tempSicherheit).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+    setFinanzData(prev => ({ ...prev, sicherheit: newTotal }));
+    setActiveField(null);
+  };
 
-    const handleSave = () => {
-      setSicherheitData(tempSicherheit);
-      const newTotal = Object.keys(tempSicherheit).reduce((total, key) => {
-        return total + calculateKategorieTotal(key);
-      }, 0);
-      setFinanzData(prev => ({ ...prev, sicherheit: newTotal }));
-      setActiveField(null);
-    };
+  const handleCancel = () => {
+    setTempSicherheit({...sicherheitData}); // KORRIGIERT: richtige Variable
+    setActiveField(null);
+  };
 
-    const handleCancel = () => {
-      setTempSicherheit({...sicherheitData});
-      setActiveField(null);
-    };
+  const sicherheitKategorien = [
+    { 
+      id: 'notgroschen', 
+      name: 'Notgroschen', 
+      icon: '🛡️', 
+      color: '#065f46', 
+      beschreibung: '3-6 Monatsausgaben als Rücklage',
+      tipp: 'Empfehlung: 3-6x Ihre monatlichen Fixkosten'
+    },
+    { 
+      id: 'versicherungen', 
+      name: 'Versicherungen', 
+      icon: '📄', 
+      color: '#047857', 
+      beschreibung: 'Haftpflicht, BU, Hausrat, etc.',
+      tipp: 'Basis-Absicherung ist essentiell'
+    },
+    { 
+      id: 'altersvorsorge', 
+      name: 'Altersvorsorge', 
+      icon: '👴', 
+      color: '#059669', 
+      beschreibung: 'Private Rente, Riester, Rürup',
+      tipp: 'Je früher desto besser durch Zinseszinseffekt'
+    },
+    { 
+      id: 'gesundheit', 
+      name: 'Gesundheit', 
+      icon: '🏥', 
+      color: '#10b981', 
+      beschreibung: 'Zusatzversicherungen, Vorsorge',
+      tipp: 'Gesundheit ist unbezahlbar'
+    },
+    { 
+      id: 'sparen', 
+      name: 'Langfristiges Sparen', 
+      icon: '💰', 
+      color: '#34d399', 
+      beschreibung: 'ETFs, Aktien, Festgeld',
+      tipp: 'Diversifikation ist der Schlüssel'
+    }
+  ];
 
-    const sicherheitKategorien = [
-      { id: 'notgroschen', name: 'Notgroschen', icon: '🛡️' },
-      { id: 'versicherungen', name: 'Versicherungen', icon: '📄' },
-      { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴' },
-      { id: 'gesundheit', name: 'Gesundheit', icon: '🏥' },
-      { id: 'sparen', name: 'Sparen', icon: '💰' }
-    ];
+  // Berechne Sicherheits-Score
+  const calculateSicherheitsScore = () => {
+    const notgroschenkaufkraft = calculateKategorieTotal('notgroschen') / finanzData.fixkostenTotal;
+    const versicherungsSchutz = calculateKategorieTotal('versicherungen') > 50 ? 100 : (calculateKategorieTotal('versicherungen') / 50) * 100;
+    const altersvorsorgeAnteil = (calculateKategorieTotal('altersvorsorge') / calculateBudget()) * 100;
+    
+    const score = (
+      Math.min(notgroschenkaufkraft * 20, 30) +  // max 30% für Notgroschen
+      Math.min(versicherungsSchutz * 0.25, 25) + // max 25% für Versicherungen  
+      Math.min(altersvorsorgeAnteil * 2, 25) +   // max 25% für Altersvorsorge
+      Math.min((calculateKategorieTotal('gesundheit') / 100) * 100, 10) + // max 10% für Gesundheit
+      Math.min((calculateKategorieTotal('sparen') / 500) * 100, 10)  // max 10% für Sparen
+    );
+    
+    return Math.min(score, 100);
+  };
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-        <HeaderBars />
-        
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-slate-800">Sicherheit & Vorsorge</h2>
-                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.sicherheit.toLocaleString()}€</p>
-              </div>
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {sicherheitKategorien.map((kategorie) => (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-slate-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? '#94a3b8' : 'white',
-                          borderColor: activeField === kategorie.id ? '#94a3b8' : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id)
-        {
-                            setActiveField(kategorie.id);
-                            setTempFixkosten({...fixkostenData});
-                          }
-                        }}
-                      >
-                        <span className="text-3xl mb-2">{kategorie.icon}</span>
-                        <span className="text-lg font-semibold text-center px-4 leading-tight">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-2xl font-bold mt-2">
-                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+  const sicherheitsScore = calculateSicherheitsScore();
+  
+  const getSicherheitsLevel = () => {
+    if (sicherheitsScore >= 80) return { text: 'Exzellent abgesichert', color: '#059669', bg: 'bg-emerald-50' };
+    if (sicherheitsScore >= 60) return { text: 'Gut abgesichert', color: '#10b981', bg: 'bg-emerald-100' };
+    if (sicherheitsScore >= 40) return { text: 'Grundabsicherung', color: '#f59e0b', bg: 'bg-yellow-50' };
+    return { text: 'Verbesserungsbedarf', color: '#ef4444', bg: 'bg-red-50' };
+  };
+
+  const sicherheitsLevel = getSicherheitsLevel();
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
+      <div className="h-screen flex flex-col pt-32">
+        {/* Sicherheits-Dashboard */}
+        <div className="flex-shrink-0 bg-white/90 backdrop-blur-lg mx-8 mt-4 rounded-xl p-6 shadow-xl border border-emerald-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
+                🛡️ Sicherheit & Vorsorge
+              </h2>
+              <p className="text-emerald-600 mt-1">
+                Gesamtsumme: <span className="font-bold">{finanzData.sicherheit.toLocaleString()}€</span> | 
+                Budget-Anteil: <span className="font-bold">{((finanzData.sicherheit / calculateBudget()) * 100).toFixed(1)}%</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-6">
+              {/* Sicherheits-Score-Ring */}
+              <div className="relative">
+                <svg className="w-24 h-24 transform -rotate-90">
+                  <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="6" fill="none" />
+                  <circle 
+                    cx="48" cy="48" r="40" 
+                    stroke={sicherheitsLevel.color} 
+                    strokeWidth="6" 
+                    fill="none"
+                    strokeDasharray={`${sicherheitsScore * 2.51} 251`}
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold" style={{color: sicherheitsLevel.color}}>
+                    {sicherheitsScore.toFixed(0)}%
+                  </span>
+                  <span className="text-xs text-gray-600">Score</span>
                 </div>
               </div>
+              <div className={`px-4 py-2 rounded-lg ${sicherheitsLevel.bg}`}>
+                <p className="font-bold" style={{color: sicherheitsLevel.color}}>
+                  {sicherheitsLevel.text}
+                </p>
+              </div>
+            </div>
+          </div>
 
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {(() => {
-                      const aktiveKategorie = fixkostenKategorien.find(k => k.id === activeField);
-                      return (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-bold text-slate-800 text-center">
-                            {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
+          {/* Quick-Tipps basierend auf aktueller Situation */}
+          <div className="mt-4 p-4 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg">
+            <h4 className="font-semibold text-emerald-800 mb-2">💡 Ihr nächster Schritt:</h4>
+            <p className="text-sm text-emerald-700">
+              {calculateKategorieTotal('notgroschen') < finanzData.fixkostenTotal * 3 
+                ? `Erhöhen Sie Ihren Notgroschen auf ${(finanzData.fixkostenTotal * 3).toLocaleString()}€ (3x Fixkosten)`
+                : calculateKategorieTotal('versicherungen') < 50 
+                ? 'Prüfen Sie Ihre Basis-Absicherung (Haftpflicht, BU)'
+                : calculateKategorieTotal('altersvorsorge') < calculateBudget() * 0.1
+                ? 'Starten Sie mit 10% Ihres Budgets in die Altersvorsorge'
+                : 'Glückwunsch! Ihre Vorsorge ist auf einem guten Weg. Optimieren Sie weiter.'}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-10">
+                {sicherheitKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl transform scale-105' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempSicherheit({...sicherheitData}); // KORRIGIERT
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-1">{kategorie.icon}</span>
+                      <span className="text-sm font-bold text-center px-3 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-lg font-bold mt-1">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
+                      
+                      {/* Erweiterte Hover-Info */}
+                      <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none max-w-48 text-center">
+                        <div className="font-semibold">{kategorie.beschreibung}</div>
+                        <div className="text-emerald-300 mt-1">{kategorie.tipp}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField); // KORRIGIERT: richtige Variable
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-emerald-200 pb-4">
+                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
                           </h3>
-                          
-                          <div className="space-y-4">
-                            {tempFixkosten[activeField].map((eintrag, index) => (
-                              <div key={index} className="flex gap-3 items-center">
+                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                          <div className="inline-block bg-emerald-100 px-3 py-1 rounded-full text-sm text-emerald-800 mt-2">
+                            💡 {aktiveKategorie.tipp}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {tempSicherheit[activeField].map((eintrag, index) => ( // KORRIGIERT
+                            <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200">
+                              <div className="flex-1">
                                 <input 
                                   type="text"
                                   value={eintrag.bezeichnung}
                                   onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                  placeholder="Bezeichnung"
-                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                  placeholder={`${aktiveKategorie.name === 'Notgroschen' ? 'z.B. Tagesgeldkonto, Sparbuch' : 
+                                               aktiveKategorie.name === 'Versicherungen' ? 'z.B. Privathaftpflicht, BU-Versicherung' : 
+                                               aktiveKategorie.name === 'Altersvorsorge' ? 'z.B. Riester-Rente, Private Rentenversicherung' :
+                                               aktiveKategorie.name === 'Gesundheit' ? 'z.B. Zahnzusatzversicherung, Heilpraktiker' :
+                                               'z.B. ETF-Sparplan, Aktien-Depot'}`}
+                                  className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
                                 />
+                              </div>
+                              <div className="flex items-center gap-2">
                                 <input 
                                   type="number"
                                   value={eintrag.betrag}
                                   onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                                   placeholder="0"
-                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                  className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
                                 />
-                                <span className="text-lg font-semibold">€</span>
-                                {tempFixkosten[activeField].length > 1 && (
-                                  <button
-                                    onClick={() => removeEintrag(activeField, index)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                  >
-                                    ✕
-                                  </button>
-                                )}
+                                <span className="text-lg font-semibold text-emerald-700">€</span>
                               </div>
-                            ))}
-                            
-                            <button
-                              onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <span className="text-2xl">+</span>
-                              <span className="font-semibold">Neue Ausgabe hinzufügen</span>
-                            </button>
-                          </div>
+                              {tempSicherheit[activeField].length > 1 && ( // KORRIGIERT
+                                <button
+                                  onClick={() => removeEintrag(activeField, index)}
+                                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
+                                  title="Eintrag löschen"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          ))}
                           
-                          <div className="border-t-2 border-slate-200 pt-4">
-                            <div className="flex justify-between items-center text-lg font-bold">
-                              <span>Gesamtsumme:</span>
-                              <span style={{color: '#004225'}}>
-                                {calculateKategorieTotal(activeField).toLocaleString()}€
-                              </span>
+                          <button
+                            onClick={() => addEintrag(activeField)}
+                            className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
+                              +
+                            </div>
+                            <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
+                          </button>
+                        </div>
+                        
+                        {/* Erweiterte Kategorie-Statistiken */}
+                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-4 border border-emerald-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
+                            <span className="text-xl font-bold text-emerald-700">
+                              {calculateKategorieTotal(activeField).toLocaleString()}€
+                            </span>
+                          </div>
+                          <div className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-emerald-600">Anteil an Sicherheitsbudget:</span>
+                              <span className="font-semibold">{finanzData.sicherheit > 0 ? 
+                                ((calculateKategorieTotal(activeField) / finanzData.sicherheit) * 100).toFixed(1) : 0}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-emerald-600">Anteil am Gesamtbudget:</span>
+                              <span className="font-semibold">{calculateBudget() > 0 ? 
+                                ((calculateKategorieTotal(activeField) / calculateBudget()) * 100).toFixed(1) : 0}%</span>
                             </div>
                           </div>
-                          
-                          <div className="flex space-x-4 justify-center">
-                            <button 
-                              onClick={handleSave}
-                              className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
-                              style={{backgroundColor: '#004225'}}
-                            >
-                              Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                            >
-                              Zurück
-                            </button>
+                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-3">
+                            <div 
+                              className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${finanzData.sicherheit > 0 ? 
+                                  (calculateKategorieTotal(activeField) / finanzData.sicherheit) * 100 : 0}%`
+                              }}
+                            />
                           </div>
                         </div>
-                      );
-                    })()}
-                  </div>
-                )}
-              </div>
+                        
+                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
+                          >
+                            🛡️ Sicherheit speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                          >
+                            ↶ Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <Sidebar /> 
-        <NavigationButtons />
       </div>
-    );
-  };
+      <Sidebar /> 
+      <NavigationButtons />
+    </div>
+  );
+};
   // Wünsche & Ziele Page
   const WuenschePage = () => {
     const [activeField, setActiveField] = useState(null);
