@@ -1107,20 +1107,37 @@ const OverviewPage = () => (
     {/* Mittlerer Bereich - ZENTRIERT */}
     <div className="text-center">
       <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
-      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+      <p className="text-3xl font-bold" style={{ color: '#004225' }}>{calculateBudget().toLocaleString()} €</p>
     </div>
 
     {/* Rechter Bereich */}
-    <div className="flex justify-end">
+    <div className="flex items-center justify-end gap-4 relative">
+      {/* Sichtbarer Button zur Zigaretten-Page */}
       <button
         onClick={() => setCurrentPage('zigaretten')}
-        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+        aria-label="Zur Zigaretten-Page wechseln"
+        className="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300"
       >
-        ⏮️
+        🚬 Zigaretten
       </button>
+
+      {/* Optional: kleiner Icon-Button (falls du nur Symbol willst) */}
+      {/* <button onClick={() => setCurrentPage('zigaretten')} aria-label="Zigaretten" className="p-2 bg-white rounded-md border border-slate-200 shadow-sm">
+          🚬
+      </button> */}
+
+      {/* Spline-Logo: schwebend, mausfolgend — pointer-events none damit Klicks passieren */}
+      <SplineFloatingLogo
+        url="https://prod.spline.design/kU5LFbV84Y97j40y/scene.splinecode"
+        size={80}
+        right={20}
+        top={12}
+        interactive={false}
+      />
     </div>
   </div>
 </div>
+
     
     {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM PERFEKT ZENTRIERT */}
     <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
