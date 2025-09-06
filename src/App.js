@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import SplineFloatingLogo from '../components/SplineFloatingLogo';
+
 
 const FinanzTool = () => {
   const [currentPage, setCurrentPage] = useState('overview');
