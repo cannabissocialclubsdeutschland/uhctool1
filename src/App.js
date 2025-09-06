@@ -3344,7 +3344,8 @@ const SicherheitPage = () => {
     </div>
   );
 };
- / WuenschePage - NEU ERSTELLT im selben Stil wie FixkostenPage
+
+ // WuenschePage - NEU ERSTELLT im selben Stil wie FixkostenPage
 const WuenschePage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempWuensche, setTempWuensche] = useState({...wuenscheData});
