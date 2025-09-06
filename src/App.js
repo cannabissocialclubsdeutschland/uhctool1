@@ -720,7 +720,7 @@ const Sidebar = () => {
 
 // Mini-Kuchendiagramm für Header - KORRIGIERT mit Grünschema
 const createMiniPieChart = () => {
-  const radius = headerHovered ? 85 : 65;
+  const radius = headerHovered ? 75 : 55;
   const centerX = 120;
   const centerY = 200;
   
