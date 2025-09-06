@@ -33,8 +33,7 @@ export default function SplineFloatingLogo({
       wrapper.style.transform = `translate3d(${p.cx - size / 2}px, ${p.cy - size / 2}px, 0)`;
       p.raf = requestAnimationFrame(frame);
     }
-    p = posRef.current;
-    p.raf = requestAnimationFrame(frame);
+    posRef.current.raf = requestAnimationFrame(frame);
 
     function onPointerMove(e) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
