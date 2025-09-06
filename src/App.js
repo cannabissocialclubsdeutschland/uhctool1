@@ -1379,6 +1379,8 @@ const OverviewPage = () => (
     `}</style>
   </div>
 );
+};
+
 
 // Basis-Absicherung Page - Professioneller Look 2025
 const BasisAbsicherungPage = () => {
