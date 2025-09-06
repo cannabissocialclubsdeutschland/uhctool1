@@ -733,13 +733,13 @@ const createMiniPieChart = () => {
   ];
 
   return (
-    <svg 
-      width="240" 
-      height="240" 
-      className="transition-all duration-500 ease-out"
-      onMouseEnter={() => setHeaderHovered(true)}
-      onMouseLeave={() => setHeaderHovered(false)}
-    >
+  <svg 
+  width="240" 
+  height="280"  // Von 240 auf 280 erhöht
+  className="transition-all duration-500 ease-out"
+  onMouseEnter={() => setHeaderHovered(true)}
+  onMouseLeave={() => setHeaderHovered(false)}
+>
       {slices.map((slice, index) => {
         const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
         const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
