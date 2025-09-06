@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SplineFloatingLogo from '../components/SplineFloatingLogo';
+import SplineFloatingLogo from "./components/SplineFloatingLogo";
 
 
 const FinanzTool = () => {
