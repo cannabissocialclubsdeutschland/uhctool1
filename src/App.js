@@ -241,8 +241,9 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// Zigaretten-Investment-Vergleich Page
+// Zigaretten-Investment-Vergleich Page - Überarbeitet im Fixkosten-Stil
 const ZigarettenInvestmentPage = () => {
+  const [activeField, setActiveField] = useState(null);
   const [raucherProfil, setRaucherProfil] = useState({
     zigarettenProTag: 20,
     preisProSchachtel: 8,
@@ -250,14 +251,11 @@ const ZigarettenInvestmentPage = () => {
     startJahr: 2014
   });
 
-  const [selectedInvestment, setSelectedInvestment] = useState('mix');
-  const [showDetails, setShowDetails] = useState(false);
-
   // Historische Renditen (realistische Durchschnittswerte)
   const investmentRenditen = {
     aktienMSCI: {
       name: 'MSCI World ETF',
-      jahresrendite: 0.085, // 8.5% p.a. Durchschnitt
+      jahresrendite: 0.085,
       historisch: {
         2014: 0.195, 2015: 0.102, 2016: 0.075, 2017: 0.078,
         2018: -0.042, 2019: 0.276, 2020: 0.061, 2021: 0.218,
@@ -266,7 +264,7 @@ const ZigarettenInvestmentPage = () => {
     },
     immobilien: {
       name: 'Deutsche Immobilien',
-      jahresrendite: 0.065, // 6.5% p.a. Durchschnitt
+      jahresrendite: 0.065,
       historisch: {
         2014: 0.045, 2015: 0.052, 2016: 0.068, 2017: 0.071,
         2018: 0.084, 2019: 0.092, 2020: 0.078, 2021: 0.143,
@@ -275,18 +273,16 @@ const ZigarettenInvestmentPage = () => {
     },
     bitcoin: {
       name: 'Bitcoin',
-      jahresrendite: 0.73, // Sehr volatil
+      jahresrendite: 0.73,
       historisch: {
         2014: -0.58, 2015: 0.35, 2016: 1.25, 2017: 13.0,
         2018: -0.73, 2019: 0.87, 2020: 3.03, 2021: 0.59,
         2022: -0.64, 2023: 1.56, 2024: 0.45
-      },
-      startPreis: 770, // USD in 2014
-      aktuellerPreis: 95000 // USD in 2024
+      }
     },
     tagesgeld: {
       name: 'Tagesgeld/Sparbuch',
-      jahresrendite: 0.015, // 1.5% p.a. Durchschnitt
+      jahresrendite: 0.015,
       historisch: {
         2014: 0.009, 2015: 0.006, 2016: 0.002, 2017: 0.001,
         2018: 0.001, 2019: 0.001, 2020: 0.001, 2021: 0.001,
@@ -295,7 +291,7 @@ const ZigarettenInvestmentPage = () => {
     },
     sp500: {
       name: 'S&P 500',
-      jahresrendite: 0.102, // 10.2% p.a. Durchschnitt
+      jahresrendite: 0.102,
       historisch: {
         2014: 0.115, 2015: -0.007, 2016: 0.096, 2017: 0.194,
         2018: -0.064, 2019: 0.288, 2020: 0.162, 2021: 0.267,
@@ -339,237 +335,266 @@ const ZigarettenInvestmentPage = () => {
     return portfolioWert;
   };
 
-  // Mix-Portfolio berechnen (60% Aktien, 30% Immobilien, 10% Tagesgeld)
-  const berechneMixPortfolio = () => {
-    const aktienWert = berechneInvestmentWert('aktienMSCI') * 0.6;
-    const immobilienWert = berechneInvestmentWert('immobilien') * 0.3;
-    const tagesgeldWert = berechneInvestmentWert('tagesgeld') * 0.1;
-    
-    return aktienWert + immobilienWert + tagesgeldWert;
+  const updateRaucherProfil = (field, value) => {
+    setRaucherProfil(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const gespartesSumme = berechneGespartesSumme();
-  
-  // Verschiedene Investment-Szenarien
-  const szenarien = [
-    {
-      typ: 'tagesgeld',
-      name: 'Sparbuch (Sicher)',
-      wert: berechneInvestmentWert('tagesgeld'),
-      risiko: 'Sehr niedrig',
-      color: '#10b981'
+  const handleSave = () => {
+    setActiveField(null);
+  };
+
+  const handleCancel = () => {
+    setActiveField(null);
+  };
+
+  const investmentKategorien = [
+    { 
+      id: 'tagesgeld', 
+      name: 'Sicheres Sparen', 
+      icon: '🏦', 
+      color: '#065f46',
+      beschreibung: 'Tagesgeld, Sparbuch (niedrige Rendite)',
+      wert: berechneInvestmentWert('tagesgeld')
     },
-    {
-      typ: 'mix',
-      name: 'Ausgewogenes Portfolio',
-      wert: berechneMixPortfolio(),
-      risiko: 'Mittel',
-      color: '#3b82f6'
+    { 
+      id: 'aktienMSCI', 
+      name: 'MSCI World ETF', 
+      icon: '📈', 
+      color: '#047857',
+      beschreibung: 'Breit diversifizierte Aktien weltweit',
+      wert: berechneInvestmentWert('aktienMSCI')
     },
-    {
-      typ: 'aktienMSCI',
-      name: 'MSCI World ETF',
-      wert: berechneInvestmentWert('aktienMSCI'),
-      risiko: 'Mittel-Hoch',
-      color: '#8b5cf6'
+    { 
+      id: 'sp500', 
+      name: 'S&P 500', 
+      icon: '🇺🇸', 
+      color: '#059669',
+      beschreibung: 'US-amerikanische Top-Unternehmen',
+      wert: berechneInvestmentWert('sp500')
     },
-    {
-      typ: 'sp500',
-      name: 'S&P 500',
-      wert: berechneInvestmentWert('sp500'),
-      risiko: 'Mittel-Hoch',
-      color: '#ec4899'
+    { 
+      id: 'immobilien', 
+      name: 'Immobilien', 
+      icon: '🏠', 
+      color: '#10b981',
+      beschreibung: 'Deutsche Immobilien-Investments',
+      wert: berechneInvestmentWert('immobilien')
     },
-    {
-      typ: 'immobilien',
-      name: 'Immobilien-Investment',
-      wert: berechneInvestmentWert('immobilien'),
-      risiko: 'Mittel',
-      color: '#f59e0b'
-    },
-    {
-      typ: 'bitcoin',
-      name: 'Bitcoin (Spekulativ)',
-      wert: berechneInvestmentWert('bitcoin'),
-      risiko: 'Sehr hoch',
-      color: '#ef4444'
+    { 
+      id: 'bitcoin', 
+      name: 'Bitcoin', 
+      icon: '₿', 
+      color: '#34d399',
+      beschreibung: 'Hochspekulative Kryptowährung',
+      wert: berechneInvestmentWert('bitcoin')
     }
   ];
 
-  // Gesundheits-Fakten
-  const gesundheitsFakten = [
-    { zeit: '20 Minuten', effekt: 'Blutdruck normalisiert sich' },
-    { zeit: '8 Stunden', effekt: 'Sauerstoffgehalt im Blut normalisiert sich' },
-    { zeit: '1 Jahr', effekt: 'Herzinfarktrisiko halbiert' },
-    { zeit: '10 Jahre', effekt: 'Lungenkrebsrisiko halbiert' }
-  ];
+  const gespartesSumme = berechneGespartesSumme();
 
   return (
-    <div className={`h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
-      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
-        <div className="h-full flex items-center px-8 relative">
-          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
-            <h1 className="text-xl font-bold text-slate-800">Zigaretten-Investment-Vergleich</h1>
-            <p className="text-sm text-slate-600">Was wäre wenn... Sie nicht geraucht hätten?</p>
-            
-            <button
-              onClick={() => setCurrentPage('overview')}
-              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
-            >
-              🏠 Zur Übersicht
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="h-screen flex flex-col pt-32">
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
-            
-            {/* Eingabe-Bereich */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-xl">
-              <h3 className="text-lg font-bold mb-4 text-slate-800">Ihr Raucherprofil</h3>
-              <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <label className="text-sm text-gray-600">Zigaretten pro Tag</label>
-                  <input
-                    type="number"
-                    value={raucherProfil.zigarettenProTag}
-                    onChange={(e) => setRaucherProfil({...raucherProfil, zigarettenProTag: parseInt(e.target.value) || 0})}
-                    className="w-full p-2 border rounded-lg mt-1"
-                    min="1"
-                    max="60"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Preis pro Schachtel (€)</label>
-                  <input
-                    type="number"
-                    value={raucherProfil.preisProSchachtel}
-                    onChange={(e) => setRaucherProfil({...raucherProfil, preisProSchachtel: parseFloat(e.target.value) || 0})}
-                    className="w-full p-2 border rounded-lg mt-1"
-                    min="1"
-                    max="20"
-                    step="0.5"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Jahre geraucht</label>
-                  <input
-                    type="number"
-                    value={raucherProfil.jahreGeraucht}
-                    onChange={(e) => setRaucherProfil({...raucherProfil, jahreGeraucht: parseInt(e.target.value) || 0})}
-                    className="w-full p-2 border rounded-lg mt-1"
-                    min="1"
-                    max="50"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Start-Jahr</label>
-                  <select
-                    value={raucherProfil.startJahr}
-                    onChange={(e) => setRaucherProfil({...raucherProfil, startJahr: parseInt(e.target.value)})}
-                    className="w-full p-2 border rounded-lg mt-1"
-                  >
-                    {[...Array(11)].map((_, i) => (
-                      <option key={i} value={2014 + i}>{2014 + i}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Ersparnis-Übersicht */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
-              <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
-                <p className="text-sm text-red-600">Täglich verschwendet</p>
-                <p className="text-2xl font-bold text-red-700">{gespartesSumme.täglich}€</p>
-              </div>
-              <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
-                <p className="text-sm text-orange-600">Monatlich verschwendet</p>
-                <p className="text-2xl font-bold text-orange-700">{gespartesSumme.monatlich}€</p>
-              </div>
-              <div className="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
-                <p className="text-sm text-yellow-700">Jährlich verschwendet</p>
-                <p className="text-2xl font-bold text-yellow-800">{gespartesSumme.jährlich}€</p>
-              </div>
-              <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
-                <p className="text-sm text-green-600">Gesamt verschwendet</p>
-                <p className="text-2xl font-bold text-green-700">{gespartesSumme.gesamt}€</p>
-              </div>
-            </div>
-
-            {/* Investment-Vergleich */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl mb-6">
-              <h3 className="text-lg font-bold mb-4 text-slate-800">
-                💰 Was aus {gespartesSumme.gesamt}€ geworden wäre...
-              </h3>
-              <div className="space-y-3">
-                {szenarien.map((szenario) => (
-                  <div 
-                    key={szenario.typ}
-                    className="relative bg-gray-50 rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => setSelectedInvestment(szenario.typ)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-bold text-slate-800">{szenario.name}</h4>
-                        <p className="text-sm text-gray-600">Risiko: {szenario.risiko}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold" style={{color: szenario.color}}>
-                          {szenario.wert.toLocaleString('de-DE', { 
-                            style: 'currency', 
-                            currency: 'EUR',
-                            maximumFractionDigits: 0 
-                          })}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Gewinn: {(szenario.wert - parseFloat(gespartesSumme.gesamt)).toLocaleString('de-DE', { 
-                            style: 'currency', 
-                            currency: 'EUR',
-                            maximumFractionDigits: 0 
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Fortschrittsbalken */}
-                    <div className="mt-3 w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div 
-                        className="h-full transition-all duration-1000"
-                        style={{
-                          width: `${Math.min((szenario.wert / Math.max(...szenarien.map(s => s.wert))) * 100, 100)}%`,
-                          backgroundColor: szenario.color
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Gesundheits-Benefits */}
-            <div className="bg-green-50 rounded-2xl p-6 shadow-xl">
-              <h3 className="text-lg font-bold mb-4 text-green-800">
-                ❤️ Zusätzliche Gesundheitsvorteile nach dem Rauchstopp
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {gesundheitsFakten.map((fakt, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <span className="text-green-600 text-xl">✓</span>
-                    <div>
-                      <p className="font-semibold text-green-800">{fakt.zeit}</p>
-                      <p className="text-sm text-gray-700">{fakt.effekt}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
       
+      <div className="h-screen flex flex-col pt-32">
+        {/* Investment-Dashboard */}
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-800">Investment-Vergleich</h2>
+              <p className="text-emerald-600">
+                Gesparte Summe: <span className="font-bold">{gespartesSumme.gesamt}€</span> | 
+                Zeitraum: <span className="font-bold">{raucherProfil.jahreGeraucht} Jahre</span>
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <div className="text-center">
+                <div className="text-2xl">💰</div>
+                <div className="text-xs text-gray-600">Täglich</div>
+                <div className="font-bold text-emerald-700">{gespartesSumme.täglich}€</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl">📅</div>
+                <div className="text-xs text-gray-600">Monatlich</div>
+                <div className="font-bold text-emerald-700">{gespartesSumme.monatlich}€</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl">🗓️</div>
+                <div className="text-xs text-gray-600">Jährlich</div>
+                <div className="font-bold text-emerald-700">{gespartesSumme.jährlich}€</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-12">
+                {investmentKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl transform scale-105' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
+                      <span className="text-base font-bold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-xl font-bold mt-2">
+                        {kategorie.wert.toLocaleString('de-DE', { 
+                          style: 'currency', 
+                          currency: 'EUR',
+                          maximumFractionDigits: 0 
+                        })}
+                      </span>
+                      
+                      {/* Hover-Info */}
+                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        {kategorie.beschreibung}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = investmentKategorien.find(k => k.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-emerald-200 pb-4">
+                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
+                          </h3>
+                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                        </div>
+                        
+                        {/* Raucherprofil Eingabe */}
+                        <div className="space-y-4">
+                          <h4 className="font-semibold text-emerald-800 text-center">Ihre Rauchgewohnheiten</h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm text-emerald-700 mb-2">Zigaretten pro Tag</label>
+                              <input
+                                type="number"
+                                value={raucherProfil.zigarettenProTag}
+                                onChange={(e) => updateRaucherProfil('zigarettenProTag', parseInt(e.target.value) || 0)}
+                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                min="1"
+                                max="60"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm text-emerald-700 mb-2">Preis pro Schachtel (€)</label>
+                              <input
+                                type="number"
+                                value={raucherProfil.preisProSchachtel}
+                                onChange={(e) => updateRaucherProfil('preisProSchachtel', parseFloat(e.target.value) || 0)}
+                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                min="1"
+                                max="20"
+                                step="0.5"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm text-emerald-700 mb-2">Jahre geraucht</label>
+                              <input
+                                type="number"
+                                value={raucherProfil.jahreGeraucht}
+                                onChange={(e) => updateRaucherProfil('jahreGeraucht', parseInt(e.target.value) || 0)}
+                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                min="1"
+                                max="50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm text-emerald-700 mb-2">Start-Jahr</label>
+                              <select
+                                value={raucherProfil.startJahr}
+                                onChange={(e) => updateRaucherProfil('startJahr', parseInt(e.target.value))}
+                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                              >
+                                {[...Array(11)].map((_, i) => (
+                                  <option key={i} value={2014 + i}>{2014 + i}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Investment-Resultat */}
+                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold text-emerald-800">Investment-Wert heute:</span>
+                            <span className="text-xl font-bold text-emerald-700">
+                              {aktiveKategorie.wert.toLocaleString('de-DE', { 
+                                style: 'currency', 
+                                currency: 'EUR',
+                                maximumFractionDigits: 0 
+                              })}
+                            </span>
+                          </div>
+                          <div className="text-sm text-emerald-600">
+                            Gewinn: {(aktiveKategorie.wert - parseFloat(gespartesSumme.gesamt)).toLocaleString('de-DE', { 
+                              style: 'currency', 
+                              currency: 'EUR',
+                              maximumFractionDigits: 0 
+                            })}
+                          </div>
+                          <div className="text-sm text-emerald-600">
+                            Rendite: {investmentRenditen[activeField].jahresrendite ? 
+                              (investmentRenditen[activeField].jahresrendite * 100).toFixed(1) : 0}% p.a. (Durchschnitt)
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
+                          >
+                            💾 Verstanden
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                          >
+                            ↶ Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <Sidebar /> 
       <NavigationButtons />
     </div>
   );
