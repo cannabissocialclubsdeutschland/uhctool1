@@ -693,40 +693,40 @@ const Sidebar = () => {
 
   const percentages = calculatePercentages();
 
-  // Mini-Kuchendiagramm für Header mit Emojis und differenzierten Farben
+// Mini-Kuchendiagramm für Header - KORRIGIERT mit Grünschema
 const createMiniPieChart = () => {
   const radius = headerHovered ? 95 : 65;
   const centerX = 120;
   const centerY = 120;
   
   let cumulativePercentage = 0;
-  // UNTERSCHIEDLICHE Farben für das Mini-Diagramm (dunkler als Header-Balken)
+  // Korrigierte Farben im Grünschema (dunkler für bessere Sichtbarkeit)
   const slices = [
     { 
       name: 'Fixkosten', 
       value: percentages.fixkosten, 
-      color: '#002818', // Noch dunkler als #004225
+      color: '#065f46', // Dunkelgrün für Fixkosten
       page: 'fixkosten',
       emoji: '🏠'
     },
     { 
       name: 'Lifestyle', 
       value: percentages.lifestyle, 
-      color: '#0f3a28', // Dunkler als #1f5f3f
+      color: '#047857', // Mittleres Grün für Lifestyle
       page: 'lifestyle',
       emoji: '🎭'
     },
     { 
       name: 'Sicherheit', 
       value: percentages.sicherheit, 
-      color: '#2d5040', // Dunkler als #4d7c5f
+      color: '#059669', // Helles Grün für Sicherheit
       page: 'sicherheit',
       emoji: '🛡️'
     },
     { 
       name: 'Überschuss', 
       value: percentages.ueberschuss, 
-      color: percentages.ueberschuss < 0 ? '#dc2626' : '#059669', // Grün/Rot je nach Wert
+      color: percentages.ueberschuss < 0 ? '#dc2626' : '#10b981', // Rot für Defizit, Grün für Überschuss
       page: null,
       emoji: percentages.ueberschuss < 0 ? '⚠️' : '💰'
     }
@@ -773,7 +773,7 @@ const createMiniPieChart = () => {
               fill={slice.color}
               stroke="white"
               strokeWidth="2"
-              className="cursor-pointer transition-all duration-300 hover:opacity-80"
+              className="cursor-pointer transition-all duration-300 hover:opacity-80 hover:brightness-110"
               onClick={() => slice.page && setCurrentPage(slice.page)}
               style={{
                 filter: headerHovered ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' : ''
@@ -793,7 +793,7 @@ const createMiniPieChart = () => {
               </text>
             )}
             
-            {/* Prozent-Text */}
+            {/* Prozent-Text mit besserer Lesbarkeit */}
             {headerHovered && slice.value > 5 && (
               <text
                 x={emojiX}
@@ -801,6 +801,10 @@ const createMiniPieChart = () => {
                 textAnchor="middle"
                 className="text-[10px] font-bold fill-white pointer-events-none animate-fadeIn"
                 dy="3"
+                style={{ 
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+                  filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))'
+                }}
               >
                 {slice.value.toFixed(0)}%
               </text>
@@ -809,15 +813,15 @@ const createMiniPieChart = () => {
         );
       })}
       
-      {/* Zentraler Kreis mit verbessertem Grün */}
+      {/* Zentraler Kreis mit verbessertem Grünschema */}
       <circle
         cx={centerX}
         cy={centerY}
         r={headerHovered ? 32 : 28}
         fill="white"
-        stroke="#004225" // Konsistent mit Hauptfarbe
+        stroke="#065f46" // Konsistentes Dunkelgrün
         strokeWidth="2"
-        className="cursor-pointer transition-all duration-300"
+        className="cursor-pointer transition-all duration-300 hover:stroke-4"
         onClick={() => setCurrentPage('budget')}
       />
       <text 
@@ -833,14 +837,25 @@ const createMiniPieChart = () => {
         y={centerY + 6} 
         textAnchor="middle" 
         className="text-[10px] font-bold pointer-events-none" 
-        style={{fill: '#004225'}} // Grün statt Blau
+        style={{fill: '#065f46'}} // Konsistentes Dunkelgrün
       >
         {calculateBudget()}€
       </text>
+      
+      {/* Hover-Tooltip für bessere UX */}
+      {headerHovered && (
+        <text
+          x={centerX}
+          y={centerY + 55}
+          textAnchor="middle"
+          className="text-[8px] fill-slate-500 pointer-events-none animate-fadeIn"
+        >
+          Klicken zum Navigieren
+        </text>
+      )}
     </svg>
   );
 };
-
   // Navigation Buttons mit einheitlichem Grünschema
 const NavigationButtons = () => {
   const prevPage = getPrevPage();
