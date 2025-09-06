@@ -1226,23 +1226,26 @@ const OverviewPage = () => (
       {/* Kuchendiagramm */}
       {createPieChart()}
       
-      {/* Innerer Kreis - MITTIG AUSGERICHTET */}
-      <circle
-        cx="225"
-        cy="225"
-        r="60"
-        fill="white"
-        stroke="#004225"
-        strokeWidth="3"
-        className="cursor-pointer transition-all hover:r-67"
-        onClick={() => setCurrentPage('budget')}
-      />
-      <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-        Budget
-      </text>
-      <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
-        {calculateBudget().toLocaleString()}€
-      </text>
+    {/* Innerer Kreis - MIT SPLINE LOGO */}
+<foreignObject x="165" y="165" width="120" height="120">
+  <div className="w-full h-full flex items-center justify-center">
+    <SplineFloatingLogo
+      url="https://prod.spline.design/kU5LFbV84Y97j40y/scene.splinecode"
+      size={120}
+      interactive={false}
+    />
+  </div>
+</foreignObject>
+<circle
+  cx="225"
+  cy="225"
+  r="60"
+  fill="transparent"
+  stroke="#004225"
+  strokeWidth="3"
+  className="cursor-pointer transition-all hover:r-67"
+  onClick={() => setCurrentPage('budget')}
+/>
     </svg>
   </div>
 </div>
