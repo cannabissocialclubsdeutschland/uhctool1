@@ -2195,7 +2195,7 @@ const FixkostenPage = () => {
       
       <div className="h-screen flex flex-col pt-32">
         {/* Statistik-Banner */}
-        <div className="flex-shrink-0 top-6 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-emerald-800">Fixkosten-Übersicht</h2>
