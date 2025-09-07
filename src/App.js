@@ -2221,7 +2221,6 @@ const FixkostenPage = () => {
                 </div>
               ))}
             </div>
-          </div>
         </div>
       </div>
 
@@ -2341,7 +2340,6 @@ const FixkostenPage = () => {
     </div>
   );
 };
-
   // LifestylePage - VOLLSTÄNDIG FERTIGGESTELLT mit Grünschema
 const LifestylePage = () => {
   const [activeField, setActiveField] = useState(null);
