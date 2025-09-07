@@ -2339,6 +2339,7 @@ const FixkostenPage = () => {
     </div>
   );
 };
+
   // LifestylePage - VOLLSTÄNDIG FERTIGGESTELLT mit Grünschema
 const LifestylePage = () => {
   const [activeField, setActiveField] = useState(null);
