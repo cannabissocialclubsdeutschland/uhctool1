@@ -2228,7 +2228,7 @@ const FixkostenPage = () => {
             <div className="flex-1 flex items-start justify-center pt-6">
               {activeField && (
                 <div 
-                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(() => {
