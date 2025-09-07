@@ -2124,10 +2124,10 @@ const BudgetPage = () => {
   );
 };
 
-// FixkostenPage - VOLLSTÄNDIG KORRIGIERT mit richtigen State-Variablen und Grünschema
+// FixkostenPage - OHNE Statistik-Banner
 const FixkostenPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData}); // KORRIGIERT: richtige Variable
+  const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData});
 
   const calculateKategorieTotal = (kategorie) => {
     return tempFixkosten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
@@ -2166,7 +2166,7 @@ const FixkostenPage = () => {
   };
 
   const handleCancel = () => {
-    setTempFixkosten({...fixkostenData}); // KORRIGIERT: richtige Variable
+    setTempFixkosten({...fixkostenData});
     setActiveField(null);
   };
 
@@ -2178,44 +2178,11 @@ const FixkostenPage = () => {
     { id: 'sonstiges', name: 'Sonstige Fixkosten', icon: '📋', color: '#34d399', beschreibung: 'Weitere feste Ausgaben' }
   ];
 
-  const getKategorieStats = () => {
-    const stats = fixkostenKategorien.map(kat => ({
-      ...kat,
-      betrag: calculateKategorieTotal(kat.id),
-      prozent: finanzData.fixkostenTotal > 0 ? 
-        (calculateKategorieTotal(kat.id) / finanzData.fixkostenTotal * 100) : 0
-    }));
-    
-    return stats.sort((a, b) => b.betrag - a.betrag);
-  };
-
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
       
-      <div className="h-screen flex flex-col pt-32">
-        {/* Statistik-Banner */}
-        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-emerald-800">Fixkosten-Übersicht</h2>
-              <p className="text-emerald-600">
-                Gesamtsumme: <span className="font-bold">{finanzData.fixkostenTotal.toLocaleString()}€</span> | 
-                Budget-Anteil: <span className="font-bold">{((finanzData.fixkostenTotal / calculateBudget()) * 100).toFixed(1)}%</span>
-              </p>
-            </div>
-            <div className="flex gap-4">
-              {getKategorieStats().slice(0, 3).map((kat, index) => (
-                <div key={kat.id} className="text-center">
-                  <div className="text-2xl">{kat.icon}</div>
-                  <div className="text-xs text-gray-600">{kat.name}</div>
-                  <div className="font-bold text-emerald-700">{kat.betrag}€</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        
+      <div className="h-screen flex flex-col pt-44">
         <div className="flex-1 p-8 overflow-y-auto">
           <div className="h-full flex flex-col">
             
@@ -2236,7 +2203,7 @@ const FixkostenPage = () => {
                       onClick={() => {
                         if (activeField !== kategorie.id) {
                           setActiveField(kategorie.id);
-                          setTempFixkosten({...fixkostenData}); // KORRIGIERT
+                          setTempFixkosten({...fixkostenData});
                         }
                       }}
                     >
@@ -2265,7 +2232,7 @@ const FixkostenPage = () => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(() => {
-                    const aktiveKategorie = fixkostenKategorien.find(k => k.id === activeField); // KORRIGIERT
+                    const aktiveKategorie = fixkostenKategorien.find(k => k.id === activeField);
                     return (
                       <div className="space-y-6">
                         <div className="text-center border-b border-emerald-200 pb-4">
@@ -2277,7 +2244,7 @@ const FixkostenPage = () => {
                         </div>
                         
                         <div className="space-y-4">
-                          {tempFixkosten[activeField].map((eintrag, index) => ( // KORRIGIERT
+                          {tempFixkosten[activeField].map((eintrag, index) => (
                             <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                               <div className="flex-1">
                                 <input 
@@ -2298,7 +2265,7 @@ const FixkostenPage = () => {
                                 />
                                 <span className="text-lg font-semibold text-emerald-700">€</span>
                               </div>
-                              {tempFixkosten[activeField].length > 1 && ( // KORRIGIERT
+                              {tempFixkosten[activeField].length > 1 && (
                                 <button
                                   onClick={() => removeEintrag(activeField, index)}
                                   className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
