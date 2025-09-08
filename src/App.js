@@ -2372,7 +2372,7 @@ const FixkostenPage = () => {
     </div>
   );
 };
-  // LifestylePage - OHNE Statistik-Banner, Fixkosten-Style
+// LifestylePage - OHNE Statistik-Banner, Fixkosten-Style
 const LifestylePage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempLifestyle, setTempLifestyle] = useState({ ...lifestyleData });
@@ -2589,6 +2589,7 @@ const LifestylePage = () => {
     </div>
   );
 };
+
 
 
 // SicherheitPage - VOLLSTÄNDIG KORRIGIERT mit richtigen State-Variablen und professionellem Design
