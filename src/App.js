@@ -1380,10 +1380,10 @@ const BasisAbsicherungPage = () => {
   );
 };
 
-// BudgetPage - OHNE Statistik-Banner, Fixkosten-Style
+// BudgetPage - Korrigiert im Fixkosten-Stil mit Modal-Overlay
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempBudget, setTempBudget] = useState({ ...budgetData });
+  const [tempBudget, setTempBudget] = useState({...budgetData});
 
   const calculateKategorieTotal = (kategorie) => {
     return tempBudget[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
@@ -1406,7 +1406,7 @@ const BudgetPage = () => {
   const updateEintrag = (kategorie, index, field, value) => {
     setTempBudget(prev => ({
       ...prev,
-      [kategorie]: prev[kategorie].map((item, i) =>
+      [kategorie]: prev[kategorie].map((item, i) => 
         i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
       )
     }));
@@ -1422,31 +1422,31 @@ const BudgetPage = () => {
   };
 
   const handleCancel = () => {
-    setTempBudget({ ...budgetData });
+    setTempBudget({...budgetData});
     setActiveField(null);
   };
 
   const budgetKategorien = [
-    { id: 'einnahmen', name: 'Einnahmen', icon: '💶', color: '#047857', beschreibung: 'Gehalt, Nebeneinkünfte' },
-    { id: 'ausgaben', name: 'Ausgaben', icon: '💸', color: '#059669', beschreibung: 'Monatliche Fixkosten & variable Kosten' },
-    { id: 'investitionen', name: 'Investitionen', icon: '📈', color: '#10b981', beschreibung: 'Aktien, ETFs, Projekte' },
-    { id: 'ruecklagen', name: 'Rücklagen', icon: '🏦', color: '#34d399', beschreibung: 'Polster für besondere Fälle' }
+    { id: 'einnahmen', name: 'Einnahmen', icon: '💶', color: '#065f46', beschreibung: 'Gehalt, Nebeneinkünfte' },
+    { id: 'ausgaben', name: 'Ausgaben', icon: '💸', color: '#047857', beschreibung: 'Monatliche Fixkosten & variable Kosten' },
+    { id: 'investitionen', name: 'Investitionen', icon: '📈', color: '#059669', beschreibung: 'Aktien, ETFs, Projekte' },
+    { id: 'ruecklagen', name: 'Rücklagen', icon: '🏦', color: '#10b981', beschreibung: 'Polster für besondere Fälle' }
   ];
 
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
-
+      
       <div className="h-screen flex flex-col pt-44">
         <div className="flex-1 p-8">
           <div className="h-full flex justify-center items-center">
             <div className="flex space-x-12">
               {budgetKategorien.map((kategorie) => (
                 <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
+                  <div 
                     className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
+                      activeField === kategorie.id 
+                        ? 'text-white shadow-2xl transform scale-105' 
                         : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
                     }`}
                     style={{
@@ -1456,17 +1456,20 @@ const BudgetPage = () => {
                     onClick={() => {
                       if (activeField !== kategorie.id) {
                         setActiveField(kategorie.id);
-                        setTempBudget({ ...budgetData });
+                        setTempBudget({...budgetData});
                       }
                     }}
                   >
                     <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4">{kategorie.name}</span>
+                    <span className="text-base font-bold text-center px-4 leading-tight">
+                      {kategorie.name}
+                    </span>
                     <span className="text-xl font-bold mt-2">
                       {calculateKategorieTotal(kategorie.id).toLocaleString()}€
                     </span>
-
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    
+                    {/* Hover-Info */}
+                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                       {kategorie.beschreibung}
                     </div>
                   </div>
@@ -1475,85 +1478,118 @@ const BudgetPage = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
+      {/* Modal Overlay */}
+      {activeField && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8 max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      {tempBudget[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100">
-                          <input
+            {(() => {
+              const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <div className="text-center border-b border-emerald-200 pb-4">
+                    <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                      <span className="text-3xl">{aktiveKategorie.icon}</span>
+                      {aktiveKategorie.name}
+                    </h3>
+                    <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {tempBudget[activeField].map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                        <div className="flex-1">
+                          <input 
                             type="text"
                             value={eintrag.bezeichnung}
                             onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                            placeholder="Bezeichnung"
-                            className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg"
+                            placeholder="z.B. Gehalt, Miete, Sparpläne..."
+                            className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
                           />
-                          <input
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input 
                             type="number"
                             value={eintrag.betrag}
                             onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
                             placeholder="0"
-                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg text-right"
+                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
                           />
-                          {tempBudget[activeField].length > 1 && (
-                            <button
-                              onClick={() => removeEintrag(activeField, index)}
-                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
-                            >
-                              ✕
-                            </button>
-                          )}
+                          <span className="text-lg font-semibold text-emerald-700">€</span>
                         </div>
-                      ))}
-
-                      <button
-                        onClick={() => addEintrag(activeField)}
-                        className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500"
-                      >
-                        ➕ Neuen Eintrag hinzufügen
-                      </button>
+                        {tempBudget[activeField].length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
+                            title="Eintrag löschen"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
+                        +
+                      </div>
+                      <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  {/* Kategorie-Statistiken */}
+                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
+                      <span className="text-xl font-bold text-emerald-700">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
                     </div>
-
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
+                    <div className="text-sm text-emerald-600">
+                      Anteil an Gesamtbudget: {finanzData.budget > 0 ? 
+                        ((calculateKategorieTotal(activeField) / finanzData.budget) * 100).toFixed(1) : 0}%
+                    </div>
+                    <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
+                      <div 
+                        className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${finanzData.budget > 0 ? 
+                            (calculateKategorieTotal(activeField) / finanzData.budget) * 100 : 0}%`
+                        }}
+                      />
                     </div>
                   </div>
-                );
-              })()}
-            </div>
+                  
+                  <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
+                    >
+                      💾 Budget speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                    >
+                      ↶ Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <Sidebar />
       <NavigationButtons />
