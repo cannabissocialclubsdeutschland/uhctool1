@@ -2117,306 +2117,140 @@ const createMiniPieChart = () => {
     );
   };
 
-  // Wünsche Page
-  const WuenschePage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [editValues, setEditValues] = useState([]);
-    const [newEntry, setNewEntry] = useState({ bezeichnung: '', betrag: '', erreicht: '' });
+ // WünschePage - OHNE Statistik-Banner, Fixkosten-Style
+const WuenschePage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
 
-    const wuenscheKategorien = [
-      { 
-        id: 'traumurlaub', 
-        name: 'Traumurlaub', 
-        icon: '✈️', 
-        color: '#065f46',
-        items: wuenscheData.traumurlaub,
-        description: 'Reisen und Urlaube'
-      },
-      { 
-        id: 'luxus', 
-        name: 'Luxus', 
-        icon: '💎', 
-        color: '#047857',
-        items: wuenscheData.luxus,
-        description: 'Luxusgüter und besondere Anschaffungen'
-      },
-      { 
-        id: 'erlebnisse', 
-        name: 'Erlebnisse', 
-        icon: '🎪', 
-        color: '#059669',
-        items: wuenscheData.erlebnisse,
-        description: 'Besondere Erlebnisse und Events'
-      },
-      { 
-        id: 'weiterbildung', 
-        name: 'Weiterbildung', 
-        icon: '🎓', 
-        color: '#10b981',
-        items: wuenscheData.weiterbildung,
-        description: 'Kurse, Studium, Fortbildung'
-      },
-      { 
-        id: 'geschenke', 
-        name: 'Geschenke', 
-        icon: '🎁', 
-        color: '#34d399',
-        items: wuenscheData.geschenke,
-        description: 'Geschenke für Familie und Freunde'
-      }
-    ];
+  const calculateKategorieTotal = (kategorie) => {
+    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
+  };
 
-    const handleSave = () => {
-      setWuenscheData(prev => ({
-        ...prev,
-        [activeField]: editValues
-      }));
-      
-      setActiveField(null);
-      setNewEntry({ bezeichnung: '', betrag: '', erreicht: '' });
-    };
+  const handleSave = () => {
+    setWuenscheData(tempWuensche);
+    setActiveField(null);
+  };
 
-    const handleCancel = () => {
-      const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-      setEditValues([...aktiveKategorie.items]);
-      setActiveField(null);
-      setNewEntry({ bezeichnung: '', betrag: '', erreicht: '' });
-    };
+  const handleCancel = () => {
+    setTempWuensche({ ...wuenscheData });
+    setActiveField(null);
+  };
 
-    const addNewEntry = () => {
-      if (newEntry.bezeichnung && newEntry.betrag) {
-        setEditValues(prev => [...prev, {
-          bezeichnung: newEntry.bezeichnung,
-          betrag: parseFloat(newEntry.betrag) || 0,
-          erreicht: parseFloat(newEntry.erreicht) || 0
-        }]);
-        setNewEntry({ bezeichnung: '', betrag: '', erreicht: '' });
-      }
-    };
+  const wuenscheKategorien = [
+    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️', color: '#047857', beschreibung: 'Reisen & Abenteuer' },
+    { id: 'luxus', name: 'Luxus', icon: '💎', color: '#059669', beschreibung: 'Exklusive Anschaffungen' },
+    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉', color: '#10b981', beschreibung: 'Besondere Erfahrungen' },
+    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚', color: '#34d399', beschreibung: 'Studium & Kurse' },
+    { id: 'geschenke', name: 'Geschenke', icon: '🎁', color: '#6ee7b7', beschreibung: 'Für Freunde & Familie' }
+  ];
 
-    const removeEntry = (index) => {
-      setEditValues(prev => prev.filter((_, i) => i !== index));
-    };
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
 
-    const updateEntry = (index, field, value) => {
-      setEditValues(prev => prev.map((item, i) => 
-        i === index ? { ...item, [field]: field === 'betrag' || field === 'erreicht' ? parseFloat(value) || 0 : value } : item
-      ));
-    };
-
-    return (
-      <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-        <HeaderBars />
-        
-        <div className="h-screen flex flex-col pt-44">
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-12">
-                  {wuenscheKategorien.map((kategorie) => {
-                    const gesamtSumme = kategorie.items.reduce((sum, item) => sum + item.betrag, 0);
-                    const erreichtSumme = kategorie.items.reduce((sum, item) => sum + item.erreicht, 0);
-                    const prozent = gesamtSumme > 0 ? (erreichtSumme / gesamtSumme) * 100 : 0;
-                    
-                    return (
-                      <div key={kategorie.id} className="flex flex-col items-center">
-                        <div 
-                          className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                            activeField === kategorie.id 
-                              ? 'text-white shadow-2xl transform scale-105' 
-                              : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                          }`}
-                          style={{
-                            backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                            borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                          }}
-                          onClick={() => {
-                            if (activeField !== kategorie.id) {
-                              setActiveField(kategorie.id);
-                              setEditValues([...kategorie.items]);
-                            }
-                          }}
-                        >
-                          <span className="text-3xl mb-2">{kategorie.icon}</span>
-                          <span className="text-base font-bold text-center px-4 leading-tight">
-                            {kategorie.name}
-                          </span>
-                          <span className="text-xl font-bold mt-2">
-                            {Math.round(prozent)}%
-                          </span>
-                          
-                          {/* Hover-Info */}
-                          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                            {kategorie.description}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
+      <div className="h-screen flex flex-col pt-44">
+        <div className="flex-1 p-8">
+          <div className="h-full flex justify-center items-center">
+            <div className="flex space-x-12">
+              {wuenscheKategorien.map((kategorie) => (
+                <div key={kategorie.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                      activeField === kategorie.id
+                        ? 'text-white shadow-2xl transform scale-105'
+                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    }`}
+                    style={{
+                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                    }}
+                    onClick={() => {
+                      if (activeField !== kategorie.id) {
+                        setActiveField(kategorie.id);
+                        setTempWuensche({ ...wuenscheData });
+                      }
+                    }}
                   >
-                    {(() => {
-                      const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-                      const gesamtSumme = editValues.reduce((sum, item) => sum + item.betrag, 0);
-                      const erreichtSumme = editValues.reduce((sum, item) => sum + item.erreicht, 0);
-                      const prozent = gesamtSumme > 0 ? (erreichtSumme / gesamtSumme) * 100 : 0;
-                      
-                      return (
-                        <div className="space-y-6">
-                          <div className="text-center border-b border-emerald-200 pb-4">
-                            <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                              <span className="text-3xl">{aktiveKategorie.icon}</span>
-                              {aktiveKategorie.name}
-                            </h3>
-                            <p className="text-emerald-600 mt-1">{aktiveKategorie.description}</p>
-                          </div>
-                          
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-3 gap-4">
-                              <div>
-                                <label className="block text-sm text-emerald-700 mb-2">Bezeichnung</label>
-                                <input
-                                  type="text"
-                                  value={newEntry.bezeichnung}
-                                  onChange={(e) => setNewEntry(prev => ({ ...prev, bezeichnung: e.target.value }))}
-                                  className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                                  placeholder="z.B. Weltreise"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm text-emerald-700 mb-2">Zielbetrag (€)</label>
-                                <input
-                                  type="number"
-                                  value={newEntry.betrag}
-                                  onChange={(e) => setNewEntry(prev => ({ ...prev, betrag: e.target.value }))}
-                                  className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                                  placeholder="0.00"
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm text-emerald-700 mb-2">Erreicht (€)</label>
-                                <div className="flex space-x-2">
-                                  <input
-                                    type="number"
-                                    value={newEntry.erreicht}
-                                    onChange={(e) => setNewEntry(prev => ({ ...prev, erreicht: e.target.value }))}
-                                    className="flex-1 p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                                    placeholder="0.00"
-                                    min="0"
-                                    step="0.01"
-                                  />
-                                  <button
-                                    onClick={addNewEntry}
-                                    className="px-4 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                              <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold text-emerald-800">Gesamtziel:</span>
-                                <span className="text-xl font-bold text-emerald-700">
-                                  {gesamtSumme.toLocaleString('de-DE', { minimumFractionDigits: 2 })}€
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-emerald-800">Erreicht:</span>
-                                <span className="text-xl font-bold text-emerald-700">
-                                  {erreichtSumme.toLocaleString('de-DE', { minimumFractionDigits: 2 })}€
-                                </span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
-                                <div 
-                                  className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
-                                  style={{ width: `${prozent}%` }}
-                                ></div>
-                              </div>
-                              <div className="text-sm text-emerald-600 text-right mt-1">
-                                {Math.round(prozent)}% erreicht
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-3">
-                              {editValues.map((item, index) => (
-                                <div key={index} className="flex items-center space-x-3 p-3 bg-white border border-emerald-100 rounded-lg">
-                                  <input
-                                    type="text"
-                                    value={item.bezeichnung}
-                                    onChange={(e) => updateEntry(index, 'bezeichnung', e.target.value)}
-                                    className="flex-1 p-2 border border-emerald-200 rounded focus:ring-2 focus:ring-emerald-500 outline-none"
-                                  />
-                                  <input
-                                    type="number"
-                                    value={item.betrag}
-                                    onChange={(e) => updateEntry(index, 'betrag', e.target.value)}
-                                    className="w-20 p-2 border border-emerald-200 rounded focus:ring-2 focus:ring-emerald-500 outline-none"
-                                    min="0"
-                                    step="0.01"
-                                  />
-                                  <input
-                                    type="number"
-                                    value={item.erreicht}
-                                    onChange={(e) => updateEntry(index, 'erreicht', e.target.value)}
-                                    className="w-20 p-2 border border-emerald-200 rounded focus:ring-2 focus:ring-emerald-500 outline-none"
-                                    min="0"
-                                    step="0.01"
-                                  />
-                                  <div className="w-16 text-sm text-emerald-600">
-                                    {item.betrag > 0 ? Math.round((item.erreicht / item.betrag) * 100) : 0}%
-                                  </div>
-                                  <button
-                                    onClick={() => removeEntry(index)}
-                                    className="p-2 text-red-500 hover:text-red-700 transition-colors"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                            <button 
-                              onClick={handleSave}
-                              className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                            >
-                              💾 Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                            >
-                              ↶ Abbrechen
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })()}
+                    <span className="text-3xl mb-2">{kategorie.icon}</span>
+                    <span className="text-base font-bold text-center">{kategorie.name}</span>
+                    <span className="text-xl font-bold mt-2">
+                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                    </span>
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        
-        <Sidebar />
-        <NavigationButtons />
+
+        {/* Modal Overlay */}
+        {activeField && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setActiveField(null)}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+                return (
+                  <div className="space-y-6">
+                    <div className="text-center border-b border-emerald-200 pb-4">
+                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                        <span className="text-3xl">{aktiveKategorie.icon}</span>
+                        {aktiveKategorie.name}
+                      </h3>
+                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {tempWuensche[activeField].map((eintrag, index) => (
+                        <div key={index} className="p-3 bg-emerald-50 rounded-lg">
+                          <div className="flex justify-between">
+                            <span className="font-semibold">{eintrag.bezeichnung}</span>
+                            <span className="text-sm text-emerald-600">
+                              Ziel: {eintrag.betrag}€ | Erreicht: {eintrag.erreicht}€
+                            </span>
+                          </div>
+                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
+                            <div
+                              className="bg-emerald-600 h-2 rounded-full"
+                              style={{ width: `${(eintrag.erreicht / eintrag.betrag) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                      <button
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
+                      >
+                        💾 Speichern
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+                      >
+                        ↶ Zurück
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </div>
-    );
-  };
+
+      <Sidebar />
+      <NavigationButtons />
+    </div>
+  );
+};
 
   // Kurzfristige Anschaffungen Page
   const KurzfristigPage = () => {
