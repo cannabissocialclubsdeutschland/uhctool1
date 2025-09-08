@@ -26,6 +26,14 @@ const FinanzTool = () => {
     abos: [{ bezeichnung: 'Netflix', betrag: 15 }],
     mobilitaet: [{ bezeichnung: 'Monatskarte', betrag: 90 }],
     sonstiges: []
+
+      // BasisAbs Daten
+  const [basisData, setBasisdata] = useState({
+    wohnen: [{ bezeichnung: 'Miete', betrag: 800 }],
+    lebensmittel: [{ bezeichnung: 'Wocheneinkauf', betrag: 400 }],
+    abos: [{ bezeichnung: 'Netflix', betrag: 15 }],
+    mobilitaet: [{ bezeichnung: 'Monatskarte', betrag: 90 }],
+    sonstiges: []
   });
 
   // Lifestyle Daten
@@ -73,22 +81,7 @@ const FinanzTool = () => {
     renovation: [{ bezeichnung: 'Bad renovieren', betrag: 5000, erreicht: 1000 }]
   });
 
-  // Langfristige Anschaffungen
-  const [langfristigData, setLangfristigData] = useState({
-    immobilie: [{ bezeichnung: 'Eigenheim-Anzahlung', betrag: 50000, erreicht: 10000 }],
-    fahrzeug: [{ bezeichnung: 'Neues Auto', betrag: 25000, erreicht: 5000 }],
-    bildung: [{ bezeichnung: 'Kinder-Studium', betrag: 40000, erreicht: 8000 }],
-    altersvorsorge: [{ bezeichnung: 'Private Zusatzrente', betrag: 100000, erreicht: 15000 }],
-    unternehmen: [{ bezeichnung: 'Geschäftsgründung', betrag: 30000, erreicht: 3000 }]
-  });
-
-  const [gehaltExpanded, setGehaltExpanded] = useState(false);
-  const [gehaltDetails, setGehaltDetails] = useState({
-    brutto: 0,
-    netto: 2500,
-    zusatzleistungen: 0
-  });
-
+ 
   // Animation states
   const [pageTransition, setPageTransition] = useState(false);
 
