@@ -27,15 +27,6 @@ const FinanzTool = () => {
     mobilitaet: [{ bezeichnung: 'Monatskarte', betrag: 90 }],
     sonstiges: []
 
-      // BasisAbs Daten
-  const [basisData, setBasisdata] = useState({
-    wohnen: [{ bezeichnung: 'Miete', betrag: 800 }],
-    lebensmittel: [{ bezeichnung: 'Wocheneinkauf', betrag: 400 }],
-    abos: [{ bezeichnung: 'Netflix', betrag: 15 }],
-    mobilitaet: [{ bezeichnung: 'Monatskarte', betrag: 90 }],
-    sonstiges: []
-  });
-
   // Lifestyle Daten
   const [lifestyleData, setLifestyleData] = useState({
     freizeit: [{ bezeichnung: 'Kino', betrag: 30 }],
@@ -158,7 +149,7 @@ const FinanzTool = () => {
   };
 
 //Basis-Absicherung Daten - Optimiert 2025
-const [basisAbsicherungData, setBasisAbsicherungData] = useState({
+const [basisData, setBasisData] = useState({
   krankenversicherung: { 
     status: 'vorhanden', 
     monatlich: 450, 
