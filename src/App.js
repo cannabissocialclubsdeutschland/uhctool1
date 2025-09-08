@@ -1359,770 +1359,330 @@ const OverviewPage = () => (
   </div>
 );
 
-// Basis-Absicherung Page - KOMPLETT ÜBERARBEITET im einheitlichen Design
+// BasisAbsicherungPage - OHNE Statistik-Banner, Fixkosten-Style
 const BasisAbsicherungPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempBasisData, setTempBasisData] = useState({...basisAbsicherungData});
+  const [tempBasis, setTempBasis] = useState({ ...basisData });
 
-  const calculateVersicherungskosten = (kategorie) => {
-    return tempBasisData[kategorie]?.monatlich || 0;
-  };
-
-  const updateVersicherung = (kategorie, field, value) => {
-    setTempBasisData(prev => ({
-      ...prev,
-      [kategorie]: {
-        ...prev[kategorie],
-        [field]: field === 'monatlich' ? (parseFloat(value) || 0) : value
-      }
-    }));
+  const calculateKategorieTotal = (kategorie) => {
+    return tempBasis[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
   };
 
   const handleSave = () => {
-    setBasisAbsicherungData(tempBasisData);
-    const newTotal = Object.keys(tempBasisData).reduce((total, key) => {
-      return total + calculateVersicherungskosten(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, versicherungenTotal: newTotal }));
+    setBasisData(tempBasis);
     setActiveField(null);
   };
 
   const handleCancel = () => {
-    setTempBasisData({...basisAbsicherungData});
+    setTempBasis({ ...basisData });
     setActiveField(null);
   };
 
-  const versicherungsKategorien = [
-    { 
-      id: 'krankenversicherung', 
-      name: 'Krankenversicherung', 
-      icon: '🏥', 
-      color: '#065f46',
-      beschreibung: 'Gesetzlich vorgeschrieben',
-      prioritaet: 'PFLICHT',
-      empfehlung: 'Basis-Schutz für alle'
-    },
-    { 
-      id: 'haftpflicht', 
-      name: 'Privathaftpflicht', 
-      icon: '🛡️', 
-      color: '#047857',
-      beschreibung: 'Schutz vor Schadenersatz',
-      prioritaet: 'KRITISCH',
-      empfehlung: 'Existenziell wichtig!'
-    },
-    { 
-      id: 'berufsunfaehigkeit', 
-      name: 'Berufsunfähigkeit', 
-      icon: '💼', 
-      color: '#059669',
-      beschreibung: 'Schutz der Arbeitskraft',
-      prioritaet: 'SEHR HOCH',
-      empfehlung: 'Jeder 4. wird BU'
-    },
-    { 
-      id: 'rechtsschutz', 
-      name: 'Rechtsschutz', 
-      icon: '⚖️', 
-      color: '#10b981',
-      beschreibung: 'Hilfe bei Rechtsstreit',
-      prioritaet: 'MITTEL',
-      empfehlung: 'Schutz vor Anwaltskosten'
-    },
-    { 
-      id: 'hausrat', 
-      name: 'Hausratversicherung', 
-      icon: '🏠', 
-      color: '#34d399',
-      beschreibung: 'Schutz für Eigentum',
-      prioritaet: 'NIEDRIG',
-      empfehlung: 'Bei wertigem Hausrat'
-    }
+  const basisKategorien = [
+    { id: 'krankenversicherung', name: 'Krankenversicherung', icon: '🏥', color: '#047857', beschreibung: 'Gesetzlich/Privat' },
+    { id: 'pflegeversicherung', name: 'Pflegeversicherung', icon: '❤️', color: '#059669', beschreibung: 'Pflegepflicht' },
+    { id: 'arbeitslosenversicherung', name: 'Arbeitslosenversicherung', icon: '💼', color: '#10b981', beschreibung: 'Sicherung im Jobverlust' },
+    { id: 'rentenversicherung', name: 'Rentenversicherung', icon: '👴', color: '#34d399', beschreibung: 'Pflichtbeiträge' }
   ];
-
-  const calculateAbsicherungsgrad = () => {
-    let score = 0;
-    let maxScore = 0;
-    
-    const gewichtung = {
-      krankenversicherung: 25,
-      haftpflicht: 30,
-      berufsunfaehigkeit: 25,
-      rechtsschutz: 15,
-      hausrat: 10
-    };
-    
-    Object.entries(gewichtung).forEach(([key, weight]) => {
-      maxScore += weight;
-      if (tempBasisData[key]?.status === 'vorhanden') {
-        score += weight;
-      } else if (tempBasisData[key]?.status === 'teilweise') {
-        score += weight * 0.5;
-      }
-    });
-    
-    return (score / maxScore) * 100;
-  };
-
-  const calculateGesamtkosten = () => {
-    return Object.keys(tempBasisData).reduce((sum, key) => 
-      sum + calculateVersicherungskosten(key), 0
-    );
-  };
-
-  const getAbsicherungsStatus = () => {
-    const grad = calculateAbsicherungsgrad();
-    if (grad >= 80) return { text: 'Exzellent', color: '#059669', icon: '🌟' };
-    if (grad >= 60) return { text: 'Gut', color: '#10b981', icon: '✅' };
-    if (grad >= 40) return { text: 'Ausbaufähig', color: '#f59e0b', icon: '⚡' };
-    return { text: 'Kritisch', color: '#ef4444', icon: '⚠️' };
-  };
-
-  const absicherungsStatus = getAbsicherungsStatus();
 
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
-      
-      <div className="h-screen flex flex-col pt-32">
-        {/* Absicherungs-Dashboard */}
-        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-emerald-800">🛡️ Basis-Absicherung</h2>
-              <p className="text-emerald-600">
-                Monatliche Kosten: <span className="font-bold">{calculateGesamtkosten().toLocaleString()}€</span> | 
-                Absicherungsgrad: <span className="font-bold">{calculateAbsicherungsgrad().toFixed(0)}%</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className={`px-4 py-2 rounded-lg ${absicherungsStatus.color === '#ef4444' ? 'bg-red-50' : absicherungsStatus.color === '#f59e0b' ? 'bg-yellow-50' : 'bg-emerald-50'}`}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{absicherungsStatus.icon}</span>
-                  <div>
-                    <p className="font-bold" style={{color: absicherungsStatus.color}}>
-                      {absicherungsStatus.text}
-                    </p>
+
+      <div className="h-screen flex flex-col pt-44">
+        <div className="flex-1 p-8">
+          <div className="h-full flex justify-center items-center">
+            <div className="flex space-x-12">
+              {basisKategorien.map((kategorie) => (
+                <div key={kategorie.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                      activeField === kategorie.id
+                        ? 'text-white shadow-2xl transform scale-105'
+                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    }`}
+                    style={{
+                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                    }}
+                    onClick={() => {
+                      if (activeField !== kategorie.id) {
+                        setActiveField(kategorie.id);
+                        setTempBasis({ ...basisData });
+                      }
+                    }}
+                  >
+                    <span className="text-3xl mb-2">{kategorie.icon}</span>
+                    <span className="text-base font-bold text-center">{kategorie.name}</span>
+                    <span className="text-xl font-bold mt-2">
+                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                    </span>
                   </div>
                 </div>
-              </div>
-              <div className="bg-emerald-50 p-3 rounded-lg">
-                <div className="text-sm text-emerald-800 font-semibold">💡 Priorität</div>
-                <div className="text-xs text-emerald-700 mt-1">
-                  {tempBasisData.haftpflicht?.status === 'fehlt' 
-                    ? 'Haftpflicht sofort abschließen!'
-                    : tempBasisData.berufsunfaehigkeit?.status === 'fehlt'
-                    ? 'BU-Versicherung prüfen'
-                    : 'Basis-Schutz vorhanden'}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-        
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="h-full flex flex-col">
-            
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-12">
-                {versicherungsKategorien.map((kategorie) => {
-                  const istVorhanden = tempBasisData[kategorie.id]?.status === 'vorhanden';
-                  const istTeilweise = tempBasisData[kategorie.id]?.status === 'teilweise';
-                  const kosten = calculateVersicherungskosten(kategorie.id);
-                  
-                  return (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-2xl transform scale-105' 
-                            : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                          borderColor: activeField === kategorie.id ? kategorie.color : 
-                                      istVorhanden ? '#059669' : 
-                                      istTeilweise ? '#f59e0b' : '#ef4444'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id) {
-                            setActiveField(kategorie.id);
-                            setTempBasisData({...basisAbsicherungData});
-                          }
-                        }}
-                      >
-                        {/* Status-Indikator */}
-                        <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                          istVorhanden ? 'bg-green-500' : istTeilweise ? 'bg-yellow-500' : 'bg-red-500'
-                        }`}>
-                          {istVorhanden ? '✓' : istTeilweise ? '◐' : '✗'}
-                        </div>
 
-                        <span className="text-3xl mb-2">{kategorie.icon}</span>
-                        <span className="text-base font-bold text-center px-4 leading-tight">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-xl font-bold mt-2">
-                          {kosten > 0 ? `${kosten}€` : '-'}
-                        </span>
-                        
-                        {/* Prioritäts-Badge */}
-                        <div className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded text-xs font-semibold ${
-                          kategorie.prioritaet === 'PFLICHT' ? 'bg-gray-600 text-white' :
-                          kategorie.prioritaet === 'KRITISCH' ? 'bg-red-600 text-white' :
-                          kategorie.prioritaet === 'SEHR HOCH' ? 'bg-orange-600 text-white' :
-                          kategorie.prioritaet === 'MITTEL' ? 'bg-yellow-600 text-white' :
-                          'bg-green-600 text-white'
-                        }`}>
-                          {kategorie.prioritaet}
-                        </div>
-                        
-                        {/* Hover-Info */}
-                        <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none max-w-48 text-center z-10">
-                          <div className="font-semibold">{kategorie.beschreibung}</div>
-                          <div className="text-emerald-300 mt-1">{kategorie.empfehlung}</div>
-                        </div>
-                      </div>
+        {activeField && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setActiveField(null)}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const aktiveKategorie = basisKategorien.find(k => k.id === activeField);
+                return (
+                  <div className="space-y-6">
+                    <div className="text-center border-b border-emerald-200 pb-4">
+                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                        <span className="text-3xl">{aktiveKategorie.icon}</span>
+                        {aktiveKategorie.name}
+                      </h3>
+                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = versicherungsKategorien.find(k => k.id === activeField);
-                    const aktuelleVersicherung = tempBasisData[activeField];
-                    
-                    return (
-                      <div className="space-y-6">
-                        <div className="text-center border-b border-emerald-200 pb-4">
-                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktiveKategorie.icon}</span>
-                            {aktiveKategorie.name}
-                          </h3>
-                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                          <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2 ${
-                            aktiveKategorie.prioritaet === 'PFLICHT' ? 'bg-gray-100 text-gray-800' :
-                            aktiveKategorie.prioritaet === 'KRITISCH' ? 'bg-red-100 text-red-800' :
-                            aktiveKategorie.prioritaet === 'SEHR HOCH' ? 'bg-orange-100 text-orange-800' :
-                            aktiveKategorie.prioritaet === 'MITTEL' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            Priorität: {aktiveKategorie.prioritaet}
-                          </div>
+                    <div className="space-y-4">
+                      {tempBasis[activeField].map((eintrag, index) => (
+                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg">
+                          <input
+                            type="text"
+                            value={eintrag.bezeichnung}
+                            onChange={(e) => {
+                              const newArr = [...tempBasis[activeField]];
+                              newArr[index].bezeichnung = e.target.value;
+                              setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
+                            }}
+                            placeholder="Bezeichnung"
+                            className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg"
+                          />
+                          <input
+                            type="number"
+                            value={eintrag.betrag}
+                            onChange={(e) => {
+                              const newArr = [...tempBasis[activeField]];
+                              newArr[index].betrag = parseFloat(e.target.value) || 0;
+                              setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
+                            }}
+                            placeholder="0"
+                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg text-right"
+                          />
                         </div>
-                        
-                        <div className="space-y-4">
-                          {/* Status-Auswahl */}
-                          <div>
-                            <label className="block text-sm font-semibold text-emerald-700 mb-3">
-                              Versicherungsstatus
-                            </label>
-                            <div className="grid grid-cols-3 gap-3">
-                              {['vorhanden', 'teilweise', 'fehlt'].map((status) => (
-                                <button
-                                  key={status}
-                                  onClick={() => updateVersicherung(activeField, 'status', status)}
-                                  className={`p-3 rounded-lg border-2 text-center font-semibold transition-all ${
-                                    aktuelleVersicherung?.status === status
-                                      ? status === 'vorhanden' ? 'bg-green-500 text-white border-green-500'
-                                        : status === 'teilweise' ? 'bg-yellow-500 text-white border-yellow-500'
-                                        : 'bg-red-500 text-white border-red-500'
-                                      : 'bg-white text-gray-700 border-gray-300 hover:border-emerald-400'
-                                  }`}
-                                >
-                                  {status === 'vorhanden' ? '✅ Vorhanden' 
-                                   : status === 'teilweise' ? '⚡ Teilweise'
-                                   : '❌ Fehlt'}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
+                      ))}
+                    </div>
 
-                          {/* Monatliche Kosten */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-semibold text-emerald-700 mb-2">
-                                Aktuelle Kosten (€/Monat)
-                              </label>
-                              <input 
-                                type="number"
-                                value={aktuelleVersicherung?.monatlich || 0}
-                                onChange={(e) => updateVersicherung(activeField, 'monatlich', e.target.value)}
-                                className="w-full p-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center font-semibold"
-                                placeholder="0"
-                                min="0"
-                                max="1000"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-semibold text-emerald-700 mb-2">
-                                Empfohlener Betrag (€/Monat)
-                              </label>
-                              <div className="p-3 bg-emerald-50 border-2 border-emerald-200 rounded-lg text-center font-semibold text-emerald-800">
-                                {aktuelleVersicherung?.empfohlen || 'Individuell'}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Versicherungsdetails */}
-                          {activeField === 'haftpflicht' && (
-                            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                              <h4 className="font-semibold text-red-800 mb-2">🚨 Warum so wichtig?</h4>
-                              <p className="text-sm text-red-700">
-                                Ein einziger Schaden kann Sie finanziell ruinieren. Schon ein Fahrradunfall mit Personenschaden 
-                                kann Millionen kosten. Diese Versicherung ist existenziell wichtig!
-                              </p>
-                            </div>
-                          )}
-
-                          {activeField === 'berufsunfaehigkeit' && (
-                            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                              <h4 className="font-semibold text-orange-800 mb-2">💼 Ihr wertvollstes Gut</h4>
-                              <p className="text-sm text-orange-700">
-                                Ihre Arbeitskraft ist Ihr wertvollstes Vermögen. Statistisch wird jeder 4. Deutsche 
-                                berufsunfähig. Die gesetzliche EM-Rente reicht nicht zum Leben.
-                              </p>
-                            </div>
-                          )}
-
-                          {activeField === 'krankenversicherung' && (
-                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                              <h4 className="font-semibold text-blue-800 mb-2">🏥 Gesetzliche Pflicht</h4>
-                              <p className="text-sm text-blue-700">
-                                In Deutschland besteht Krankenversicherungspflicht. Wählen Sie zwischen 
-                                gesetzlicher (ca. 14,6% + Zusatzbeitrag) oder privater Krankenversicherung.
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Kosten-Übersicht */}
-                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-semibold text-emerald-800">Aktuelle Kosten:</span>
-                            <span className="text-xl font-bold text-emerald-700">
-                              {calculateVersicherungskosten(activeField)}€/Monat
-                            </span>
-                          </div>
-                          <div className="text-sm text-emerald-600">
-                            Status: <span className="font-semibold">
-                              {aktuelleVersicherung?.status === 'vorhanden' ? 'Vollständig abgesichert' :
-                               aktuelleVersicherung?.status === 'teilweise' ? 'Teilweise abgesichert' :
-                               'Nicht abgesichert - Handlungsbedarf!'}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                          >
-                            🛡️ Absicherung speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                          >
-                            ↶ Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
+                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                      <button
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
+                      >
+                        💾 Speichern
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+                      >
+                        ↶ Zurück
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
-        </div>
+        )}
       </div>
-      <Sidebar /> 
+
+      <Sidebar />
       <NavigationButtons />
     </div>
   );
 };
 
-// BudgetPage - ÜBERARBEITET im Fixkosten-Stil mit Kreisen
+// BudgetPage - OHNE Statistik-Banner, Fixkosten-Style
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempValues, setTempValues] = useState({...finanzData});
-  const [errors, setErrors] = useState({});
-  const [showSummary, setShowSummary] = useState(false);
-  const [gehaltExpanded, setGehaltExpanded] = useState(false);
-  const [gehaltDetails, setGehaltDetails] = useState({
-    brutto: 0,
-    netto: 2500,
-    zusatzleistungen: 0
-  });
+  const [tempBudget, setTempBudget] = useState({ ...budgetData });
 
-  const handleInputChange = (field, value) => {
-    const numValue = parseFloat(value) || 0;
-    
-    // Validierung
-    let newErrors = {...errors};
-    if (numValue < 0) {
-      newErrors[field] = 'Negative Werte sind nicht erlaubt';
-    } else if (numValue > 50000) {
-      newErrors[field] = 'Wert scheint unrealistisch hoch';
-    } else {
-      delete newErrors[field];
-    }
-    setErrors(newErrors);
-    
-    setTempValues(prev => ({
+  const calculateKategorieTotal = (kategorie) => {
+    return tempBudget[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
+
+  const addEintrag = (kategorie) => {
+    setTempBudget(prev => ({
       ...prev,
-      [field]: numValue
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
+
+  const removeEintrag = (kategorie, index) => {
+    setTempBudget(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempBudget(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) =>
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
     }));
   };
 
   const handleSave = () => {
-    if (Object.keys(errors).length === 0) {
-      setFinanzData(tempValues);
-      setActiveField(null);
-      setGehaltExpanded(false);
-      setShowSummary(true);
-      
-      // Auto-hide Summary nach 3 Sekunden
-      setTimeout(() => setShowSummary(false), 3000);
-    }
+    setBudgetData(tempBudget);
+    const newTotal = Object.keys(tempBudget).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+    setFinanzData(prev => ({ ...prev, budget: newTotal }));
+    setActiveField(null);
   };
 
   const handleCancel = () => {
-    setTempValues({...finanzData});
+    setTempBudget({ ...budgetData });
     setActiveField(null);
-    setGehaltExpanded(false);
-    setErrors({});
   };
 
-  const calculateTempBudget = () => {
-    return tempValues.gehaltNetto + tempValues.zusatzeinkommen + 
-           tempValues.kapitalertraege + tempValues.mieteinnahmen + tempValues.individuell;
-  };
-
-  const einkommensKategorien = [
-    { 
-      id: 'gehaltNetto', 
-      name: 'Netto-Gehalt', 
-      icon: '💼', 
-      color: '#065f46',
-      beschreibung: 'Ihr monatliches Netto-Einkommen',
-      wert: tempValues.gehaltNetto,
-      hasExpanded: true
-    },
-    { 
-      id: 'zusatzeinkommen', 
-      name: 'Zusatzeinkommen', 
-      icon: '💰', 
-      color: '#047857',
-      beschreibung: 'Nebentätigkeit, Freelancing, etc.',
-      wert: tempValues.zusatzeinkommen
-    },
-    { 
-      id: 'kapitalertraege', 
-      name: 'Kapitalerträge', 
-      icon: '📈', 
-      color: '#059669',
-      beschreibung: 'Dividenden, Zinsen, Mieteinnahmen',
-      wert: tempValues.kapitalertraege
-    },
-    { 
-      id: 'mieteinnahmen', 
-      name: 'Mieteinnahmen', 
-      icon: '🏠', 
-      color: '#10b981',
-      beschreibung: 'Einnahmen aus Vermietung',
-      wert: tempValues.mieteinnahmen
-    },
-    { 
-      id: 'individuell', 
-      name: 'Sonstige Einnahmen', 
-      icon: '📊', 
-      color: '#34d399',
-      beschreibung: 'Unterhalt, Kindergeld, etc.',
-      wert: tempValues.individuell
-    }
+  const budgetKategorien = [
+    { id: 'einnahmen', name: 'Einnahmen', icon: '💶', color: '#047857', beschreibung: 'Gehalt, Nebeneinkünfte' },
+    { id: 'ausgaben', name: 'Ausgaben', icon: '💸', color: '#059669', beschreibung: 'Monatliche Fixkosten & variable Kosten' },
+    { id: 'investitionen', name: 'Investitionen', icon: '📈', color: '#10b981', beschreibung: 'Aktien, ETFs, Projekte' },
+    { id: 'ruecklagen', name: 'Rücklagen', icon: '🏦', color: '#34d399', beschreibung: 'Polster für besondere Fälle' }
   ];
-
-  const getBudgetStatus = () => {
-    const budget = calculateTempBudget();
-    if (budget < 1000) return { text: 'Sehr knapp', color: '#ef4444', icon: '⚠️' };
-    if (budget < 2000) return { text: 'Grundversorgung', color: '#f59e0b', icon: '⚡' };
-    if (budget < 3500) return { text: 'Solide Basis', color: '#10b981', icon: '✅' };
-    if (budget < 5000) return { text: 'Komfortabel', color: '#059669', icon: '💎' };
-    return { text: 'Sehr gut situiert', color: '#065f46', icon: '🌟' };
-  };
-
-  const budgetStatus = getBudgetStatus();
 
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
-      
-      {/* Success Summary */}
-      {showSummary && (
-        <div className="fixed top-40 left-1/2 transform -translate-x-1/2 z-50 animate-pulse">
-          <div className="bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">✅</span>
-              <div>
-                <div className="font-bold">Budget gespeichert!</div>
-                <div className="text-sm">Gesamtbudget: {calculateTempBudget().toLocaleString()}€</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <div className="h-screen flex flex-col pt-32">
-        {/* Budget-Dashboard */}
-        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-emerald-100">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-emerald-800">💼 Budget-Eingabe</h2>
-              <p className="text-emerald-600">
-                Gesamtbudget: <span className="font-bold">{calculateTempBudget().toLocaleString()}€</span> | 
-                Status: <span className="font-bold" style={{color: budgetStatus.color}}>{budgetStatus.text}</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className={`px-4 py-2 rounded-lg ${budgetStatus.color === '#ef4444' ? 'bg-red-50' : budgetStatus.color === '#f59e0b' ? 'bg-yellow-50' : 'bg-emerald-50'}`}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{budgetStatus.icon}</span>
-                  <div>
-                    <p className="font-bold" style={{color: budgetStatus.color}}>
-                      {budgetStatus.text}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-emerald-50 p-3 rounded-lg">
-                <div className="text-sm text-emerald-800 font-semibold">💡 Tipp</div>
-                <div className="text-xs text-emerald-700 mt-1">
-                  {calculateTempBudget() < 2000 
-                    ? 'Fokussieren Sie sich auf Fixkosten-Optimierung'
-                    : calculateTempBudget() < 3500
-                    ? 'Bauen Sie einen Notgroschen auf'
-                    : 'Perfekt für diversifizierte Geldanlage'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="h-full flex flex-col">
-            
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-12">
-                {einkommensKategorien.map((kategorie) => (
-                  <div key={kategorie.id} className="flex flex-col items-center">
-                    <div 
-                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                        activeField === kategorie.id 
-                          ? 'text-white shadow-2xl transform scale-105' 
-                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                      }`}
-                      style={{
-                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                        borderColor: activeField === kategorie.id ? kategorie.color : errors[kategorie.id] ? '#ef4444' : '#cbd5e1'
-                      }}
-                      onClick={() => {
-                        if (activeField !== kategorie.id) {
-                          setActiveField(kategorie.id);
-                          setTempValues({...finanzData});
-                          setErrors({});
-                        }
-                      }}
-                    >
-                      <span className="text-3xl mb-2">{kategorie.icon}</span>
-                      <span className="text-base font-bold text-center px-4 leading-tight">
-                        {kategorie.name}
-                      </span>
-                      <span className="text-xl font-bold mt-2">
-                        {kategorie.wert.toLocaleString()}€
-                      </span>
-                      
-                      {/* Error Indicator */}
-                      {errors[kategorie.id] && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">
-                          !
-                        </div>
-                      )}
-                      
-                      {/* Hover-Info */}
-                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                        {kategorie.beschreibung}
-                      </div>
+
+      <div className="h-screen flex flex-col pt-44">
+        <div className="flex-1 p-8">
+          <div className="h-full flex justify-center items-center">
+            <div className="flex space-x-12">
+              {budgetKategorien.map((kategorie) => (
+                <div key={kategorie.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                      activeField === kategorie.id
+                        ? 'text-white shadow-2xl transform scale-105'
+                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    }`}
+                    style={{
+                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                    }}
+                    onClick={() => {
+                      if (activeField !== kategorie.id) {
+                        setActiveField(kategorie.id);
+                        setTempBudget({ ...budgetData });
+                      }
+                    }}
+                  >
+                    <span className="text-3xl mb-2">{kategorie.icon}</span>
+                    <span className="text-base font-bold text-center px-4">{kategorie.name}</span>
+                    <span className="text-xl font-bold mt-2">
+                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                    </span>
+
+                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                      {kategorie.beschreibung}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = einkommensKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <div className="text-center border-b border-emerald-200 pb-4">
-                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktiveKategorie.icon}</span>
-                            {aktiveKategorie.name}
-                          </h3>
-                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                        </div>
-                        
-                        <div className="flex flex-col items-center space-y-4">
-                          <div className="w-full max-w-sm">
-                            <label className="block text-base font-semibold text-emerald-700 mb-3 text-center">
-                              Monatlicher Betrag in Euro
-                            </label>
-                            <div className="relative">
-                              <input 
-                                type="number" 
-                                value={tempValues[aktiveKategorie.id]}
-                                onChange={(e) => handleInputChange(aktiveKategorie.id, e.target.value)}
-                                className={`w-full p-4 bg-white border-2 rounded-xl outline-none text-center text-xl font-semibold pr-8 ${
-                                  errors[aktiveKategorie.id] 
-                                    ? 'border-red-500 focus:ring-2 focus:ring-red-500' 
-                                    : 'border-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
-                                }`}
-                                placeholder={`z.B. ${
-                                  aktiveKategorie.id === 'gehaltNetto' ? '2500' :
-                                  aktiveKategorie.id === 'zusatzeinkommen' ? '500' :
-                                  aktiveKategorie.id === 'kapitalertraege' ? '150' :
-                                  aktiveKategorie.id === 'mieteinnahmen' ? '800' :
-                                  '200'
-                                }€`}
-                                autoFocus
-                                min="0"
-                                max="50000"
-                              />
-                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-700 font-bold">
-                                €
-                              </span>
-                            </div>
-                            {errors[aktiveKategorie.id] && (
-                              <p className="text-red-500 text-sm mt-2 text-center">
-                                {errors[aktiveKategorie.id]}
-                              </p>
-                            )}
-                          </div>
-                          
-                          {activeField === 'gehaltNetto' && (
-                            <div className="w-full max-w-sm">
-                              <button 
-                                onClick={() => setGehaltExpanded(!gehaltExpanded)}
-                                className="w-full py-3 px-4 rounded-xl border-2 border-emerald-300 hover:bg-emerald-50 transition-all text-emerald-700 font-semibold"
-                              >
-                                {gehaltExpanded ? '📊 Weniger Details' : '📊 Brutto-Details anzeigen'}
-                              </button>
-                              
-                              {gehaltExpanded && (
-                                <div className="mt-4 space-y-3 pt-4 border-t-2 border-emerald-200">
-                                  <div>
-                                    <label className="block text-sm font-semibold text-emerald-700 mb-2 text-center">
-                                      Brutto-Gehalt (optional)
-                                    </label>
-                                    <input 
-                                      type="number" 
-                                      value={gehaltDetails.brutto}
-                                      onChange={(e) => setGehaltDetails(prev => ({
-                                        ...prev, 
-                                        brutto: parseFloat(e.target.value) || 0
-                                      }))}
-                                      className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center text-base"
-                                      placeholder="z.B. 3500€"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-sm font-semibold text-emerald-700 mb-2 text-center">
-                                      Zusatzleistungen (optional)
-                                    </label>
-                                    <input 
-                                      type="number" 
-                                      value={gehaltDetails.zusatzleistungen}
-                                      onChange={(e) => setGehaltDetails(prev => ({
-                                        ...prev, 
-                                        zusatzleistungen: parseFloat(e.target.value) || 0
-                                      }))}
-                                      className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-center text-base"
-                                      placeholder="z.B. Dienstwagen 200€"
-                                    />
-                                  </div>
-                                  
-                                  {/* Steuer-Tipp */}
-                                  <div className="bg-blue-50 p-3 rounded-lg text-sm">
-                                    <div className="font-semibold text-blue-800">💡 Steuer-Tipp:</div>
-                                    <div className="text-blue-700">
-                                      Abzüge: ca. {gehaltDetails.brutto > 0 ? 
-                                        Math.round((gehaltDetails.brutto - tempValues.gehaltNetto) / gehaltDetails.brutto * 100) : 0}%
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          
-                          {/* Live Budget Preview */}
-                          <div className="w-full bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                            <div className="text-center">
-                              <div className="text-sm text-emerald-600 font-semibold">Vorschau Gesamtbudget</div>
-                              <div className="text-2xl font-bold text-emerald-800 mt-1">
-                                {calculateTempBudget().toLocaleString()}€
-                              </div>
-                              <div className="text-xs text-emerald-600 flex items-center justify-center gap-1 mt-1">
-                                {budgetStatus.icon} {budgetStatus.text}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex space-x-4 mt-6">
-                            <button 
-                              onClick={handleSave}
-                              disabled={Object.keys(errors).length > 0}
-                              className={`px-8 py-3 text-base font-semibold text-white rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105 ${
-                                Object.keys(errors).length > 0 
-                                  ? 'bg-gray-400 cursor-not-allowed' 
-                                  : 'bg-emerald-600 hover:bg-emerald-700'
-                              }`}
-                            >
-                              💾 Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                            >
-                              ↶ Abbrechen
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
+
+        {activeField && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setActiveField(null)}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
+                return (
+                  <div className="space-y-6">
+                    <div className="text-center border-b border-emerald-200 pb-4">
+                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                        <span className="text-3xl">{aktiveKategorie.icon}</span>
+                        {aktiveKategorie.name}
+                      </h3>
+                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {tempBudget[activeField].map((eintrag, index) => (
+                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100">
+                          <input
+                            type="text"
+                            value={eintrag.bezeichnung}
+                            onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                            placeholder="Bezeichnung"
+                            className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg"
+                          />
+                          <input
+                            type="number"
+                            value={eintrag.betrag}
+                            onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                            placeholder="0"
+                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg text-right"
+                          />
+                          {tempBudget[activeField].length > 1 && (
+                            <button
+                              onClick={() => removeEintrag(activeField, index)}
+                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      <button
+                        onClick={() => addEintrag(activeField)}
+                        className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500"
+                      >
+                        ➕ Neuen Eintrag hinzufügen
+                      </button>
+                    </div>
+
+                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                      <button
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
+                      >
+                        💾 Speichern
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+                      >
+                        ↶ Zurück
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </div>
-      <Sidebar /> 
+
+      <Sidebar />
       <NavigationButtons />
     </div>
   );
 };
+
 
 // FixkostenPage - OHNE Statistik-Banner und mit Modal-Overlay
 const FixkostenPage = () => {
