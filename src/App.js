@@ -241,159 +241,242 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// ZigarettenPage - MIT Statistik-Banner (nach unten verschoben)
+// ZigarettenPage - KORRIGIERT im Fixkosten-Stil
 const ZigarettenPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempZigaretten, setTempZigaretten] = useState({ ...zigarettenData });
+  const [tempZigaretten, setTempZigaretten] = useState({...zigarettenData});
 
   const calculateKategorieTotal = (kategorie) => {
     return tempZigaretten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
   };
 
+  const addEintrag = (kategorie) => {
+    setTempZigaretten(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
+
+  const removeEintrag = (kategorie, index) => {
+    setTempZigaretten(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempZigaretten(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
+
   const handleSave = () => {
     setZigarettenData(tempZigaretten);
+    const newTotal = Object.keys(tempZigaretten).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+    setFinanzData(prev => ({ ...prev, zigarettenTotal: newTotal }));
     setActiveField(null);
   };
 
   const handleCancel = () => {
-    setTempZigaretten({ ...zigarettenData });
+    setTempZigaretten({...zigarettenData});
     setActiveField(null);
   };
 
-  const zigKategorien = [
-    { id: 'konsum', name: 'Konsum', icon: '🚬', color: '#dc2626', beschreibung: 'Täglicher Zigarettenkonsum' }
+  const zigarettenKategorien = [
+    { 
+      id: 'konsum', 
+      name: 'Zigaretten-Konsum', 
+      icon: '🚬', 
+      color: '#dc2626',
+      beschreibung: 'Täglicher Zigarettenkonsum und Kosten'
+    }
   ];
+
+  const getMonatlicheKosten = () => {
+    return Object.keys(tempZigaretten).reduce((sum, key) => sum + calculateKategorieTotal(key), 0);
+  };
+
+  const getJahrlicheKosten = () => {
+    return getMonatlicheKosten() * 12;
+  };
 
   return (
     <div className="h-screen bg-gradient-to-br from-red-50 to-slate-100 font-sans">
       <HeaderBars />
-
-      {/* Statistik-Banner (leicht nach unten verschoben) */}
-      <div className="mt-20 mb-6 px-8">
-        <div className="bg-red-100 border border-red-300 rounded-xl p-6 shadow-md">
-          <h3 className="text-lg font-bold text-red-800">Statistik: Zigarettenkosten</h3>
-          <p className="text-red-700 mt-1">
-            Übersicht deiner monatlichen Ausgaben für Zigaretten.
-          </p>
-        </div>
-      </div>
-
-      <div className="h-screen flex flex-col pt-10">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {zigKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer hover:scale-105 shadow-lg ${
-                      activeField === kategorie.id
-                        ? 'bg-red-600 text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 border-slate-300 hover:border-red-400'
-                    }`}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempZigaretten({ ...zigarettenData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold">{kategorie.name}</span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-                  </div>
-                </div>
-              ))}
+      
+      <div className="h-screen flex flex-col pt-32">
+        {/* Zigaretten-Dashboard */}
+        <div className="flex-shrink-0 bg-red-100/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-red-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-red-800">Zigaretten-Übersicht</h2>
+              <p className="text-red-600">
+                Monatlich: <span className="font-bold">{getMonatlicheKosten().toLocaleString()}€</span> | 
+                Jährlich: <span className="font-bold">{getJahrlicheKosten().toLocaleString()}€</span>
+              </p>
+            </div>
+            <div className="text-center bg-red-50 px-4 py-2 rounded-lg">
+              <div className="text-2xl">⚠️</div>
+              <div className="text-xs text-red-600">Gesundheitskosten</div>
+              <div className="font-bold text-red-700">{getMonatlicheKosten()}€</div>
             </div>
           </div>
         </div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-12">
+                {zigarettenKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl transform scale-105' 
+                          : 'bg-white text-slate-700 hover:border-red-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempZigaretten({...zigarettenData});
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
+                      <span className="text-base font-bold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-xl font-bold mt-2">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
+                      
+                      {/* Hover-Info */}
+                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        {kategorie.beschreibung}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Modal */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white rounded-2xl border-2 border-red-200 p-8 w-full max-w-3xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = zigKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-red-700 flex items-center justify-center gap-3">
-                      {aktiveKategorie.icon} {aktiveKategorie.name}
-                    </h3>
-                    <div className="space-y-4">
-                      {tempZigaretten[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-red-50 rounded-lg">
-                          <input
-                            type="text"
-                            value={eintrag.bezeichnung}
-                            onChange={(e) => {
-                              const newArr = [...tempZigaretten[activeField]];
-                              newArr[index].bezeichnung = e.target.value;
-                              setTempZigaretten(prev => ({ ...prev, [activeField]: newArr }));
-                            }}
-                            placeholder="Bezeichnung"
-                            className="flex-1 p-3 bg-white border-2 border-red-300 rounded-lg"
-                          />
-                          <input
-                            type="number"
-                            value={eintrag.betrag}
-                            onChange={(e) => {
-                              const newArr = [...tempZigaretten[activeField]];
-                              newArr[index].betrag = parseFloat(e.target.value) || 0;
-                              setTempZigaretten(prev => ({ ...prev, [activeField]: newArr }));
-                            }}
-                            placeholder="0"
-                            className="w-28 p-3 bg-white border-2 border-red-300 rounded-lg text-right"
-                          />
-                          {tempZigaretten[activeField].length > 1 && (
-                            <button
-                              onClick={() => {
-                                const newArr = [...tempZigaretten[activeField]];
-                                newArr.splice(index, 1);
-                                setTempZigaretten(prev => ({ ...prev, [activeField]: newArr }));
-                              }}
-                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
-                            >
-                              ✕
-                            </button>
-                          )}
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-red-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = zigarettenKategorien.find(k => k.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <div className="text-center border-b border-red-200 pb-4">
+                          <h3 className="text-2xl font-bold text-red-800 flex items-center justify-center gap-3">
+                            <span className="text-3xl">{aktiveKategorie.icon}</span>
+                            {aktiveKategorie.name}
+                          </h3>
+                          <p className="text-red-600 mt-1">{aktiveKategorie.beschreibung}</p>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-red-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-red-600 rounded-xl shadow-lg hover:bg-red-700"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
+                        
+                        <div className="space-y-4">
+                          {tempZigaretten[activeField].map((eintrag, index) => (
+                            <div key={index} className="flex gap-3 items-center p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                              <div className="flex-1">
+                                <input 
+                                  type="text"
+                                  value={eintrag.bezeichnung}
+                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                  placeholder="z.B. Marlboro, Camel, E-Zigarette..."
+                                  className="w-full p-3 bg-white border-2 border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-800 placeholder:text-gray-500"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <input 
+                                  type="number"
+                                  value={eintrag.betrag}
+                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                  placeholder="0"
+                                  className="w-28 p-3 bg-white border-2 border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-right font-semibold"
+                                />
+                                <span className="text-lg font-semibold text-red-700">€</span>
+                              </div>
+                              {tempZigaretten[activeField].length > 1 && (
+                                <button
+                                  onClick={() => removeEintrag(activeField, index)}
+                                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
+                                  title="Eintrag löschen"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          
+                          <button
+                            onClick={() => addEintrag(activeField)}
+                            className="w-full p-4 border-2 border-dashed border-red-300 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-3 group"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center group-hover:bg-red-600 transition-colors">
+                              +
+                            </div>
+                            <span className="font-semibold text-red-700 group-hover:text-red-800">Neuen Zigaretten-Eintrag hinzufügen</span>
+                          </button>
+                        </div>
+                        
+                        {/* Gesundheits-Warnung */}
+                        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold text-red-800">Monatliche Kosten:</span>
+                            <span className="text-xl font-bold text-red-700">
+                              {calculateKategorieTotal(activeField).toLocaleString()}€
+                            </span>
+                          </div>
+                          <div className="text-sm text-red-600 space-y-1">
+                            <div>Jährliche Kosten: <span className="font-semibold">{(calculateKategorieTotal(activeField) * 12).toLocaleString()}€</span></div>
+                            <div className="text-xs text-red-500 mt-2 p-2 bg-red-100 rounded">
+                              ⚠️ Hinweis: Zigaretten schädigen die Gesundheit und verursachen hohe Folgekosten
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-4 justify-center pt-4 border-t border-red-200">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-red-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-red-700 hover:scale-105"
+                          >
+                            💾 Zigaretten speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
+                          >
+                            ↶ Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
-
       <Sidebar />
       <NavigationButtons />
     </div>
   );
 };
-
   
 // Sidebar mit korrigiertem Grünschema und verbesserter Stabilität
 const Sidebar = () => {
