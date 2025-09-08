@@ -2561,10 +2561,10 @@ const LifestylePage = () => {
 };
 
 
-// SicherheitPage - VOLLSTÄNDIG KORRIGIERT mit richtigen State-Variablen und professionellem Design
+// SicherheitPage - OHNE Statistik-Banner, Fixkosten-Style
 const SicherheitPage = () => {
   const [activeField, setActiveField] = useState(null);
-  const [tempSicherheit, setTempSicherheit] = useState({...sicherheitData}); // KORRIGIERT: richtige Variable
+  const [tempSicherheit, setTempSicherheit] = useState({ ...sicherheitData });
 
   const calculateKategorieTotal = (kategorie) => {
     return tempSicherheit[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
@@ -2587,7 +2587,7 @@ const SicherheitPage = () => {
   const updateEintrag = (kategorie, index, field, value) => {
     setTempSicherheit(prev => ({
       ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
+      [kategorie]: prev[kategorie].map((item, i) =>
         i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
       )
     }));
@@ -2603,689 +2603,286 @@ const SicherheitPage = () => {
   };
 
   const handleCancel = () => {
-    setTempSicherheit({...sicherheitData}); // KORRIGIERT: richtige Variable
+    setTempSicherheit({ ...sicherheitData });
     setActiveField(null);
   };
 
   const sicherheitKategorien = [
-    { 
-      id: 'notgroschen', 
-      name: 'Notgroschen', 
-      icon: '🛡️', 
-      color: '#065f46', 
-      beschreibung: '3-6 Monatsausgaben als Rücklage',
-      tipp: 'Empfehlung: 3-6x Ihre monatlichen Fixkosten'
-    },
-    { 
-      id: 'versicherungen', 
-      name: 'Versicherungen', 
-      icon: '📄', 
-      color: '#047857', 
-      beschreibung: 'Haftpflicht, BU, Hausrat, etc.',
-      tipp: 'Basis-Absicherung ist essentiell'
-    },
-    { 
-      id: 'altersvorsorge', 
-      name: 'Altersvorsorge', 
-      icon: '👴', 
-      color: '#059669', 
-      beschreibung: 'Private Rente, Riester, Rürup',
-      tipp: 'Je früher desto besser durch Zinseszinseffekt'
-    },
-    { 
-      id: 'gesundheit', 
-      name: 'Gesundheit', 
-      icon: '🏥', 
-      color: '#10b981', 
-      beschreibung: 'Zusatzversicherungen, Vorsorge',
-      tipp: 'Gesundheit ist unbezahlbar'
-    },
-    { 
-      id: 'sparen', 
-      name: 'Langfristiges Sparen', 
-      icon: '💰', 
-      color: '#34d399', 
-      beschreibung: 'ETFs, Aktien, Festgeld',
-      tipp: 'Diversifikation ist der Schlüssel'
-    }
+    { id: 'notgroschen', name: 'Notgroschen', icon: '💰', color: '#047857', beschreibung: 'Rücklagen für Notfälle' },
+    { id: 'versicherungen', name: 'Versicherungen', icon: '🛡️', color: '#059669', beschreibung: 'Haftpflicht, Hausrat etc.' },
+    { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴', color: '#10b981', beschreibung: 'Private Renten, ETF-Sparpläne' },
+    { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️', color: '#34d399', beschreibung: 'Zusatzversicherung, Vorsorge' },
+    { id: 'sparen', name: 'Sparen', icon: '🏦', color: '#6ee7b7', beschreibung: 'Sparkonto, Tagesgeld' }
   ];
 
-  // Berechne Sicherheits-Score
-  const calculateSicherheitsScore = () => {
-    const notgroschenkaufkraft = calculateKategorieTotal('notgroschen') / finanzData.fixkostenTotal;
-    const versicherungsSchutz = calculateKategorieTotal('versicherungen') > 50 ? 100 : (calculateKategorieTotal('versicherungen') / 50) * 100;
-    const altersvorsorgeAnteil = (calculateKategorieTotal('altersvorsorge') / calculateBudget()) * 100;
-    
-    const score = (
-      Math.min(notgroschenkaufkraft * 20, 30) +  // max 30% für Notgroschen
-      Math.min(versicherungsSchutz * 0.25, 25) + // max 25% für Versicherungen  
-      Math.min(altersvorsorgeAnteil * 2, 25) +   // max 25% für Altersvorsorge
-      Math.min((calculateKategorieTotal('gesundheit') / 100) * 100, 10) + // max 10% für Gesundheit
-      Math.min((calculateKategorieTotal('sparen') / 500) * 100, 10)  // max 10% für Sparen
-    );
-    
-    return Math.min(score, 100);
-  };
-
-  const sicherheitsScore = calculateSicherheitsScore();
-  
-  const getSicherheitsLevel = () => {
-    if (sicherheitsScore >= 80) return { text: 'Exzellent abgesichert', color: '#059669', bg: 'bg-emerald-50' };
-    if (sicherheitsScore >= 60) return { text: 'Gut abgesichert', color: '#10b981', bg: 'bg-emerald-100' };
-    if (sicherheitsScore >= 40) return { text: 'Grundabsicherung', color: '#f59e0b', bg: 'bg-yellow-50' };
-    return { text: 'Verbesserungsbedarf', color: '#ef4444', bg: 'bg-red-50' };
-  };
-
-  const sicherheitsLevel = getSicherheitsLevel();
-
   return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
-      
-      <div className="h-screen flex flex-col pt-32">
-        {/* Sicherheits-Dashboard */}
-        <div className="flex-shrink-0 bg-white/90 backdrop-blur-lg mx-8 mt-4 rounded-xl p-6 shadow-xl border border-emerald-200">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
-                🛡️ Sicherheit & Vorsorge
-              </h2>
-              <p className="text-emerald-600 mt-1">
-                Gesamtsumme: <span className="font-bold">{finanzData.sicherheit.toLocaleString()}€</span> | 
-                Budget-Anteil: <span className="font-bold">{((finanzData.sicherheit / calculateBudget()) * 100).toFixed(1)}%</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-6">
-              {/* Sicherheits-Score-Ring */}
-              <div className="relative">
-                <svg className="w-24 h-24 transform -rotate-90">
-                  <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="6" fill="none" />
-                  <circle 
-                    cx="48" cy="48" r="40" 
-                    stroke={sicherheitsLevel.color} 
-                    strokeWidth="6" 
-                    fill="none"
-                    strokeDasharray={`${sicherheitsScore * 2.51} 251`}
-                    className="transition-all duration-1000"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold" style={{color: sicherheitsLevel.color}}>
-                    {sicherheitsScore.toFixed(0)}%
-                  </span>
-                  <span className="text-xs text-gray-600">Score</span>
-                </div>
-              </div>
-              <div className={`px-4 py-2 rounded-lg ${sicherheitsLevel.bg}`}>
-                <p className="font-bold" style={{color: sicherheitsLevel.color}}>
-                  {sicherheitsLevel.text}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          {/* Quick-Tipps basierend auf aktueller Situation */}
-          <div className="mt-4 p-4 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg">
-            <h4 className="font-semibold text-emerald-800 mb-2">💡 Ihr nächster Schritt:</h4>
-            <p className="text-sm text-emerald-700">
-              {calculateKategorieTotal('notgroschen') < finanzData.fixkostenTotal * 3 
-                ? `Erhöhen Sie Ihren Notgroschen auf ${(finanzData.fixkostenTotal * 3).toLocaleString()}€ (3x Fixkosten)`
-                : calculateKategorieTotal('versicherungen') < 50 
-                ? 'Prüfen Sie Ihre Basis-Absicherung (Haftpflicht, BU)'
-                : calculateKategorieTotal('altersvorsorge') < calculateBudget() * 0.1
-                ? 'Starten Sie mit 10% Ihres Budgets in die Altersvorsorge'
-                : 'Glückwunsch! Ihre Vorsorge ist auf einem guten Weg. Optimieren Sie weiter.'}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="h-full flex flex-col">
-            
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-10">
-                {sicherheitKategorien.map((kategorie) => (
-                  <div key={kategorie.id} className="flex flex-col items-center">
-                    <div 
-                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                        activeField === kategorie.id 
-                          ? 'text-white shadow-2xl transform scale-105' 
-                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                      }`}
-                      style={{
-                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                      }}
-                      onClick={() => {
-                        if (activeField !== kategorie.id) {
-                          setActiveField(kategorie.id);
-                          setTempSicherheit({...sicherheitData}); // KORRIGIERT
-                        }
-                      }}
-                    >
-                      <span className="text-3xl mb-1">{kategorie.icon}</span>
-                      <span className="text-sm font-bold text-center px-3 leading-tight">
-                        {kategorie.name}
-                      </span>
-                      <span className="text-lg font-bold mt-1">
-                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                      </span>
-                      
-                      {/* Erweiterte Hover-Info */}
-                      <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none max-w-48 text-center">
-                        <div className="font-semibold">{kategorie.beschreibung}</div>
-                        <div className="text-emerald-300 mt-1">{kategorie.tipp}</div>
-                      </div>
+      <div className="h-screen flex flex-col pt-44">
+        <div className="flex-1 p-8">
+          <div className="h-full flex justify-center items-center">
+            <div className="flex space-x-12">
+              {sicherheitKategorien.map((kategorie) => (
+                <div key={kategorie.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                      activeField === kategorie.id
+                        ? 'text-white shadow-2xl transform scale-105'
+                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    }`}
+                    style={{
+                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                    }}
+                    onClick={() => {
+                      if (activeField !== kategorie.id) {
+                        setActiveField(kategorie.id);
+                        setTempSicherheit({ ...sicherheitData });
+                      }
+                    }}
+                  >
+                    <span className="text-3xl mb-2">{kategorie.icon}</span>
+                    <span className="text-base font-bold text-center px-4 leading-tight">
+                      {kategorie.name}
+                    </span>
+                    <span className="text-xl font-bold mt-2">
+                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                    </span>
+
+                    {/* Hover-Info */}
+                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                      {kategorie.beschreibung}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField); // KORRIGIERT: richtige Variable
-                    return (
-                      <div className="space-y-6">
-                        <div className="text-center border-b border-emerald-200 pb-4">
-                          <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktiveKategorie.icon}</span>
-                            {aktiveKategorie.name}
-                          </h3>
-                          <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                          <div className="inline-block bg-emerald-100 px-3 py-1 rounded-full text-sm text-emerald-800 mt-2">
-                            💡 {aktiveKategorie.tipp}
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          {tempSicherheit[activeField].map((eintrag, index) => ( // KORRIGIERT
-                            <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200">
-                              <div className="flex-1">
-                                <input 
-                                  type="text"
-                                  value={eintrag.bezeichnung}
-                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                  placeholder={`${aktiveKategorie.name === 'Notgroschen' ? 'z.B. Tagesgeldkonto, Sparbuch' : 
-                                               aktiveKategorie.name === 'Versicherungen' ? 'z.B. Privathaftpflicht, BU-Versicherung' : 
-                                               aktiveKategorie.name === 'Altersvorsorge' ? 'z.B. Riester-Rente, Private Rentenversicherung' :
-                                               aktiveKategorie.name === 'Gesundheit' ? 'z.B. Zahnzusatzversicherung, Heilpraktiker' :
-                                               'z.B. ETF-Sparplan, Aktien-Depot'}`}
-                                  className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
-                                />
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <input 
-                                  type="number"
-                                  value={eintrag.betrag}
-                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                  placeholder="0"
-                                  className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
-                                />
-                                <span className="text-lg font-semibold text-emerald-700">€</span>
-                              </div>
-                              {tempSicherheit[activeField].length > 1 && ( // KORRIGIERT
-                                <button
-                                  onClick={() => removeEintrag(activeField, index)}
-                                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
-                                  title="Eintrag löschen"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
-                              +
-                            </div>
-                            <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        {/* Erweiterte Kategorie-Statistiken */}
-                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-4 border border-emerald-200">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
-                            <span className="text-xl font-bold text-emerald-700">
-                              {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                          <div className="text-sm space-y-1">
-                            <div className="flex justify-between">
-                              <span className="text-emerald-600">Anteil an Sicherheitsbudget:</span>
-                              <span className="font-semibold">{finanzData.sicherheit > 0 ? 
-                                ((calculateKategorieTotal(activeField) / finanzData.sicherheit) * 100).toFixed(1) : 0}%</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-emerald-600">Anteil am Gesamtbudget:</span>
-                              <span className="font-semibold">{calculateBudget() > 0 ? 
-                                ((calculateKategorieTotal(activeField) / calculateBudget()) * 100).toFixed(1) : 0}%</span>
-                            </div>
-                          </div>
-                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-3">
-                            <div 
-                              className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
-                              style={{
-                                width: `${finanzData.sicherheit > 0 ? 
-                                  (calculateKategorieTotal(activeField) / finanzData.sicherheit) * 100 : 0}%`
-                              }}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                          >
-                            🛡️ Sicherheit speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                          >
-                            ↶ Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      <Sidebar /> 
-      <NavigationButtons />
-    </div>
-  );
-};
-
- // WuenschePage - NEU ERSTELLT im selben Stil wie FixkostenPage
-const WuenschePage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempWuensche, setTempWuensche] = useState({...wuenscheData});
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
-
-  const calculateKategorieErreicht = (kategorie) => {
-    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
-  };
-
-  const addEintrag = (kategorie) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0, erreicht: 0 }]
-    }));
-  };
-
-  const removeEintrag = (kategorie, index) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, [field]: parseFloat(value) || 0 } : item
-      )
-    }));
-  };
-
-  const updateBezeichnung = (kategorie, index, value) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, bezeichnung: value } : item
-      )
-    }));
-  };
-
-  const handleSave = () => {
-    setWuenscheData(tempWuensche);
-    const newTotalZiel = Object.keys(tempWuensche).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    const newTotalErreicht = Object.keys(tempWuensche).reduce((total, key) => {
-      return total + calculateKategorieErreicht(key);
-    }, 0);
-    setFinanzData(prev => ({ 
-      ...prev, 
-      wuenscheTotal: newTotalZiel,
-      wuenscheErreicht: newTotalErreicht 
-    }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempWuensche({...wuenscheData});
-    setActiveField(null);
-  };
-
-  const wuenscheKategorien = [
-    { 
-      id: 'traumurlaub', 
-      name: 'Traumurlaub & Reisen', 
-      icon: '✈️', 
-      color: '#065f46',
-      beschreibung: 'Weltreise, Fernreisen, Luxusurlaub'
-    },
-    { 
-      id: 'luxus', 
-      name: 'Luxusgüter', 
-      icon: '💎', 
-      color: '#047857',
-      beschreibung: 'Schmuck, Uhren, Designer-Artikel'
-    },
-    { 
-      id: 'erlebnisse', 
-      name: 'Erlebnisse & Events', 
-      icon: '🎢', 
-      color: '#059669',
-      beschreibung: 'Konzerte, Shows, Abenteuer'
-    },
-    { 
-      id: 'weiterbildung', 
-      name: 'Bildung & Kurse', 
-      icon: '🎓', 
-      color: '#10b981',
-      beschreibung: 'MBA, Seminare, Coaching'
-    },
-    { 
-      id: 'geschenke', 
-      name: 'Geschenke & Familie', 
-      icon: '🎁', 
-      color: '#34d399',
-      beschreibung: 'Hochzeit, Jubiläum, besondere Anlässe'
-    }
-  ];
-
-  const calculateGesamtfortschritt = () => {
-    const totalZiel = Object.keys(tempWuensche).reduce((sum, key) => sum + calculateKategorieTotal(key), 0);
-    const totalErreicht = Object.keys(tempWuensche).reduce((sum, key) => sum + calculateKategorieErreicht(key), 0);
-    return totalZiel > 0 ? (totalErreicht / totalZiel) * 100 : 0;
-  };
-
-  const getKategorieStats = () => {
-    const stats = wuenscheKategorien.map(kat => ({
-      ...kat,
-      ziel: calculateKategorieTotal(kat.id),
-      erreicht: calculateKategorieErreicht(kat.id),
-      progress: calculateKategorieTotal(kat.id) > 0 ? 
-        (calculateKategorieErreicht(kat.id) / calculateKategorieTotal(kat.id)) * 100 : 0
-    }));
-    
-    return stats.sort((a, b) => b.progress - a.progress);
-  };
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-sans">
-      <HeaderBars />
-      
-      <div className="h-screen flex flex-col pt-32">
-        {/* Wünsche-Dashboard */}
-        <div className="flex-shrink-0 bg-white/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-purple-100">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-purple-800">Wünsche & Träume</h2>
-              <p className="text-purple-600">
-                Fortschritt: <span className="font-bold">{calculateGesamtfortschritt().toFixed(1)}%</span> | 
-                Erreicht: <span className="font-bold">{Object.keys(tempWuensche).reduce((sum, key) => sum + calculateKategorieErreicht(key), 0).toLocaleString()}€</span> von <span className="font-bold">{Object.keys(tempWuensche).reduce((sum, key) => sum + calculateKategorieTotal(key), 0).toLocaleString()}€</span>
-              </p>
-            </div>
-            <div className="flex gap-4">
-              {getKategorieStats().slice(0, 3).map((kat) => (
-                <div key={kat.id} className="text-center">
-                  <div className="text-2xl">{kat.icon}</div>
-                  <div className="text-xs text-gray-600">{kat.name}</div>
-                  <div className="font-bold text-purple-700">{kat.progress.toFixed(0)}%</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="h-full flex flex-col">
-            
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-12">
-                {wuenscheKategorien.map((kategorie) => {
-                  const progress = calculateKategorieTotal(kategorie.id) > 0 ? 
-                    (calculateKategorieErreicht(kategorie.id) / calculateKategorieTotal(kategorie.id)) * 100 : 0;
-                  return (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-2xl transform scale-105' 
-                            : 'bg-white text-slate-700 hover:border-purple-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                          borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id) {
-                            setActiveField(kategorie.id);
-                            setTempWuensche({...wuenscheData});
-                          }
-                        }}
-                      >
-                        {/* Fortschrittsring */}
-                        <svg className="absolute inset-0 w-44 h-44">
-                          <circle
-                            cx="88"
-                            cy="88"
-                            r="86"
-                            fill="none"
-                            stroke={activeField === kategorie.id ? 'rgba(255,255,255,0.3)' : '#e5e7eb'}
-                            strokeWidth="4"
-                          />
-                          <circle
-                            cx="88"
-                            cy="88"
-                            r="86"
-                            fill="none"
-                            stroke={kategorie.color}
-                            strokeWidth="4"
-                            strokeDasharray={`${progress * 5.4} 540`}
-                            strokeDashoffset="0"
-                            transform="rotate(-90 88 88)"
-                            className="transition-all duration-1000"
-                          />
-                        </svg>
-                        <span className="text-3xl mb-2 z-10">{kategorie.icon}</span>
-                        <span className="text-base font-bold text-center px-4 leading-tight z-10">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-xl font-bold mt-2 z-10">
-                          {progress.toFixed(0)}%
-                        </span>
-                        
-                        {/* Hover-Info */}
-                        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                          <div>{kategorie.beschreibung}</div>
-                          <div className="text-yellow-300 mt-1">
-                            {calculateKategorieErreicht(kategorie.id)}€ / {calculateKategorieTotal(kategorie.id)}€
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-purple-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <div className="text-center border-b border-purple-200 pb-4">
-                          <h3 className="text-2xl font-bold text-purple-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktiveKategorie.icon}</span>
-                            {aktiveKategorie.name}
-                          </h3>
-                          <p className="text-purple-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          {tempWuensche[activeField].map((eintrag, index) => (
-                            <div key={index} className="space-y-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
-                              <div className="flex gap-3 items-center">
-                                <div className="flex-1">
-                                  <input 
-                                    type="text"
-                                    value={eintrag.bezeichnung}
-                                    onChange={(e) => updateBezeichnung(activeField, index, e.target.value)}
-                                    placeholder={`${aktiveKategorie.name === 'Traumurlaub & Reisen' ? 'z.B. Weltreise, Malediven, Safari' : 
-                                                 aktiveKategorie.name === 'Luxusgüter' ? 'z.B. Rolex, Designer-Handtasche' : 
-                                                 aktiveKategorie.name === 'Erlebnisse & Events' ? 'z.B. VIP-Konzert, Fallschirmsprung' :
-                                                 aktiveKategorie.name === 'Bildung & Kurse' ? 'z.B. MBA-Studium, Coaching' :
-                                                 'z.B. Hochzeitsgeschenk, Jubiläum'}`}
-                                    className="w-full p-3 bg-white border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
-                                  />
-                                </div>
-                                <div className="flex items-center gap-2 bg-white rounded-lg p-2">
-                                  <div className="text-center">
-                                    <div className="text-xs text-gray-500">Gespart</div>
-                                    <input 
-                                      type="number"
-                                      value={eintrag.erreicht}
-                                      onChange={(e) => updateEintrag(activeField, index, 'erreicht', e.target.value)}
-                                      placeholder="0"
-                                      className="w-24 p-2 border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-center text-sm font-semibold"
-                                    />
-                                  </div>
-                                  <span className="text-lg font-bold text-gray-400">/</span>
-                                  <div className="text-center">
-                                    <div className="text-xs text-gray-500">Ziel</div>
-                                    <input 
-                                      type="number"
-                                      value={eintrag.betrag}
-                                      onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                      placeholder="0"
-                                      className="w-24 p-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none text-center text-sm font-semibold"
-                                    />
-                                  </div>
-                                  <span className="text-lg font-semibold text-purple-700">€</span>
-                                </div>
-                                {tempWuensche[activeField].length > 1 && (
-                                  <button
-                                    onClick={() => removeEintrag(activeField, index)}
-                                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors w-10 h-10 flex items-center justify-center"
-                                    title="Eintrag löschen"
-                                  >
-                                    ✕
-                                  </button>
-                                )}
-                              </div>
-                              
-                              {/* Fortschrittsbalken */}
-                              <div className="space-y-2">
-                                <div className="flex justify-between text-sm">
-                                  <span className="text-gray-600">Fortschritt</span>
-                                  <span className="font-semibold text-purple-700">
-                                    {eintrag.betrag > 0 ? ((eintrag.erreicht / eintrag.betrag) * 100).toFixed(1) : 0}%
-                                  </span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                  <div 
-                                    className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-green-500 to-purple-500"
-                                    style={{width: `${eintrag.betrag > 0 ? Math.min((eintrag.erreicht / eintrag.betrag) * 100, 100) : 0}%`}}
-                                  />
-                                </div>
-                                <div className="text-xs text-gray-500 text-center">
-                                  Noch {Math.max(eintrag.betrag - eintrag.erreicht, 0).toLocaleString()}€ bis zum Ziel
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-4 border-2 border-dashed border-purple-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all flex items-center justify-center gap-3 group"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform">
-                              +
-                            </div>
-                            <span className="font-semibold text-purple-700 group-hover:text-purple-800">Neuen Traum hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        {/* Kategorie-Zusammenfassung */}
-                        <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="font-semibold text-purple-800">Kategorie-Fortschritt:</span>
-                            <span className="text-xl font-bold text-purple-700">
-                              {calculateKategorieErreicht(activeField).toLocaleString()}€ / {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-                            <div 
-                              className="h-full rounded-full bg-gradient-to-r from-green-500 to-purple-500 transition-all duration-1000"
-                              style={{
-                                width: `${calculateKategorieTotal(activeField) > 0 ? 
-                                  Math.min((calculateKategorieErreicht(activeField) / calculateKategorieTotal(activeField)) * 100, 100) : 0}%`
-                              }}
+        {/* Modal Overlay */}
+        {activeField && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setActiveField(null)}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
+                return (
+                  <div className="space-y-6">
+                    <div className="text-center border-b border-emerald-200 pb-4">
+                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                        <span className="text-3xl">{aktiveKategorie.icon}</span>
+                        {aktiveKategorie.name}
+                      </h3>
+                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                    </div>
+
+                    {/* Einträge */}
+                    <div className="space-y-4">
+                      {tempSicherheit[activeField].map((eintrag, index) => (
+                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={eintrag.bezeichnung}
+                              onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                              placeholder="z.B. Versicherung, Rücklage..."
+                              className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                             />
                           </div>
-                          <div className="text-center text-sm text-purple-700 font-semibold">
-                            {calculateKategorieTotal(activeField) > 0 ? 
-                              ((calculateKategorieErreicht(activeField) / calculateKategorieTotal(activeField)) * 100).toFixed(1) : 0}% erreicht
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={eintrag.betrag}
+                              onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                              className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-right font-semibold"
+                            />
+                            <span className="text-lg font-semibold text-emerald-700">€</span>
                           </div>
+                          {tempSicherheit[activeField].length > 1 && (
+                            <button
+                              onClick={() => removeEintrag(activeField, index)}
+                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
+                            >
+                              ✕
+                            </button>
+                          )}
                         </div>
-                        
-                        <div className="flex space-x-4 justify-center pt-4 border-t border-purple-200">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105"
-                          >
-                            💾 Träume speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                          >
-                            ↶ Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
+                      ))}
+                    </div>
+
+                    {/* Aktionen */}
+                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                      <button
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg hover:bg-emerald-700 hover:scale-105"
+                      >
+                        💾 Speichern
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+                      >
+                        ↶ Zurück
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
-        </div>
+        )}
       </div>
+
       <Sidebar />
       <NavigationButtons />
     </div>
   );
 };
+
+
+// WünschePage - OHNE Statistik-Banner, Fixkosten-Style
+const WuenschePage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
+
+  const calculateKategorieTotal = (kategorie) => {
+    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
+  };
+
+  const handleSave = () => {
+    setWuenscheData(tempWuensche);
+    setActiveField(null);
+  };
+
+  const handleCancel = () => {
+    setTempWuensche({ ...wuenscheData });
+    setActiveField(null);
+  };
+
+  const wuenscheKategorien = [
+    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️', color: '#047857', beschreibung: 'Reisen & Abenteuer' },
+    { id: 'luxus', name: 'Luxus', icon: '💎', color: '#059669', beschreibung: 'Exklusive Anschaffungen' },
+    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉', color: '#10b981', beschreibung: 'Besondere Erfahrungen' },
+    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚', color: '#34d399', beschreibung: 'Studium & Kurse' },
+    { id: 'geschenke', name: 'Geschenke', icon: '🎁', color: '#6ee7b7', beschreibung: 'Für Freunde & Familie' }
+  ];
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
+
+      <div className="h-screen flex flex-col pt-44">
+        <div className="flex-1 p-8">
+          <div className="h-full flex justify-center items-center">
+            <div className="flex space-x-12">
+              {wuenscheKategorien.map((kategorie) => (
+                <div key={kategorie.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
+                      activeField === kategorie.id
+                        ? 'text-white shadow-2xl transform scale-105'
+                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    }`}
+                    style={{
+                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
+                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                    }}
+                    onClick={() => {
+                      if (activeField !== kategorie.id) {
+                        setActiveField(kategorie.id);
+                        setTempWuensche({ ...wuenscheData });
+                      }
+                    }}
+                  >
+                    <span className="text-3xl mb-2">{kategorie.icon}</span>
+                    <span className="text-base font-bold text-center">{kategorie.name}</span>
+                    <span className="text-xl font-bold mt-2">
+                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Overlay */}
+        {activeField && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setActiveField(null)}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+                return (
+                  <div className="space-y-6">
+                    <div className="text-center border-b border-emerald-200 pb-4">
+                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
+                        <span className="text-3xl">{aktiveKategorie.icon}</span>
+                        {aktiveKategorie.name}
+                      </h3>
+                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {tempWuensche[activeField].map((eintrag, index) => (
+                        <div key={index} className="p-3 bg-emerald-50 rounded-lg">
+                          <div className="flex justify-between">
+                            <span className="font-semibold">{eintrag.bezeichnung}</span>
+                            <span className="text-sm text-emerald-600">
+                              Ziel: {eintrag.betrag}€ | Erreicht: {eintrag.erreicht}€
+                            </span>
+                          </div>
+                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
+                            <div
+                              className="bg-emerald-600 h-2 rounded-full"
+                              style={{ width: `${(eintrag.erreicht / eintrag.betrag) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
+                      <button
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
+                      >
+                        💾 Speichern
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+                      >
+                        ↶ Zurück
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Sidebar />
+      <NavigationButtons />
+    </div>
+  );
+};
+
+
   // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
   const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => {
     const [activeField, setActiveField] = useState(null);
