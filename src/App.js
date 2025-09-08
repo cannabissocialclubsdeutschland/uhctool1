@@ -1093,7 +1093,7 @@ const OverviewPage = () => (
         stroke="#004225"
         strokeWidth="3"
         className="cursor-pointer transition-all hover:r-67"
-        onClick={() => setCurrentPage('budgetpage')}
+        onClick={() => setCurrentPage('BudgetPage')}
       />
       <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
         Budget
