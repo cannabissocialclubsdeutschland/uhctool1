@@ -801,8 +801,8 @@ const HeaderBars = () => (
           {currentPage === 'kurzfristig' && 'Kurzfristige Anschaffungen'}
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
-          {currentPage === 'basisabsicherung' && 'Basis-Absicherung'}
-          {currentPage === 'zigarettenpage' && 'Investment-Vergleich'}
+          {currentPage === 'BasisAbsicherung' && 'Basis-Absicherung'}
+          {currentPage === 'zigaretten' && 'Investment-Vergleich'}
         </p>
 
          {/* Home Button mit Grünschema */}
