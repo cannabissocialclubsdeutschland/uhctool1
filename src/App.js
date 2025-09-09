@@ -2039,136 +2039,147 @@ const SicherheitPage = () => {
   };
 
   const sicherheitKategorien = [
-    { id: 'notgroschen', name: 'Notgroschen', icon: '💰', color: '#047857', beschreibung: 'Rücklagen für Notfälle' },
-    { id: 'versicherungen', name: 'Versicherungen', icon: '🛡️', color: '#059669', beschreibung: 'Haftpflicht, Hausrat etc.' },
-    { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴', color: '#10b981', beschreibung: 'Private Renten, ETF-Sparpläne' },
-    { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️', color: '#34d399', beschreibung: 'Zusatzversicherung, Vorsorge' },
-    { id: 'sparen', name: 'Sparen', icon: '🏦', color: '#6ee7b7', beschreibung: 'Sparkonto, Tagesgeld' }
+    { id: 'notgroschen', name: 'Notgroschen', icon: '💰' },
+    { id: 'versicherungen', name: 'Versicherungen', icon: '🛡️' },
+    { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴' },
+    { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️' },
+    { id: 'sparen', name: 'Sparen', icon: '🏦' }
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
       <HeaderBars />
 
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {sicherheitKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempSicherheit({ ...sicherheitData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4 leading-tight">
-                      {kategorie.name}
-                    </span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-
-                    {/* Hover-Info */}
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      {kategorie.beschreibung}
+      <div className="h-screen flex flex-col">
+        <div className="h-1/4"></div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            {/* Hauptüberschrift */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">🛡️ Sicherheit</h1>
+              <p className="text-lg text-slate-600 mb-4">Erfassen Sie Ihre Sicherheitsrücklagen</p>
+              <p className="text-lg text-slate-600">Gesamtsumme: {finanzData.sicherheit?.toLocaleString() || 0}€</p>
+            </div>
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-16">
+                {sicherheitKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-xl' 
+                          : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? '#047857' : 'white',
+                        borderColor: activeField === kategorie.id ? '#047857' : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempSicherheit({...sicherheitData});
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
+                      <span className="text-lg font-semibold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-2xl font-bold mt-2">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <h3 className="text-2xl font-bold text-slate-800 text-center">
+                          {aktiveKategorie.icon} {aktiveKategorie.name}
+                        </h3>
+                        
+                        <div className="space-y-4">
+                          {tempSicherheit[activeField].map((eintrag, index) => (
+                            <div key={index} className="flex gap-3 items-center">
+                              <input 
+                                type="text"
+                                value={eintrag.bezeichnung}
+                                onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                placeholder="Bezeichnung"
+                                className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                              />
+                              <input 
+                                type="number"
+                                value={eintrag.betrag}
+                                onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                placeholder="0"
+                                className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                              />
+                              <span className="text-lg font-semibold">€</span>
+                              {tempSicherheit[activeField].length > 1 && (
+                                <button
+                                  onClick={() => removeEintrag(activeField, index)}
+                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          
+                          <button
+                            onClick={() => addEintrag(activeField)}
+                            className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <span className="text-2xl">+</span>
+                            <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                          </button>
+                        </div>
+                        
+                        <div className="border-t-2 border-slate-200 pt-4">
+                          <div className="flex justify-between items-center text-lg font-bold">
+                            <span>Gesamtsumme:</span>
+                            <span className="text-slate-700">
+                              {calculateKategorieTotal(activeField).toLocaleString()}€
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-4 justify-center">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                          >
+                            Speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                          >
+                            Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
-
-        {/* Modal Overlay */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                    </div>
-
-                    {/* Einträge */}
-                    <div className="space-y-4">
-                      {tempSicherheit[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                          <div className="flex-1">
-                            <input
-                              type="text"
-                              value={eintrag.bezeichnung}
-                              onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                              placeholder="z.B. Versicherung, Rücklage..."
-                              className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              value={eintrag.betrag}
-                              onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                              className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-right font-semibold"
-                            />
-                            <span className="text-lg font-semibold text-emerald-700">€</span>
-                          </div>
-                          {tempSicherheit[activeField].length > 1 && (
-                            <button
-                              onClick={() => removeEintrag(activeField, index)}
-                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Aktionen */}
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg hover:bg-emerald-700 hover:scale-105"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
       </div>
 
       <Sidebar />
@@ -2184,11 +2195,38 @@ const WuenschePage = () => {
   const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
 
   const calculateKategorieTotal = (kategorie) => {
-    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
+    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
+
+  const addEintrag = (kategorie) => {
+    setTempWuensche(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
+
+  const removeEintrag = (kategorie, index) => {
+    setTempWuensche(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempWuensche(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) =>
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
   };
 
   const handleSave = () => {
     setWuenscheData(tempWuensche);
+    const newTotal = Object.keys(tempWuensche).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+    setFinanzData(prev => ({ ...prev, wuenscheTotal: newTotal }));
     setActiveField(null);
   };
 
@@ -2198,113 +2236,147 @@ const WuenschePage = () => {
   };
 
   const wuenscheKategorien = [
-    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️', color: '#047857', beschreibung: 'Reisen & Abenteuer' },
-    { id: 'luxus', name: 'Luxus', icon: '💎', color: '#059669', beschreibung: 'Exklusive Anschaffungen' },
-    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉', color: '#10b981', beschreibung: 'Besondere Erfahrungen' },
-    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚', color: '#34d399', beschreibung: 'Studium & Kurse' },
-    { id: 'geschenke', name: 'Geschenke', icon: '🎁', color: '#6ee7b7', beschreibung: 'Für Freunde & Familie' }
+    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️' },
+    { id: 'luxus', name: 'Luxus', icon: '💎' },
+    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉' },
+    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚' },
+    { id: 'geschenke', name: 'Geschenke', icon: '🎁' }
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
       <HeaderBars />
 
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {wuenscheKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempWuensche({ ...wuenscheData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center">{kategorie.name}</span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
+      <div className="h-screen flex flex-col">
+        <div className="h-1/4"></div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            {/* Hauptüberschrift */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">🎁 Wünsche</h1>
+              <p className="text-lg text-slate-600 mb-4">Erfassen Sie Ihre Wünsche und Ziele</p>
+              <p className="text-lg text-slate-600">Gesamtsumme: {finanzData.wuenscheTotal?.toLocaleString() || 0}€</p>
+            </div>
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-16">
+                {wuenscheKategorien.map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-xl' 
+                          : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? '#059669' : 'white',
+                        borderColor: activeField === kategorie.id ? '#059669' : '#cbd5e1'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempWuensche({...wuenscheData});
+                        }
+                      }}
+                    >
+                      <span className="text-3xl mb-2">{kategorie.icon}</span>
+                      <span className="text-lg font-semibold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-2xl font-bold mt-2">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex items-start justify-center pt-6">
+              {activeField && (
+                <div 
+                  className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(() => {
+                    const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+                    return (
+                      <div className="space-y-6">
+                        <h3 className="text-2xl font-bold text-slate-800 text-center">
+                          {aktiveKategorie.icon} {aktiveKategorie.name}
+                        </h3>
+                        
+                        <div className="space-y-4">
+                          {tempWuensche[activeField].map((eintrag, index) => (
+                            <div key={index} className="flex gap-3 items-center">
+                              <input 
+                                type="text"
+                                value={eintrag.bezeichnung}
+                                onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                placeholder="Bezeichnung"
+                                className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                              />
+                              <input 
+                                type="number"
+                                value={eintrag.betrag}
+                                onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                placeholder="0"
+                                className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                              />
+                              <span className="text-lg font-semibold">€</span>
+                              {tempWuensche[activeField].length > 1 && (
+                                <button
+                                  onClick={() => removeEintrag(activeField, index)}
+                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          
+                          <button
+                            onClick={() => addEintrag(activeField)}
+                            className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <span className="text-2xl">+</span>
+                            <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                          </button>
+                        </div>
+                        
+                        <div className="border-t-2 border-slate-200 pt-4">
+                          <div className="flex justify-between items-center text-lg font-bold">
+                            <span>Gesamtsumme:</span>
+                            <span className="text-slate-700">
+                              {calculateKategorieTotal(activeField).toLocaleString()}€
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-4 justify-center">
+                          <button 
+                            onClick={handleSave}
+                            className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                          >
+                            Speichern
+                          </button>
+                          <button 
+                            onClick={handleCancel}
+                            className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                          >
+                            Zurück
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
-
-        {/* Modal Overlay */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      {tempWuensche[activeField].map((eintrag, index) => (
-                        <div key={index} className="p-3 bg-emerald-50 rounded-lg">
-                          <div className="flex justify-between">
-                            <span className="font-semibold">{eintrag.bezeichnung}</span>
-                            <span className="text-sm text-emerald-600">
-                              Ziel: {eintrag.betrag}€ | Erreicht: {eintrag.erreicht}€
-                            </span>
-                          </div>
-                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
-                            <div
-                              className="bg-emerald-600 h-2 rounded-full"
-                              style={{ width: `${(eintrag.erreicht / eintrag.betrag) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
       </div>
 
       <Sidebar />
@@ -2312,7 +2384,6 @@ const WuenschePage = () => {
     </div>
   );
 };
-
 
   // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
   const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => {
