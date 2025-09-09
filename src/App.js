@@ -2063,9 +2063,7 @@ const BasisAbsicherungPage = () => {
       </div>
     );
   };
-
-
-// Lifestyle Page
+  // Lifestyle Page
   const LifestylePage = () => {
     const [activeField, setActiveField] = useState(null);
     const [tempLifestyle, setTempLifestyle] = useState({...lifestyleData});
@@ -2257,7 +2255,6 @@ const BasisAbsicherungPage = () => {
       </div>
     );
   };
-
 // Sicherheit Page
   const SicherheitPage = () => {
     const [activeField, setActiveField] = useState(null);
