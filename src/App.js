@@ -26,6 +26,7 @@ const FinanzTool = () => {
     abos: [{ bezeichnung: 'Netflix', betrag: 15 }],
     mobilitaet: [{ bezeichnung: 'Monatskarte', betrag: 90 }],
     sonstiges: []
+  });
 
   // Lifestyle Daten
   const [lifestyleData, setLifestyleData] = useState({
@@ -72,7 +73,22 @@ const FinanzTool = () => {
     renovation: [{ bezeichnung: 'Bad renovieren', betrag: 5000, erreicht: 1000 }]
   });
 
- 
+  // Langfristige Anschaffungen
+  const [langfristigData, setLangfristigData] = useState({
+    immobilie: [{ bezeichnung: 'Eigenheim-Anzahlung', betrag: 50000, erreicht: 10000 }],
+    fahrzeug: [{ bezeichnung: 'Neues Auto', betrag: 25000, erreicht: 5000 }],
+    bildung: [{ bezeichnung: 'Kinder-Studium', betrag: 40000, erreicht: 8000 }],
+    altersvorsorge: [{ bezeichnung: 'Private Zusatzrente', betrag: 100000, erreicht: 15000 }],
+    unternehmen: [{ bezeichnung: 'Geschäftsgründung', betrag: 30000, erreicht: 3000 }]
+  });
+
+  const [gehaltExpanded, setGehaltExpanded] = useState(false);
+  const [gehaltDetails, setGehaltDetails] = useState({
+    brutto: 0,
+    netto: 2500,
+    zusatzleistungen: 0
+  });
+
   // Animation states
   const [pageTransition, setPageTransition] = useState(false);
 
@@ -148,59 +164,22 @@ const FinanzTool = () => {
     }
   };
 
-//Basis-Absicherung Daten - Optimiert 2025
-const [basisData, setBasisData] = useState({
-  krankenversicherung: { 
-    status: 'vorhanden', 
-    monatlich: 450, 
-    typ: 'gesetzlich',
-    deckungssumme: 'Unbegrenzt',
-    zusatzbeitrag: 2.5
-  },
-  haftpflicht: { 
-    status: 'vorhanden', 
-    monatlich: 8,
-    deckung: 50000000,
-    empfohlen: 8
-  },
-  berufsunfaehigkeit: { 
-    status: 'fehlt', 
-    monatlich: 0, 
-    empfohlen: 120,
-    absicherung: '70% des Nettoeinkommens'
-  },
-  rechtsschutz: { 
-    status: 'teilweise', 
-    monatlich: 25, 
-    bereiche: ['privat'],
-    empfohleneBereiche: ['privat', 'beruf', 'verkehr']
-  },
-  hausrat: { 
-    status: 'fehlt', 
-    monatlich: 0, 
-    empfohlen: 15,
-    versicherungssumme: '650€/qm empfohlen'
-  },
-  kfzVersicherung: { 
-    status: 'vorhanden', 
-    monatlich: 85, 
-    typ: 'teilkasko',
-    schadenfreiheitsklasse: 'SF 5'
-  },
-  auslandskranken: {
-    status: 'fehlt',
-    monatlich: 0,
-    empfohlen: 2,
-    typ: 'Reisekrankenversicherung'
-  }
+// Basis-Absicherung Daten
+const [basisAbsicherungData, setBasisAbsicherungData] = useState({
+  krankenversicherung: { status: 'vorhanden', monatlich: 450, typ: 'gesetzlich' },
+  haftpflicht: { status: 'vorhanden', monatlich: 12, deckung: 10000000 },
+  berufsunfaehigkeit: { status: 'fehlt', monatlich: 0, empfohlen: 120 },
+  rechtsschutz: { status: 'teilweise', monatlich: 25, bereiche: ['privat'] },
+  hausrat: { status: 'fehlt', monatlich: 0, empfohlen: 15 },
+  kfzVersicherung: { status: 'vorhanden', monatlich: 85, typ: 'teilkasko' }
 });
-
-// Page transition effect
-useEffect(() => {
-  setPageTransition(true);
-  const timer = setTimeout(() => setPageTransition(false), 300);
-  return () => clearTimeout(timer);
-}, [currentPage]);
+  
+  // Page transition effect
+  useEffect(() => {
+    setPageTransition(true);
+    const timer = setTimeout(() => setPageTransition(false), 300);
+    return () => clearTimeout(timer);
+  }, [currentPage]);
 
 // Modal-Komponente (fügen Sie diese vor den Page-Komponenten ein)
 const Modal = ({ isOpen, onClose, children }) => {
@@ -225,253 +204,351 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// ZigarettenPage - KORRIGIERT im Fixkosten-Stil
-const ZigarettenPage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempZigaretten, setTempZigaretten] = useState({...zigarettenData});
+// Zigaretten-Investment-Vergleich Page
+const ZigarettenInvestmentPage = () => {
+  const [raucherProfil, setRaucherProfil] = useState({
+    zigarettenProTag: 20,
+    preisProSchachtel: 8,
+    jahreGeraucht: 10,
+    startJahr: 2014
+  });
 
-  const calculateKategorieTotal = (kategorie) => {
-    return tempZigaretten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  const [selectedInvestment, setSelectedInvestment] = useState('mix');
+  const [showDetails, setShowDetails] = useState(false);
+
+  // Historische Renditen (realistische Durchschnittswerte)
+  const investmentRenditen = {
+    aktienMSCI: {
+      name: 'MSCI World ETF',
+      jahresrendite: 0.085, // 8.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.195, 2015: 0.102, 2016: 0.075, 2017: 0.078,
+        2018: -0.042, 2019: 0.276, 2020: 0.061, 2021: 0.218,
+        2022: -0.128, 2023: 0.197, 2024: 0.152
+      }
+    },
+    immobilien: {
+      name: 'Deutsche Immobilien',
+      jahresrendite: 0.065, // 6.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.045, 2015: 0.052, 2016: 0.068, 2017: 0.071,
+        2018: 0.084, 2019: 0.092, 2020: 0.078, 2021: 0.143,
+        2022: 0.035, 2023: -0.045, 2024: 0.022
+      }
+    },
+    bitcoin: {
+      name: 'Bitcoin',
+      jahresrendite: 0.73, // Sehr volatil
+      historisch: {
+        2014: -0.58, 2015: 0.35, 2016: 1.25, 2017: 13.0,
+        2018: -0.73, 2019: 0.87, 2020: 3.03, 2021: 0.59,
+        2022: -0.64, 2023: 1.56, 2024: 0.45
+      },
+      startPreis: 770, // USD in 2014
+      aktuellerPreis: 95000 // USD in 2024
+    },
+    tagesgeld: {
+      name: 'Tagesgeld/Sparbuch',
+      jahresrendite: 0.015, // 1.5% p.a. Durchschnitt
+      historisch: {
+        2014: 0.009, 2015: 0.006, 2016: 0.002, 2017: 0.001,
+        2018: 0.001, 2019: 0.001, 2020: 0.001, 2021: 0.001,
+        2022: 0.005, 2023: 0.032, 2024: 0.035
+      }
+    },
+    sp500: {
+      name: 'S&P 500',
+      jahresrendite: 0.102, // 10.2% p.a. Durchschnitt
+      historisch: {
+        2014: 0.115, 2015: -0.007, 2016: 0.096, 2017: 0.194,
+        2018: -0.064, 2019: 0.288, 2020: 0.162, 2021: 0.267,
+        2022: -0.181, 2023: 0.242, 2024: 0.233
+      }
+    }
   };
 
-  const addEintrag = (kategorie) => {
-    setTempZigaretten(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
+  // Berechnung der gesparten Summe
+  const berechneGespartesSumme = () => {
+    const zigarettenProTag = raucherProfil.zigarettenProTag;
+    const preisProZigarette = raucherProfil.preisProSchachtel / 20;
+    const täglicheKosten = zigarettenProTag * preisProZigarette;
+    const monatlicheKosten = täglicheKosten * 30;
+    const jährlicheKosten = täglicheKosten * 365;
+    const gesamtKosten = jährlicheKosten * raucherProfil.jahreGeraucht;
+
+    return {
+      täglich: täglicheKosten.toFixed(2),
+      monatlich: monatlicheKosten.toFixed(2),
+      jährlich: jährlicheKosten.toFixed(2),
+      gesamt: gesamtKosten.toFixed(2)
+    };
   };
 
-  const removeEintrag = (kategorie, index) => {
-    setTempZigaretten(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
+  // Investment-Berechnung mit historischen Daten
+  const berechneInvestmentWert = (investmentTyp) => {
+    const monatlicheErsparnis = parseFloat(berechneGespartesSumme().monatlich);
+    let portfolioWert = 0;
+    const startJahr = raucherProfil.startJahr;
+    const endJahr = startJahr + raucherProfil.jahreGeraucht;
+
+    for (let jahr = startJahr; jahr < endJahr && jahr <= 2024; jahr++) {
+      const jahresErsparnis = monatlicheErsparnis * 12;
+      const rendite = investmentRenditen[investmentTyp].historisch[jahr] || 
+                     investmentRenditen[investmentTyp].jahresrendite;
+      
+      portfolioWert = (portfolioWert + jahresErsparnis) * (1 + rendite);
+    }
+
+    return portfolioWert;
   };
 
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempZigaretten(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
+  // Mix-Portfolio berechnen (60% Aktien, 30% Immobilien, 10% Tagesgeld)
+  const berechneMixPortfolio = () => {
+    const aktienWert = berechneInvestmentWert('aktienMSCI') * 0.6;
+    const immobilienWert = berechneInvestmentWert('immobilien') * 0.3;
+    const tagesgeldWert = berechneInvestmentWert('tagesgeld') * 0.1;
+    
+    return aktienWert + immobilienWert + tagesgeldWert;
   };
 
-  const handleSave = () => {
-    setZigarettenData(tempZigaretten);
-    const newTotal = Object.keys(tempZigaretten).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, zigarettenTotal: newTotal }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempZigaretten({...zigarettenData});
-    setActiveField(null);
-  };
-
-  const zigarettenKategorien = [
-    { 
-      id: 'konsum', 
-      name: 'Zigaretten-Konsum', 
-      icon: '🚬', 
-      color: '#dc2626',
-      beschreibung: 'Täglicher Zigarettenkonsum und Kosten'
+  const gespartesSumme = berechneGespartesSumme();
+  
+  // Verschiedene Investment-Szenarien
+  const szenarien = [
+    {
+      typ: 'tagesgeld',
+      name: 'Sparbuch (Sicher)',
+      wert: berechneInvestmentWert('tagesgeld'),
+      risiko: 'Sehr niedrig',
+      color: '#10b981'
+    },
+    {
+      typ: 'mix',
+      name: 'Ausgewogenes Portfolio',
+      wert: berechneMixPortfolio(),
+      risiko: 'Mittel',
+      color: '#3b82f6'
+    },
+    {
+      typ: 'aktienMSCI',
+      name: 'MSCI World ETF',
+      wert: berechneInvestmentWert('aktienMSCI'),
+      risiko: 'Mittel-Hoch',
+      color: '#8b5cf6'
+    },
+    {
+      typ: 'sp500',
+      name: 'S&P 500',
+      wert: berechneInvestmentWert('sp500'),
+      risiko: 'Mittel-Hoch',
+      color: '#ec4899'
+    },
+    {
+      typ: 'immobilien',
+      name: 'Immobilien-Investment',
+      wert: berechneInvestmentWert('immobilien'),
+      risiko: 'Mittel',
+      color: '#f59e0b'
+    },
+    {
+      typ: 'bitcoin',
+      name: 'Bitcoin (Spekulativ)',
+      wert: berechneInvestmentWert('bitcoin'),
+      risiko: 'Sehr hoch',
+      color: '#ef4444'
     }
   ];
 
-  const getMonatlicheKosten = () => {
-    return Object.keys(tempZigaretten).reduce((sum, key) => sum + calculateKategorieTotal(key), 0);
-  };
-
-  const getJahrlicheKosten = () => {
-    return getMonatlicheKosten() * 12;
-  };
+  // Gesundheits-Fakten
+  const gesundheitsFakten = [
+    { zeit: '20 Minuten', effekt: 'Blutdruck normalisiert sich' },
+    { zeit: '8 Stunden', effekt: 'Sauerstoffgehalt im Blut normalisiert sich' },
+    { zeit: '1 Jahr', effekt: 'Herzinfarktrisiko halbiert' },
+    { zeit: '10 Jahre', effekt: 'Lungenkrebsrisiko halbiert' }
+  ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-red-50 to-slate-100 font-sans">
-      <HeaderBars />
-      
-      <div className="h-screen flex flex-col pt-32">
-        {/* Zigaretten-Dashboard */}
-        <div className="flex-shrink-0 bg-red-100/80 backdrop-blur-lg mx-8 mt-4 rounded-xl p-4 shadow-lg border border-red-200">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-red-800">Zigaretten-Übersicht</h2>
-              <p className="text-red-600">
-                Monatlich: <span className="font-bold">{getMonatlicheKosten().toLocaleString()}€</span> | 
-                Jährlich: <span className="font-bold">{getJahrlicheKosten().toLocaleString()}€</span>
-              </p>
-            </div>
-            <div className="text-center bg-red-50 px-4 py-2 rounded-lg">
-              <div className="text-2xl">⚠️</div>
-              <div className="text-xs text-red-600">Gesundheitskosten</div>
-              <div className="font-bold text-red-700">{getMonatlicheKosten()}€</div>
-            </div>
+    <div className={`h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+        <div className="h-full flex items-center px-8 relative">
+          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
+            <h1 className="text-xl font-bold text-slate-800">Zigaretten-Investment-Vergleich</h1>
+            <p className="text-sm text-slate-600">Was wäre wenn... Sie nicht geraucht hätten?</p>
+            
+            <button
+              onClick={() => setCurrentPage('overview')}
+              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
+            >
+              🏠 Zur Übersicht
+            </button>
           </div>
         </div>
-        
+      </div>
+
+      <div className="h-screen flex flex-col pt-32">
         <div className="flex-1 p-8 overflow-y-auto">
-          <div className="h-full flex flex-col">
+          <div className="max-w-7xl mx-auto">
             
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-12">
-                {zigarettenKategorien.map((kategorie) => (
-                  <div key={kategorie.id} className="flex flex-col items-center">
-                    <div 
-                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                        activeField === kategorie.id 
-                          ? 'text-white shadow-2xl transform scale-105' 
-                          : 'bg-white text-slate-700 hover:border-red-400 shadow-lg'
-                      }`}
-                      style={{
-                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                      }}
-                      onClick={() => {
-                        if (activeField !== kategorie.id) {
-                          setActiveField(kategorie.id);
-                          setTempZigaretten({...zigarettenData});
-                        }
-                      }}
-                    >
-                      <span className="text-3xl mb-2">{kategorie.icon}</span>
-                      <span className="text-base font-bold text-center px-4 leading-tight">
-                        {kategorie.name}
-                      </span>
-                      <span className="text-xl font-bold mt-2">
-                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                      </span>
-                      
-                      {/* Hover-Info */}
-                      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                        {kategorie.beschreibung}
+            {/* Eingabe-Bereich */}
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-xl">
+              <h3 className="text-lg font-bold mb-4 text-slate-800">Ihr Raucherprofil</h3>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm text-gray-600">Zigaretten pro Tag</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.zigarettenProTag}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, zigarettenProTag: parseInt(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="60"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Preis pro Schachtel (€)</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.preisProSchachtel}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, preisProSchachtel: parseFloat(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="20"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Jahre geraucht</label>
+                  <input
+                    type="number"
+                    value={raucherProfil.jahreGeraucht}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, jahreGeraucht: parseInt(e.target.value) || 0})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                    min="1"
+                    max="50"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Start-Jahr</label>
+                  <select
+                    value={raucherProfil.startJahr}
+                    onChange={(e) => setRaucherProfil({...raucherProfil, startJahr: parseInt(e.target.value)})}
+                    className="w-full p-2 border rounded-lg mt-1"
+                  >
+                    {[...Array(11)].map((_, i) => (
+                      <option key={i} value={2014 + i}>{2014 + i}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Ersparnis-Übersicht */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+                <p className="text-sm text-red-600">Täglich verschwendet</p>
+                <p className="text-2xl font-bold text-red-700">{gespartesSumme.täglich}€</p>
+              </div>
+              <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
+                <p className="text-sm text-orange-600">Monatlich verschwendet</p>
+                <p className="text-2xl font-bold text-orange-700">{gespartesSumme.monatlich}€</p>
+              </div>
+              <div className="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
+                <p className="text-sm text-yellow-700">Jährlich verschwendet</p>
+                <p className="text-2xl font-bold text-yellow-800">{gespartesSumme.jährlich}€</p>
+              </div>
+              <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                <p className="text-sm text-green-600">Gesamt verschwendet</p>
+                <p className="text-2xl font-bold text-green-700">{gespartesSumme.gesamt}€</p>
+              </div>
+            </div>
+
+            {/* Investment-Vergleich */}
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl mb-6">
+              <h3 className="text-lg font-bold mb-4 text-slate-800">
+                💰 Was aus {gespartesSumme.gesamt}€ geworden wäre...
+              </h3>
+              <div className="space-y-3">
+                {szenarien.map((szenario) => (
+                  <div 
+                    key={szenario.typ}
+                    className="relative bg-gray-50 rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer"
+                    onClick={() => setSelectedInvestment(szenario.typ)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-slate-800">{szenario.name}</h4>
+                        <p className="text-sm text-gray-600">Risiko: {szenario.risiko}</p>
                       </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold" style={{color: szenario.color}}>
+                          {szenario.wert.toLocaleString('de-DE', { 
+                            style: 'currency', 
+                            currency: 'EUR',
+                            maximumFractionDigits: 0 
+                          })}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Gewinn: {(szenario.wert - parseFloat(gespartesSumme.gesamt)).toLocaleString('de-DE', { 
+                            style: 'currency', 
+                            currency: 'EUR',
+                            maximumFractionDigits: 0 
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Fortschrittsbalken */}
+                    <div className="mt-3 w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div 
+                        className="h-full transition-all duration-1000"
+                        style={{
+                          width: `${Math.min((szenario.wert / Math.max(...szenarien.map(s => s.wert))) * 100, 100)}%`,
+                          backgroundColor: szenario.color
+                        }}
+                      />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/90 backdrop-blur-lg rounded-2xl border-2 border-red-200/50 p-8 w-full max-w-4xl shadow-2xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = zigarettenKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <div className="text-center border-b border-red-200 pb-4">
-                          <h3 className="text-2xl font-bold text-red-800 flex items-center justify-center gap-3">
-                            <span className="text-3xl">{aktiveKategorie.icon}</span>
-                            {aktiveKategorie.name}
-                          </h3>
-                          <p className="text-red-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          {tempZigaretten[activeField].map((eintrag, index) => (
-                            <div key={index} className="flex gap-3 items-center p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                              <div className="flex-1">
-                                <input 
-                                  type="text"
-                                  value={eintrag.bezeichnung}
-                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                  placeholder="z.B. Marlboro, Camel, E-Zigarette..."
-                                  className="w-full p-3 bg-white border-2 border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-800 placeholder:text-gray-500"
-                                />
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <input 
-                                  type="number"
-                                  value={eintrag.betrag}
-                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                  placeholder="0"
-                                  className="w-28 p-3 bg-white border-2 border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-right font-semibold"
-                                />
-                                <span className="text-lg font-semibold text-red-700">€</span>
-                              </div>
-                              {tempZigaretten[activeField].length > 1 && (
-                                <button
-                                  onClick={() => removeEintrag(activeField, index)}
-                                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
-                                  title="Eintrag löschen"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-4 border-2 border-dashed border-red-300 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-3 group"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center group-hover:bg-red-600 transition-colors">
-                              +
-                            </div>
-                            <span className="font-semibold text-red-700 group-hover:text-red-800">Neuen Zigaretten-Eintrag hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        {/* Gesundheits-Warnung */}
-                        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-semibold text-red-800">Monatliche Kosten:</span>
-                            <span className="text-xl font-bold text-red-700">
-                              {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                          <div className="text-sm text-red-600 space-y-1">
-                            <div>Jährliche Kosten: <span className="font-semibold">{(calculateKategorieTotal(activeField) * 12).toLocaleString()}€</span></div>
-                            <div className="text-xs text-red-500 mt-2 p-2 bg-red-100 rounded">
-                              ⚠️ Hinweis: Zigaretten schädigen die Gesundheit und verursachen hohe Folgekosten
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center pt-4 border-t border-red-200">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-red-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-red-700 hover:scale-105"
-                          >
-                            💾 Zigaretten speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                          >
-                            ↶ Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
+            {/* Gesundheits-Benefits */}
+            <div className="bg-green-50 rounded-2xl p-6 shadow-xl">
+              <h3 className="text-lg font-bold mb-4 text-green-800">
+                ❤️ Zusätzliche Gesundheitsvorteile nach dem Rauchstopp
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {gesundheitsFakten.map((fakt, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                    <div>
+                      <p className="font-semibold text-green-800">{fakt.zeit}</p>
+                      <p className="text-sm text-gray-700">{fakt.effekt}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <Sidebar />
+      
       <NavigationButtons />
     </div>
   );
 };
   
-// Sidebar mit korrigiertem Grünschema und verbesserter Stabilität
+ // 1. SIDEBAR ohne Wackel-Effekt
 const Sidebar = () => {
   const sidebarItems = [
-    { id: 'fixkosten', name: 'Fixkosten', icon: '🏠', color: '#065f46' },
-    { id: 'lifestyle', name: 'Lifestyle', icon: '🎭', color: '#047857' },
-    { id: 'sicherheit', name: 'Sicherheit', icon: '🛡️', color: '#059669' }
+    { id: 'fixkosten', name: 'Fixkosten', icon: '🏠', color: '#004225' },
+    { id: 'lifestyle', name: 'Lifestyle', icon: '🎭', color: '#1f5f3f' },
+    { id: 'sicherheit', name: 'Sicherheit', icon: '🛡️', color: '#4d7c5f' }
   ];
 
   return (
     <>
+      {/* ERHÖHTER Z-INDEX + ABSOLUTE POSITIONIERUNG */}
       <div 
         className="fixed right-8 z-[100]" 
         style={{ 
@@ -480,7 +557,7 @@ const Sidebar = () => {
           pointerEvents: 'auto' 
         }}
       >
-        {/* Kontinuierlich bewegender Grün-Farbverlauf */}
+        {/* Kontinuierlich bewegender Farbverlauf */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden">
           <div className="w-full h-full animate-flowing-gradient opacity-75"></div>
         </div>
@@ -514,27 +591,70 @@ const Sidebar = () => {
 
       <style jsx>{`
         @keyframes flowing-gradient {
-          0%, 100% {
+          0% {
             background: linear-gradient(
               45deg,
-              #065f46 0%,
-              #047857 20%,
-              #059669 40%,
-              #10b981 60%,
-              #34d399 80%,
-              #065f46 100%
+              #004225 0%,
+              #1f5f3f 20%,
+              #4d7c5f 40%,
+              #6b8e6b 60%,
+              #004225 80%,
+              #1f5f3f 100%
             );
             background-size: 200% 200%;
             background-position: 0% 0%;
           }
           25% {
+            background: linear-gradient(
+              45deg,
+              #004225 0%,
+              #1f5f3f 20%,
+              #4d7c5f 40%,
+              #6b8e6b 60%,
+              #004225 80%,
+              #1f5f3f 100%
+            );
+            background-size: 200% 200%;
             background-position: 100% 0%;
           }
           50% {
+            background: linear-gradient(
+              45deg,
+              #004225 0%,
+              #1f5f3f 20%,
+              #4d7c5f 40%,
+              #6b8e6b 60%,
+              #004225 80%,
+              #1f5f3f 100%
+            );
+            background-size: 200% 200%;
             background-position: 100% 100%;
           }
           75% {
+            background: linear-gradient(
+              45deg,
+              #004225 0%,
+              #1f5f3f 20%,
+              #4d7c5f 40%,
+              #6b8e6b 60%,
+              #004225 80%,
+              #1f5f3f 100%
+            );
+            background-size: 200% 200%;
             background-position: 0% 100%;
+          }
+          100% {
+            background: linear-gradient(
+              45deg,
+              #004225 0%,
+              #1f5f3f 20%,
+              #4d7c5f 40%,
+              #6b8e6b 60%,
+              #004225 80%,
+              #1f5f3f 100%
+            );
+            background-size: 200% 200%;
+            background-position: 0% 0%;
           }
         }
 
@@ -580,53 +700,53 @@ const Sidebar = () => {
 
   const percentages = calculatePercentages();
 
-// Mini-Kuchendiagramm für Header - KORRIGIERT mit Grünschema
+  // Mini-Kuchendiagramm für Header mit Emojis und differenzierten Farben
 const createMiniPieChart = () => {
-  const radius = headerHovered ? 75 : 55;
+  const radius = headerHovered ? 95 : 65;
   const centerX = 120;
-  const centerY = 200;
+  const centerY = 120;
   
   let cumulativePercentage = 0;
-  // Korrigierte Farben im Grünschema (dunkler für bessere Sichtbarkeit)
+  // UNTERSCHIEDLICHE Farben für das Mini-Diagramm (dunkler als Header-Balken)
   const slices = [
     { 
       name: 'Fixkosten', 
       value: percentages.fixkosten, 
-      color: '#065f46', // Dunkelgrün für Fixkosten
+      color: '#002818', // Noch dunkler als #004225
       page: 'fixkosten',
       emoji: '🏠'
     },
     { 
       name: 'Lifestyle', 
       value: percentages.lifestyle, 
-      color: '#047857', // Mittleres Grün für Lifestyle
+      color: '#0f3a28', // Dunkler als #1f5f3f
       page: 'lifestyle',
       emoji: '🎭'
     },
     { 
       name: 'Sicherheit', 
       value: percentages.sicherheit, 
-      color: '#059669', // Helles Grün für Sicherheit
+      color: '#2d5040', // Dunkler als #4d7c5f
       page: 'sicherheit',
       emoji: '🛡️'
     },
     { 
       name: 'Überschuss', 
       value: percentages.ueberschuss, 
-      color: percentages.ueberschuss < 0 ? '#dc2626' : '#10b981', // Rot für Defizit, Grün für Überschuss
+      color: percentages.ueberschuss < 0 ? '#dc2626' : '#059669', // Grün/Rot je nach Wert
       page: null,
       emoji: percentages.ueberschuss < 0 ? '⚠️' : '💰'
     }
   ];
 
   return (
-  <svg 
-  width="240" 
-  height="280"  // Von 240 auf 280 erhöht
-  className="transition-all duration-500 ease-out"
-  onMouseEnter={() => setHeaderHovered(true)}
-  onMouseLeave={() => setHeaderHovered(false)}
->
+    <svg 
+      width="240" 
+      height="240" 
+      className="transition-all duration-500 ease-out"
+      onMouseEnter={() => setHeaderHovered(true)}
+      onMouseLeave={() => setHeaderHovered(false)}
+    >
       {slices.map((slice, index) => {
         const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
         const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
@@ -660,7 +780,7 @@ const createMiniPieChart = () => {
               fill={slice.color}
               stroke="white"
               strokeWidth="2"
-              className="cursor-pointer transition-all duration-300 hover:opacity-80 hover:brightness-110"
+              className="cursor-pointer transition-all duration-300 hover:opacity-80"
               onClick={() => slice.page && setCurrentPage(slice.page)}
               style={{
                 filter: headerHovered ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' : ''
@@ -680,7 +800,7 @@ const createMiniPieChart = () => {
               </text>
             )}
             
-            {/* Prozent-Text mit besserer Lesbarkeit */}
+            {/* Prozent-Text */}
             {headerHovered && slice.value > 5 && (
               <text
                 x={emojiX}
@@ -688,10 +808,6 @@ const createMiniPieChart = () => {
                 textAnchor="middle"
                 className="text-[10px] font-bold fill-white pointer-events-none animate-fadeIn"
                 dy="3"
-                style={{ 
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-                  filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))'
-                }}
               >
                 {slice.value.toFixed(0)}%
               </text>
@@ -700,15 +816,15 @@ const createMiniPieChart = () => {
         );
       })}
       
-      {/* Zentraler Kreis mit verbessertem Grünschema */}
+      {/* Zentraler Kreis mit verbessertem Grün */}
       <circle
         cx={centerX}
         cy={centerY}
         r={headerHovered ? 32 : 28}
         fill="white"
-        stroke="#065f46" // Konsistentes Dunkelgrün
+        stroke="#004225" // Konsistent mit Hauptfarbe
         strokeWidth="2"
-        className="cursor-pointer transition-all duration-300 hover:stroke-4"
+        className="cursor-pointer transition-all duration-300"
         onClick={() => setCurrentPage('budget')}
       />
       <text 
@@ -724,55 +840,45 @@ const createMiniPieChart = () => {
         y={centerY + 6} 
         textAnchor="middle" 
         className="text-[10px] font-bold pointer-events-none" 
-        style={{fill: '#065f46'}} // Konsistentes Dunkelgrün
+        style={{fill: '#004225'}} // Grün statt Blau
       >
         {calculateBudget()}€
       </text>
-      
-      {/* Hover-Tooltip für bessere UX */}
-      {headerHovered && (
-        <text
-          x={centerX}
-          y={centerY + 55}
-          textAnchor="middle"
-          className="text-[8px] fill-slate-500 pointer-events-none animate-fadeIn"
-        >
-          Klicken zum Navigieren
-        </text>
-      )}
     </svg>
   );
 };
-  // Navigation Buttons mit einheitlichem Grünschema
-const NavigationButtons = () => {
-  const prevPage = getPrevPage();
-  const nextPage = getNextPage();
-  
-  return (
-    <div className="fixed bottom-8 right-8 flex gap-4 z-50">
-      {prevPage && (
-        <button
-          onClick={() => setCurrentPage(prevPage)}
-          className="px-6 py-3 bg-white/90 backdrop-blur-lg border-2 border-emerald-300 rounded-xl font-semibold text-emerald-700 hover:bg-emerald-50 hover:scale-105 transition-all duration-200 shadow-lg"
-        >
-          ← Zurück
-        </button>
-      )}
-      {nextPage && (
-        <button
-          onClick={() => setCurrentPage(nextPage)}
-          className="px-6 py-3 bg-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 hover:bg-emerald-800"
-        >
-          Weiter →
-        </button>
-      )}
-    </div>
-  );
-};
 
-// Header mit korrigierter Höhe und einheitlichem Grünschema
+  // Navigation Buttons
+  const NavigationButtons = () => {
+    const prevPage = getPrevPage();
+    const nextPage = getNextPage();
+    
+    return (
+      <div className="fixed bottom-8 right-8 flex gap-4 z-50">
+        {prevPage && (
+          <button
+            onClick={() => setCurrentPage(prevPage)}
+            className="px-6 py-3 bg-white/90 backdrop-blur-lg border-2 border-slate-300 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:scale-105 transition-all duration-200 shadow-lg"
+          >
+            ← Zurück
+          </button>
+        )}
+        {nextPage && (
+          <button
+            onClick={() => setCurrentPage(nextPage)}
+            className="px-6 py-3 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            style={{backgroundColor: '#004225'}}
+          >
+            Weiter →
+          </button>
+        )}
+      </div>
+    );
+  };
+
+// Header mit Balken und Import/Export
 const HeaderBars = () => (
-  <div className="fixed top-0 left-0 right-0 h-44 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+  <div className="fixed top-0 left-0 right-0 h-50 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
     <div className="h-full flex items-center px-8 relative">
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
@@ -785,28 +891,26 @@ const HeaderBars = () => (
           {currentPage === 'kurzfristig' && 'Kurzfristige Anschaffungen'}
           {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
           {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
-          {currentPage === 'BasisAbsicherung' && 'Basis-Absicherung'}
-          {currentPage === 'zigaretten' && 'Investment-Vergleich'}
         </p>
 
-         {/* Home Button mit Grünschema */}
+         {/* Home Button hinzufügen */}
         <button
           onClick={() => setCurrentPage('overview')}
-          className="mt-2 px-3 py-1 bg-emerald-700 text-white text-xs rounded-lg hover:bg-emerald-800 transition-all inline-flex items-center gap-1"
+          className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all inline-flex items-center gap-1"
         >
           🏠 Zur Übersicht
         </button>
 
-        {/* Import/Export Buttons mit Grünschema */}
+        {/* Import/Export Buttons daneben */}
         <div className="inline-flex gap-2 ml-2">
           <button
             onClick={exportData}
-            className="px-3 py-1 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-all"
+            className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-all"
           >
             📥 Export
           </button>
           
-          <label className="px-3 py-1 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-all cursor-pointer">
+          <label className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
             📤 Import
             <input
               type="file"
@@ -821,7 +925,7 @@ const HeaderBars = () => (
       {/* Drag & Drop Zone */}
       <div 
         className={`absolute right-8 top-1/2 transform -translate-y-1/2 w-48 h-20 border-2 border-dashed rounded-lg transition-all ${
-          dragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 bg-gray-50'
+          dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -836,22 +940,23 @@ const HeaderBars = () => (
         </div>
       </div>
       
-      {/* Navigation Balken mit korrigierten Farben */}
-      <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-4">
+      {/* Bestehende Navigation Balken */}
+      <div className="flex-1 flex items-end justify-center space-x-8 h-full pb-6">
+        {/* Hier bleibt der Rest Ihrer Navigation wie gehabt */}
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#065f46'}} // Dunkelgrün für Wünsche
+            className="w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{backgroundColor: '#0B2E70'}}
             onClick={() => setCurrentPage('wuensche')}
           >
             <span className="text-xs text-white font-medium">Wünsche</span>
           </div>
         </div>
         
+        {/* Rest der Balken... */}
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#047857'}} // Mittelgrün für Kurz
+            className="bg-slate-500 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('kurzfristig')}
           >
             <span className="text-xs text-white font-medium">Kurz</span>
@@ -871,8 +976,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#059669'}} // Helleres Grün für Mittel
+            className="bg-slate-400 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('mittelfristig')}
           >
             <span className="text-xs text-white font-medium">Mittel</span>
@@ -881,8 +985,7 @@ const HeaderBars = () => (
 
         <div className="flex flex-col items-center">
           <div 
-            className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{backgroundColor: '#10b981'}} // Sehr helles Grün für Lang
+            className="bg-slate-600 w-20 h-20 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
             onClick={() => setCurrentPage('langfristig')}
           >
             <span className="text-xs text-white font-medium">Lang</span>
@@ -892,12 +995,11 @@ const HeaderBars = () => (
     </div>
   </div>
 );
-
   // Kuchendiagramm erstellen
   const createPieChart = () => {
-    const radius = 180;
-    const centerX = 225;
-    const centerY = 225;
+    const radius = 120;
+    const centerX = 150;
+    const centerY = 150;
     
     let cumulativePercentage = 0;
     const slices = [
@@ -955,157 +1057,187 @@ const OverviewPage = () => (
       />
     </div>
 
-<div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
-  <div className="grid grid-cols-3 items-center px-8 py-4">
-    {/* Linker Bereich */}
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
-      <p className="text-slate-600 font-medium">Finanzberatungstool</p>
-    </div>
-
-    {/* Mittlerer Bereich - ZENTRIERT */}
-    <div className="text-center">
-      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
-      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
-    </div>
-
-    {/* Rechter Bereich */}
-    <div className="flex justify-end">
-      <button
-        onClick={() => setCurrentPage('zigarettenpage')}
-        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
-      >
-        ⏮️
-      </button>
-    </div>
-  </div>
-</div>
-    
-    {/* Hauptcontainer für die vier Kernelemente - KUCHEN-DIAGRAMM PERFEKT ZENTRIERT */}
-    <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
-      <div className="flex w-full max-w-6xl justify-center items-center px-8 gap-8">
-        {/* Basis Absicherung - LINKS */}
-        <div 
-          className="flex justify-center animate-fadeIn"
-          onClick={() => setCurrentPage('basisabsicherung')}
-        >
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-60 flex items-center justify-center">
-            <svg width="160" height="160" className="overflow-visible">
-              {/* Regentropfen Animation - stoppt am Schirm */}
-              {[...Array(8)].map((_, i) => (
-                <g key={`rain-${i}`}>
-                  <line
-                    x1={25 + i * 15}
-                    y1={10}
-                    x2={23 + i * 15}
-                    y2={30}
-                    stroke="#3b82f6"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    opacity="0.6"
-                    style={{
-                      animation: `rain-fall-short 2s linear infinite`,
-                      animationDelay: `${i * 0.3}s`
-                    }}
-                  />
-                </g>
-              ))}
-              
-              {/* Regenschirm über dem Text */}
-              <g style={{
-                animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
-                transformOrigin: '80px 35px'
-              }}>
-                {/* Schirm-Stoff */}
-                <path
-                  d="M 45 35 Q 80 20 115 35 Q 95 30 80 30 Q 65 30 45 35"
-                  fill="#dc2626"
-                  stroke="#b91c1c"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M 55 32 Q 80 23 105 32"
-                  fill="none"
-                  stroke="#991b1b"
-                  strokeWidth="1"
-                />
-                {/* Griff */}
-                <line
-                  x1="80"
-                  y1="30"
-                  x2="80"
-                  y2="50"
-                  stroke="#374151"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 80 50 Q 85 53 80 55"
-                  fill="none"
-                  stroke="#374151"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </g>
-              
-              {/* Text-Elemente */}
-              <g>
-                <text x="80" y="90" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-                  Basis
-                </text>
-                <text x="80" y="110" textAnchor="middle" className="text-lg font-bold fill-slate-800">
-                  Absicherung
-                </text>
-              </g>
-            </svg>
-          </div>
+    <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10 mb-0">
+      <div className="flex items-center justify-between px-8 py-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
+          <p className="text-slate-600 font-medium">Finanzberatungstool</p>
         </div>
 
- {/* Kuchen-Diagramm - ZENTRAL - VERGRÖßERT */}
-<div className="flex justify-center">
-  <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-    <svg width="450" height="450" viewBox="0 0 450 450">
-      {/* Kuchendiagramm */}
-      {createPieChart()}
-      
-      {/* Innerer Kreis - MITTIG AUSGERICHTET */}
-      <circle
-        cx="225"
-        cy="225"
-        r="60"
-        fill="white"
-        stroke="#004225"
-        strokeWidth="3"
-        className="cursor-pointer transition-all hover:r-67"
-        onClick={() => setCurrentPage('BudgetPage')}
-      />
-      <text x="225" y="215" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
-        Budget
-      </text>
-      <text x="225" y="238" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
-        {calculateBudget().toLocaleString()}€
-      </text>
-    </svg>
-  </div>
-</div>
+        {/* GESAMTBUDGET */}
+        <div>
+          <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
+          <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+        </div>
 
-        {/* Budget-Verteilung Legende - RECHTS */}
-        <div className="flex justify-center">
-          <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
-            <div className="space-y-2">
+        {/* HIER DEN BUTTON EINFÜGEN */}
+        <button
+          onClick={() => setCurrentPage('zigaretten')}
+          className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+        >
+          ⏮️
+        </button>
+      </div>
+    </div>
+    
+ 
+    {/* Hauptcontainer für die vier Elemente in einer Reihe */}
+    <div className="flex h-[calc(100vh-180px)] items-start relative z-10 pt-8">
+      {/* Basis Absicherung - mit Regenschirm Animation */}
+      <div 
+        className="w-1/4 p-4 flex items-center justify-center animate-fadeIn"
+        onClick={() => setCurrentPage('basisabsicherung')}
+      >
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 w-full flex items-center justify-center">
+      <svg width="180" height="180" className="overflow-visible">
+            
+            {/* Regentropfen Animation - stoppt am Schirm */}
+            {[...Array(8)].map((_, i) => (
+              <g key={`rain-${i}`}>
+                <line
+                  x1={30 + i * 15}
+                  y1={10}
+                  x2={28 + i * 15}
+                  y2={30}
+                  stroke="#3b82f6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  opacity="0.6"
+                  style={{
+                    animation: `rain-fall-short 2s linear infinite`,
+                    animationDelay: `${i * 0.3}s`
+                  }}
+                />
+              </g>
+            ))}
+            
+            {/* Regenschirm über dem Text */}
+            <g style={{
+              animation: 'umbrella-gentle-sway 4s ease-in-out infinite',
+              transformOrigin: '90px 40px'
+            }}>
+              {/* Schirm-Stoff */}
+              <path
+                d="M 55 40 Q 90 25 125 40 Q 105 35 90 35 Q 75 35 55 40"
+                fill="#dc2626"
+                stroke="#b91c1c"
+                strokeWidth="2"
+              />
+              <path
+                d="M 65 37 Q 90 28 115 37"
+                fill="none"
+                stroke="#991b1b"
+                strokeWidth="1"
+              />
+              {/* Griff */}
+              <line
+                x1="90"
+                y1="35"
+                x2="90"
+                y2="55"
+                stroke="#374151"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 90 55 Q 95 58 90 60"
+                fill="none"
+                stroke="#374151"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </g>
+            
+            {/* Tropfen, die vom Schirm abprallen (optional) */}
+            {[...Array(3)].map((_, i) => (
+              <circle
+                key={`splash-${i}`}
+                cx={60 + i * 30}
+                cy={42}
+                r="2"
+                fill="#3b82f6"
+                opacity="0"
+                style={{
+                  animation: `splash 2s ease-out infinite`,
+                  animationDelay: `${0.5 + i * 0.7}s`
+                }}
+              />
+            ))}
+            
+            {/* Schutz-Funken */}
+            {[...Array(4)].map((_, i) => (
+              <circle
+                key={`sparkle-${i}`}
+                cx={75 + i * 10}
+                cy={40 + Math.sin(i) * 3}
+                r="1.5"
+                fill="#10b981"
+                opacity="0"
+                style={{
+                  animation: `protection-sparkle 3s ease-in-out infinite`,
+                  animationDelay: `${i * 0.5}s`
+                }}
+              />
+            ))}
+            
+            {/* Text-Elemente müssen in einer Gruppe zusammengefasst werden */}
+            <g>
+              <text x="90" y="100" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                Basis
+              </text>
+              <text x="90" y="120" textAnchor="middle" className="text-lg font-bold fill-slate-800">
+                Absicherung
+              </text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      {/* Kuchen-Diagramm */}
+      <div className="w-1/4 p-4 flex items-center justify-center">
+  <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+          <div>
+          
+            {/* Kuchendiagramm 50% größer: von 300x300 auf 450x450 */}
+            <svg width="100%" height="auto" viewBox="0 0 450 450">
+              {createPieChart()}
+              
+              {/* Zentraler Kreis ebenfalls proportional vergrößert */}
+              <circle
+                cx="225"
+                cy="225"
+                r="60"
+                fill="white"
+                stroke="#004225"
+                strokeWidth="3"
+                className="cursor-pointer transition-all hover:r-67"
+                onClick={() => setCurrentPage('budget')}
+              />
+              <text x="225" y="203" textAnchor="middle" className="text-sm font-medium fill-slate-600 pointer-events-none">
+                Budget
+              </text>
+              <text x="225" y="240" textAnchor="middle" className="text-xl font-bold pointer-events-none" style={{fill: '#004225'}}>
+                {calculateBudget().toLocaleString()}€
+              </text>
+            </svg>
+          </div>
+          
+          {/* Legende-Box Position angepasst für größeres Diagramm */}
+          <div className="ml-6 bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-6 animate-fadeIn hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-lg font-bold mb-4 text-slate-900">Budget-Verteilung</h3>
+            <div className="space-y-4">
               {[
                 { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
                 { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
                 { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
                 { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
               ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
-                    <span className="text-xs font-medium text-slate-700">{item.name}</span>
+                <div key={index} className="flex items-center justify-between gap-4 hover:bg-slate-50 p-1 rounded transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-sm" style={{backgroundColor: item.color}}></div>
+                    <span className="text-sm font-medium text-slate-700">{item.name}</span>
                   </div>
-                  <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
+                  <span className="text-sm font-bold text-slate-900">{item.value.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
@@ -1113,15 +1245,19 @@ const OverviewPage = () => (
         </div>
       </div>
 
-      {/* Sidebar - AM RECHTEN RAND */}
-      <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-        <Sidebar />
+      {/* Legende */}
+      <div className="w-1/4 p-4 flex items-start justify-center">
+        {/* Hier kommt deine Legende */}
+      </div>
+
+      {/* Sidebar */}
+     <div className="w-1/4 p-4 flex items-start justify-center">
+  <Sidebar />
       </div>
     </div>
 
-    {/* 4 Säulen am unteren Ende - UNVERÄNDERT */}
-    <div className="absolute bottom-0 left-0 right-0 h-1/3 z-10">
-      <div className="flex h-full gap-4 p-4">
+    <div className="absolute bottom-0 left-0 right-0 h-1/2 z-10">
+      <div className="flex h-full gap-6 p-6">
         {[
           { 
             id: 'wuensche', 
@@ -1150,17 +1286,17 @@ const OverviewPage = () => (
         ].map((item, index) => (
           <div key={item.id} className="flex-1 flex flex-col justify-end animate-slideUp" style={{ animationDelay: `${index * 0.1}s` }}>
             <div 
-              className="h-3/4 rounded-t-xl flex flex-col items-center justify-center pb-6 relative overflow-hidden cursor-pointer transition-all hover:brightness-110 hover:scale-105 px-4"
+              className="h-3/4 rounded-t-xl flex flex-col items-center justify-center pb-8 relative overflow-hidden cursor-pointer transition-all hover:brightness-110 hover:scale-105 px-6"
               style={{backgroundColor: item.color}}
               onClick={() => setCurrentPage(item.id)}
             >
-              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-center">
-                <div className="text-white font-semibold mb-2">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-4 py-3 text-center">
+                <div className="text-white font-semibold mb-3">
                   {item.name.split(' ').map((word, i) => (
-                    <div key={i} className="text-sm">{word}</div>
+                    <div key={i} className="text-lg">{word}</div>
                   ))}
                 </div>
-                <div className="text-white/90 text-xs leading-relaxed">
+                <div className="text-white/90 text-sm leading-relaxed">
                   {item.description.map((line, i) => (
                     <div key={i} className="mb-1 last:mb-0">{line}</div>
                   ))}
@@ -1184,6 +1320,16 @@ const OverviewPage = () => (
         from { transform: translateY(100px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
       }
+      
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes dash-move {
+        from { stroke-dashoffset: 0; }
+        to { stroke-dashoffset: 24; }
+      }
 
       @keyframes rain-fall-short {
         0% { 
@@ -1203,9 +1349,29 @@ const OverviewPage = () => (
         }
       }
 
+      @keyframes splash {
+        0% { 
+          opacity: 0; 
+          transform: scale(0) translateY(0); 
+        }
+        50% { 
+          opacity: 0.5; 
+          transform: scale(1.2) translateY(2px); 
+        }
+        100% { 
+          opacity: 0; 
+          transform: scale(0.8) translateY(5px); 
+        }
+      }
+
       @keyframes umbrella-gentle-sway {
         0%, 100% { transform: rotate(-2deg); }
         50% { transform: rotate(2deg); }
+      }
+
+      @keyframes protection-sparkle {
+        0%, 100% { opacity: 0; transform: scale(0.5); }
+        50% { opacity: 1; transform: scale(1.2); }
       }
       
       .animate-fadeIn {
@@ -1217,1129 +1383,1319 @@ const OverviewPage = () => (
         animation: slideUp 0.6s ease-out forwards;
         opacity: 0;
       }
+      
+      .animate-spin-slow {
+        animation: spin-slow 20s linear infinite;
+      }
     `}</style>
   </div>
 );
 
-// BasisAbsicherungPage - OHNE Statistik-Banner, Fixkosten-Style
+// Basis-Absicherung Page - Professioneller Look
 const BasisAbsicherungPage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempBasis, setTempBasis] = useState({ ...basisData });
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempBasis[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
-
-  const handleSave = () => {
-    setBasisData(tempBasis);
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempBasis({ ...basisData });
-    setActiveField(null);
-  };
-
-  const basisKategorien = [
-    { id: 'krankenversicherung', name: 'Krankenversicherung', icon: '🏥', color: '#047857', beschreibung: 'Gesetzlich/Privat' },
-    { id: 'pflegeversicherung', name: 'Pflegeversicherung', icon: '❤️', color: '#059669', beschreibung: 'Pflegepflicht' },
-    { id: 'arbeitslosenversicherung', name: 'Arbeitslosenversicherung', icon: '💼', color: '#10b981', beschreibung: 'Sicherung im Jobverlust' },
-    { id: 'rentenversicherung', name: 'Rentenversicherung', icon: '👴', color: '#34d399', beschreibung: 'Pflichtbeiträge' }
+  const [selectedVersicherung, setSelectedVersicherung] = useState(null);
+  const [tempBasisData, setTempBasisData] = useState({...basisAbsicherungData});
+  
+  const versicherungsTypen = [
+    { 
+      id: 'krankenversicherung',
+      name: 'Krankenversicherung',
+      pflicht: true,
+      beschreibung: 'Gesetzlich vorgeschrieben',
+      minBetrag: 200,
+      maxBetrag: 900
+    },
+    { 
+      id: 'haftpflicht',
+      name: 'Privathaftpflicht',
+      pflicht: false,
+      wichtigkeit: 'SEHR HOCH',
+      beschreibung: 'Schützt vor existenzbedrohenden Forderungen',
+      empfohleneDecking: 10000000
+    },
+    { 
+      id: 'berufsunfaehigkeit',
+      name: 'Berufsunfähigkeit',
+      pflicht: false,
+      wichtigkeit: 'HOCH',
+      beschreibung: 'Absicherung der Arbeitskraft',
+      empfohlen: '70% des Nettoeinkommens'
+    },
+    { 
+      id: 'rechtsschutz',
+      name: 'Rechtsschutz',
+      pflicht: false,
+      wichtigkeit: 'MITTEL',
+      beschreibung: 'Hilfe bei rechtlichen Streitigkeiten'
+    },
+    { 
+      id: 'hausrat',
+      name: 'Hausrat',
+      pflicht: false,
+      wichtigkeit: 'MITTEL',
+      beschreibung: 'Schutz für Ihr Eigentum'
+    },
+    { 
+      id: 'kfzVersicherung',
+      name: 'KFZ-Versicherung',
+      pflicht: true,
+      beschreibung: 'Pflicht bei Fahrzeugbesitz'
+    }
   ];
-
+  
+  const calculateAbsicherungsgrad = () => {
+    let score = 0;
+    let maxScore = 0;
+    
+    versicherungsTypen.forEach(typ => {
+      if (typ.pflicht) {
+        maxScore += 30;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 30;
+      } else if (typ.wichtigkeit === 'SEHR HOCH') {
+        maxScore += 25;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 25;
+      } else if (typ.wichtigkeit === 'HOCH') {
+        maxScore += 20;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 20;
+      } else {
+        maxScore += 10;
+        if (tempBasisData[typ.id]?.status === 'vorhanden') score += 10;
+      }
+    });
+    
+    return (score / maxScore) * 100;
+  };
+  
+  const absicherungsgrad = calculateAbsicherungsgrad();
+  
+  const calculateGesamtkosten = () => {
+    return Object.values(tempBasisData).reduce((sum, item) => 
+      sum + (parseFloat(item.monatlich) || 0), 0
+    );
+  };
+  
+  const getRisikoLevel = () => {
+    if (absicherungsgrad >= 80) return { text: 'Gut abgesichert', color: '#004225' };
+    if (absicherungsgrad >= 60) return { text: 'Basis vorhanden', color: '#166534' };
+    if (absicherungsgrad >= 40) return { text: 'Lücken vorhanden', color: '#ea580c' };
+    return { text: 'Kritisch', color: '#dc2626' };
+  };
+  
+  const risikoLevel = getRisikoLevel();
+  
   return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {basisKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempBasis({ ...basisData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center">{kategorie.name}</span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+      <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
+        <div className="h-full flex items-center px-8 relative">
+          <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
+            <h1 className="text-xl font-bold text-slate-800">United Hands Capital</h1>
+            <p className="text-sm text-slate-600">Basis-Absicherung - Ihr Sicherheitsnetz</p>
+            
+            {/* Home Button */}
+            <button
+              onClick={() => setCurrentPage('overview')}
+              className="mt-2 px-3 py-1 bg-slate-700 text-white text-xs rounded-lg hover:bg-slate-800 transition-all"
             >
-              {(() => {
-                const aktiveKategorie = basisKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      {tempBasis[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg">
-                          <input
-                            type="text"
-                            value={eintrag.bezeichnung}
-                            onChange={(e) => {
-                              const newArr = [...tempBasis[activeField]];
-                              newArr[index].bezeichnung = e.target.value;
-                              setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
-                            }}
-                            placeholder="Bezeichnung"
-                            className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg"
-                          />
-                          <input
-                            type="number"
-                            value={eintrag.betrag}
-                            onChange={(e) => {
-                              const newArr = [...tempBasis[activeField]];
-                              newArr[index].betrag = parseFloat(e.target.value) || 0;
-                              setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
-                            }}
-                            placeholder="0"
-                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg text-right"
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
+              🏠 Zur Übersicht
+            </button>
           </div>
-        )}
-      </div>
-
-      <Sidebar />
-      <NavigationButtons />
-    </div>
-  );
-};
-
-// BudgetPage - Korrigiert im Fixkosten-Stil mit Modal-Overlay
-const BudgetPage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempBudget, setTempBudget] = useState({...budgetData});
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempBudget[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
-
-  const addEintrag = (kategorie) => {
-    setTempBudget(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
-  };
-
-  const removeEintrag = (kategorie, index) => {
-    setTempBudget(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempBudget(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
-  };
-
-  const handleSave = () => {
-    setBudgetData(tempBudget);
-    const newTotal = Object.keys(tempBudget).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, budget: newTotal }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempBudget({...budgetData});
-    setActiveField(null);
-  };
-
-  const budgetKategorien = [
-    { id: 'einnahmen', name: 'Einnahmen', icon: '💶', color: '#065f46', beschreibung: 'Gehalt, Nebeneinkünfte' },
-    { id: 'ausgaben', name: 'Ausgaben', icon: '💸', color: '#047857', beschreibung: 'Monatliche Fixkosten & variable Kosten' },
-    { id: 'investitionen', name: 'Investitionen', icon: '📈', color: '#059669', beschreibung: 'Aktien, ETFs, Projekte' },
-    { id: 'ruecklagen', name: 'Rücklagen', icon: '🏦', color: '#10b981', beschreibung: 'Polster für besondere Fälle' }
-  ];
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-      
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {budgetKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
+          
+          {/* Risiko-Anzeige - professioneller */}
+          <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
+            <div className="text-right">
+              <p className="text-sm text-slate-500 uppercase tracking-wider">Absicherungsgrad</p>
+              <div className="flex items-center gap-3 mt-1">
+                <div className="w-48 h-6 bg-gray-200 rounded overflow-hidden">
                   <div 
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id 
-                        ? 'text-white shadow-2xl transform scale-105' 
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
+                    className="h-full transition-all duration-500"
                     style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                      width: `${absicherungsgrad}%`,
+                      backgroundColor: risikoLevel.color
                     }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempBudget({...budgetData});
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4 leading-tight">
-                      {kategorie.name}
-                    </span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-                    
-                    {/* Hover-Info */}
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      {kategorie.beschreibung}
-                    </div>
-                  </div>
+                  />
                 </div>
-              ))}
+                <span className="text-2xl font-bold" style={{color: risikoLevel.color}}>
+                  {absicherungsgrad.toFixed(0)}%
+                </span>
+              </div>
+              <p className="text-sm mt-1 font-medium" style={{color: risikoLevel.color}}>
+                {risikoLevel.text}
+              </p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Modal Overlay */}
-      {activeField && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setActiveField(null)}
-        >
-          <div 
-            className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8 max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {(() => {
-              const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
-              return (
-                <div className="space-y-6">
-                  <div className="text-center border-b border-emerald-200 pb-4">
-                    <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                      <span className="text-3xl">{aktiveKategorie.icon}</span>
-                      {aktiveKategorie.name}
-                    </h3>
-                    <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {tempBudget[activeField].map((eintrag, index) => (
-                      <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                        <div className="flex-1">
-                          <input 
-                            type="text"
-                            value={eintrag.bezeichnung}
-                            onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                            placeholder="z.B. Gehalt, Miete, Sparpläne..."
-                            className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input 
-                            type="number"
-                            value={eintrag.betrag}
-                            onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                            placeholder="0"
-                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
-                          />
-                          <span className="text-lg font-semibold text-emerald-700">€</span>
-                        </div>
-                        {tempBudget[activeField].length > 1 && (
-                          <button
-                            onClick={() => removeEintrag(activeField, index)}
-                            className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
-                            title="Eintrag löschen"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    
-                    <button
-                      onClick={() => addEintrag(activeField)}
-                      className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
-                        +
-                      </div>
-                      <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
-                    </button>
-                  </div>
-                  
-                  {/* Kategorie-Statistiken */}
-                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
-                      <span className="text-xl font-bold text-emerald-700">
-                        {calculateKategorieTotal(activeField).toLocaleString()}€
-                      </span>
-                    </div>
-                    <div className="text-sm text-emerald-600">
-                      Anteil an Gesamtbudget: {finanzData.budget > 0 ? 
-                        ((calculateKategorieTotal(activeField) / finanzData.budget) * 100).toFixed(1) : 0}%
-                    </div>
-                    <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
-                      <div 
-                        className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${finanzData.budget > 0 ? 
-                            (calculateKategorieTotal(activeField) / finanzData.budget) * 100 : 0}%`
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                    <button 
-                      onClick={handleSave}
-                      className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                    >
-                      💾 Budget speichern
-                    </button>
-                    <button 
-                      onClick={handleCancel}
-                      className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                    >
-                      ↶ Zurück
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
-
-      <Sidebar />
-      <NavigationButtons />
-    </div>
-  );
-};
-
-
-// FixkostenPage - OHNE Statistik-Banner und mit Modal-Overlay
-const FixkostenPage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData});
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempFixkosten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
-
-  const addEintrag = (kategorie) => {
-    setTempFixkosten(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
-  };
-
-  const removeEintrag = (kategorie, index) => {
-    setTempFixkosten(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempFixkosten(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
-  };
-
-  const handleSave = () => {
-    setFixkostenData(tempFixkosten);
-    const newTotal = Object.keys(tempFixkosten).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, fixkostenTotal: newTotal }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempFixkosten({...fixkostenData});
-    setActiveField(null);
-  };
-
-  const fixkostenKategorien = [
-    { id: 'wohnen', name: 'Wohnen', icon: '🏠', color: '#065f46', beschreibung: 'Miete, Nebenkosten, Strom' },
-    { id: 'lebensmittel', name: 'Lebensmittel', icon: '🛒', color: '#047857', beschreibung: 'Wocheneinkauf, Getränke' },
-    { id: 'abos', name: 'Abos & Services', icon: '📱', color: '#059669', beschreibung: 'Netflix, Spotify, Handy' },
-    { id: 'mobilitaet', name: 'Mobilität', icon: '🚗', color: '#10b981', beschreibung: 'ÖPNV, Sprit, Versicherung' },
-    { id: 'sonstiges', name: 'Sonstige Fixkosten', icon: '📋', color: '#34d399', beschreibung: 'Weitere feste Ausgaben' }
-  ];
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
       
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {fixkostenKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div 
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id 
-                        ? 'text-white shadow-2xl transform scale-105' 
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempFixkosten({...fixkostenData});
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4 leading-tight">
-                      {kategorie.name}
-                    </span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-                    
-                    {/* Hover-Info */}
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      {kategorie.beschreibung}
-                    </div>
-                  </div>
+      <div className="h-screen flex flex-col pt-32">
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
+            {/* Übersichtskarten - Grüntöne */}
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-emerald-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 font-medium">Monatliche Kosten</span>
                 </div>
-              ))}
+                <p className="text-3xl font-bold text-emerald-800">
+                  {calculateGesamtkosten()}€
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {((calculateGesamtkosten() / calculateBudget()) * 100).toFixed(1)}% vom Budget
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-orange-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 font-medium">Fehlende Absicherung</span>
+                </div>
+                <p className="text-3xl font-bold text-orange-600">
+                  {Object.values(tempBasisData).filter(v => v.status === 'fehlt').length}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Versicherungen fehlen
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-emerald-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 font-medium">Empfohlene Aktion</span>
+                </div>
+                <p className="text-lg font-bold text-emerald-700">
+                  {tempBasisData.berufsunfaehigkeit.status === 'fehlt' 
+                    ? 'BU-Versicherung prüfen' 
+                    : tempBasisData.haftpflicht.status === 'fehlt'
+                    ? 'Haftpflicht abschließen'
+                    : 'Status optimal'}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal Overlay - erscheint ÜBER den Kreisen */}
-      {activeField && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setActiveField(null)}
-        >
-          <div 
-            className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {(() => {
-              const aktiveKategorie = fixkostenKategorien.find(k => k.id === activeField);
-              return (
-                <div className="space-y-6">
-                  <div className="text-center border-b border-emerald-200 pb-4">
-                    <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                      <span className="text-3xl">{aktiveKategorie.icon}</span>
-                      {aktiveKategorie.name}
-                    </h3>
-                    <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {tempFixkosten[activeField].map((eintrag, index) => (
-                      <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                        <div className="flex-1">
-                          <input 
-                            type="text"
-                            value={eintrag.bezeichnung}
-                            onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                            placeholder="z.B. Warmmiete, Strom, Internet..."
-                            className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input 
-                            type="number"
-                            value={eintrag.betrag}
-                            onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                            placeholder="0"
-                            className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
-                          />
-                          <span className="text-lg font-semibold text-emerald-700">€</span>
-                        </div>
-                        {tempFixkosten[activeField].length > 1 && (
-                          <button
-                            onClick={() => removeEintrag(activeField, index)}
-                            className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
-                            title="Eintrag löschen"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    
-                    <button
-                      onClick={() => addEintrag(activeField)}
-                      className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
-                        +
-                      </div>
-                      <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
-                    </button>
-                  </div>
-                  
-                  {/* Kategorie-Statistiken */}
-                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
-                      <span className="text-xl font-bold text-emerald-700">
-                        {calculateKategorieTotal(activeField).toLocaleString()}€
-                      </span>
-                    </div>
-                    <div className="text-sm text-emerald-600">
-                      Anteil an Gesamtfixkosten: {finanzData.fixkostenTotal > 0 ? 
-                        ((calculateKategorieTotal(activeField) / finanzData.fixkostenTotal) * 100).toFixed(1) : 0}%
-                    </div>
-                    <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
-                      <div 
-                        className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${finanzData.fixkostenTotal > 0 ? 
-                            (calculateKategorieTotal(activeField) / finanzData.fixkostenTotal) * 100 : 0}%`
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                    <button 
-                      onClick={handleSave}
-                      className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                    >
-                      💾 Speichern
-                    </button>
-                    <button 
-                      onClick={handleCancel}
-                      className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                    >
-                      ↶ Zurück
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
-
-      <Sidebar /> 
-      <NavigationButtons />
-    </div>
-  );
-};
-
-// LifestylePage - OHNE Statistik-Banner, Fixkosten-Style
-const LifestylePage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempLifestyle, setTempLifestyle] = useState({ ...lifestyleData });
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempLifestyle[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
-
-  const addEintrag = (kategorie) => {
-    setTempLifestyle(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
-  };
-
-  const removeEintrag = (kategorie, index) => {
-    setTempLifestyle(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempLifestyle(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) => 
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
-  };
-
-  const handleSave = () => {
-    setLifestyleData(tempLifestyle);
-    const newTotal = Object.keys(tempLifestyle).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, lifestyleTotal: newTotal }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempLifestyle({ ...lifestyleData });
-    setActiveField(null);
-  };
-
-  const lifestyleKategorien = [
-    { id: 'freizeit', name: 'Freizeit', icon: '🎬', color: '#047857', beschreibung: 'Kino, Ausflüge, Events' },
-    { id: 'restaurant', name: 'Restaurants', icon: '🍽️', color: '#059669', beschreibung: 'Essen gehen, Lieferdienste' },
-    { id: 'shopping', name: 'Shopping', icon: '🛍️', color: '#10b981', beschreibung: 'Kleidung, Schuhe, Accessoires' },
-    { id: 'wellness', name: 'Wellness & Fitness', icon: '💆‍♂️', color: '#34d399', beschreibung: 'Fitnessstudio, Massagen' },
-    { id: 'hobbies', name: 'Hobbies', icon: '⚽', color: '#6ee7b7', beschreibung: 'Sport, Freizeitaktivitäten' }
-  ];
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {lifestyleKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempLifestyle({ ...lifestyleData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4 leading-tight">
-                      {kategorie.name}
-                    </span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-
-                    {/* Hover-Info */}
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      {kategorie.beschreibung}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Modal Overlay */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
+            
+            {/* Versicherungs-Grid - professioneller Look */}
+            <div className="grid grid-cols-3 gap-6">
+              {versicherungsTypen.map((versicherung, index) => {
+                const data = tempBasisData[versicherung.id];
+                const statusColor = 
+                  data?.status === 'vorhanden' ? '#004225' : 
+                  data?.status === 'teilweise' ? '#ea580c' : '#dc2626';
+                
                 return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+                  <div 
+                    key={versicherung.id}
+                    className="bg-white/90 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-slate-200"
+                    onClick={() => setSelectedVersicherung(versicherung.id)}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      {versicherung.pflicht && (
+                        <span className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded font-semibold">
+                          PFLICHT
+                        </span>
+                      )}
+                      {versicherung.wichtigkeit && (
+                        <span className={`px-2 py-1 text-xs rounded font-semibold ${
+                          versicherung.wichtigkeit === 'SEHR HOCH' ? 'bg-orange-50 text-orange-700' :
+                          versicherung.wichtigkeit === 'HOCH' ? 'bg-yellow-50 text-yellow-700' :
+                          'bg-gray-50 text-gray-700'
+                        }`}>
+                          {versicherung.wichtigkeit}
+                        </span>
+                      )}
                     </div>
-
-                    <div className="space-y-4">
-                      {tempLifestyle[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                          <div className="flex-1">
-                            <input
-                              type="text"
-                              value={eintrag.bezeichnung}
-                              onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                              placeholder="z.B. Kino, Essen, Shopping..."
-                              className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-800 placeholder:text-gray-500"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              value={eintrag.betrag}
-                              onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                              placeholder="0"
-                              className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-right font-semibold"
-                            />
-                            <span className="text-lg font-semibold text-emerald-700">€</span>
-                          </div>
-                          {tempLifestyle[activeField].length > 1 && (
-                            <button
-                              onClick={() => removeEintrag(activeField, index)}
-                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center w-10 h-10"
-                              title="Eintrag löschen"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
-                      ))}
-
-                      <button
-                        onClick={() => addEintrag(activeField)}
-                        className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 group"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
-                          +
-                        </div>
-                        <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">Neuen Eintrag hinzufügen</span>
-                      </button>
-                    </div>
-
-                    {/* Kategorie-Statistiken */}
-                    <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-emerald-800">Kategorie-Summe:</span>
-                        <span className="text-xl font-bold text-emerald-700">
-                          {calculateKategorieTotal(activeField).toLocaleString()}€
+                    
+                    <h3 className="font-bold text-lg text-slate-800 mb-2">
+                      {versicherung.name}
+                    </h3>
+                    
+                    <p className="text-sm text-gray-600 mb-3">
+                      {versicherung.beschreibung}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: statusColor }}
+                        />
+                        <span className="text-sm font-medium" style={{ color: statusColor }}>
+                          {data?.status === 'vorhanden' ? 'Aktiv' : 
+                           data?.status === 'teilweise' ? 'Teilweise' : 'Fehlt'}
                         </span>
                       </div>
-                      <div className="text-sm text-emerald-600">
-                        Anteil am Gesamtbudget: {finanzData.lifestyleTotal > 0 ?
-                          ((calculateKategorieTotal(activeField) / finanzData.lifestyleTotal) * 100).toFixed(1) : 0}%
-                      </div>
-                      <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
-                        <div
-                          className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
-                          style={{
-                            width: `${finanzData.lifestyleTotal > 0 ?
-                              (calculateKategorieTotal(activeField) / finanzData.lifestyleTotal) * 100 : 0}%`
-                          }}
-                        />
-                      </div>
+                      
+                      <span className="text-lg font-bold text-slate-700">
+                        {data?.monatlich || data?.empfohlen || 0}€/M
+                      </span>
                     </div>
-
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-all shadow-lg hover:shadow-xl hover:bg-emerald-700 hover:scale-105"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all shadow-md"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
+                    
+                    {data?.status === 'fehlt' && data?.empfohlen && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-orange-600 font-medium">
+                          Empfohlener Beitrag: {data.empfohlen}€/Monat
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
-              })()}
+              })}
+            </div>
+            
+            {/* Handlungsempfehlungen - professioneller */}
+            <div className="mt-8 bg-emerald-50 rounded-xl p-6 border border-emerald-200">
+              <h3 className="text-lg font-bold text-emerald-900 mb-4">
+                Ihre nächsten Schritte
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {tempBasisData.berufsunfaehigkeit.status === 'fehlt' && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5"></div>
+                    <div>
+                      <p className="font-semibold text-slate-800">Berufsunfähigkeit abschließen</p>
+                      <p className="text-sm text-gray-600">Ihre Arbeitskraft ist Ihr wichtigstes Kapital</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-
-      <Sidebar />
+      
       <NavigationButtons />
     </div>
   );
 };
 
+  // Budget Input Page mit vergrößerten Kreisen und korrigierter Event-Behandlung
+  const BudgetPage = () => {
+    const [activeField, setActiveField] = useState(null);
+    const [tempValues, setTempValues] = useState({...finanzData});
 
-// SicherheitPage - OHNE Statistik-Banner, Fixkosten-Style
-const SicherheitPage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempSicherheit, setTempSicherheit] = useState({ ...sicherheitData });
+    const handleInputChange = (field, value) => {
+      setTempValues(prev => ({
+        ...prev,
+        [field]: parseFloat(value) || 0
+      }));
+    };
 
-  const calculateKategorieTotal = (kategorie) => {
-    return tempSicherheit[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-  };
+    const handleSave = () => {
+      setFinanzData(tempValues);
+      setActiveField(null);
+      setGehaltExpanded(false);
+    };
 
-  const addEintrag = (kategorie) => {
-    setTempSicherheit(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
-  };
+    const handleCancel = () => {
+      setTempValues({...finanzData});
+      setActiveField(null);
+      setGehaltExpanded(false);
+    };
 
-  const removeEintrag = (kategorie, index) => {
-    setTempSicherheit(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
-  };
+    const einkommensfelder = [
+      { 
+        id: 'gehalt', 
+        name: 'Gehalt', 
+        value: tempValues.gehaltNetto, 
+        field: 'gehaltNetto',
+        hasExpanded: true
+      },
+      { 
+        id: 'zusatz', 
+        name: 'Zusatzeinkommen', 
+        value: tempValues.zusatzeinkommen, 
+        field: 'zusatzeinkommen'
+      },
+      { 
+        id: 'kapital', 
+        name: 'Kapitalerträge', 
+        value: tempValues.kapitalertraege, 
+        field: 'kapitalertraege'
+      },
+      { 
+        id: 'miete', 
+        name: 'Mieteinnahmen', 
+        value: tempValues.mieteinnahmen, 
+        field: 'mieteinnahmen'
+      },
+      { 
+        id: 'individuell', 
+        name: 'Individuell', 
+        value: tempValues.individuell, 
+        field: 'individuell'
+      }
+    ];
 
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempSicherheit(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) =>
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
-  };
-
-  const handleSave = () => {
-    setSicherheitData(tempSicherheit);
-    const newTotal = Object.keys(tempSicherheit).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, sicherheit: newTotal }));
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempSicherheit({ ...sicherheitData });
-    setActiveField(null);
-  };
-
-  const sicherheitKategorien = [
-    { id: 'notgroschen', name: 'Notgroschen', icon: '💰', color: '#047857', beschreibung: 'Rücklagen für Notfälle' },
-    { id: 'versicherungen', name: 'Versicherungen', icon: '🛡️', color: '#059669', beschreibung: 'Haftpflicht, Hausrat etc.' },
-    { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴', color: '#10b981', beschreibung: 'Private Renten, ETF-Sparpläne' },
-    { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️', color: '#34d399', beschreibung: 'Zusatzversicherung, Vorsorge' },
-    { id: 'sparen', name: 'Sparen', icon: '🏦', color: '#6ee7b7', beschreibung: 'Sparkonto, Tagesgeld' }
-  ];
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {sicherheitKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempSicherheit({ ...sicherheitData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center px-4 leading-tight">
-                      {kategorie.name}
-                    </span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-
-                    {/* Hover-Info */}
-                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      {kategorie.beschreibung}
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+        <HeaderBars />
+        
+        <div className="h-screen flex flex-col">
+          <div className="h-1/4"></div>
+          
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="h-full flex flex-col">
+              
+              <div className="flex-shrink-0 flex justify-center items-center py-8">
+                <div className="flex space-x-16">
+                  {einkommensfelder.map((feld) => (
+                    <div key={feld.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                          activeField === feld.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === feld.id ? '#004225' : 'white',
+                          borderColor: activeField === feld.id ? '#004225' : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== feld.id) {
+                            setActiveField(feld.id);
+                            setTempValues({...finanzData});
+                          }
+                        }}
+                      >
+                        <span className="text-lg font-semibold text-center px-4 leading-tight">
+                          {feld.name}
+                        </span>
+                        <span className="text-2xl font-bold mt-2">
+                          {feld.value.toLocaleString()}€
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="flex-1 flex items-start justify-center pt-6">
+                {activeField && (
+                  <div 
+                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-2xl shadow-xl"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(() => {
+                      const aktivesFeld = einkommensfelder.find(f => f.id === activeField);
+                      return (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-bold text-slate-800 text-center">
+                            {aktivesFeld.name} eingeben
+                          </h3>
+                          
+                          <div className="flex flex-col items-center space-y-4">
+                            <div className="w-full max-w-sm">
+                              <label className="block text-base font-semibold text-slate-700 mb-3 text-center">
+                                {activeField === 'gehalt' ? 'Netto-Gehalt' : 'Monatlicher Betrag'}
+                              </label>
+                              <input 
+                                type="number" 
+                                value={tempValues[aktivesFeld.field]}
+                                onChange={(e) => handleInputChange(aktivesFeld.field, e.target.value)}
+                                className="w-full p-4 bg-white border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-xl font-semibold"
+                                placeholder="0"
+                                autoFocus
+                              />
+                            </div>
+                            
+                            {activeField === 'gehalt' && (
+                              <div className="w-full max-w-sm">
+                                <button 
+                                  onClick={() => setGehaltExpanded(!gehaltExpanded)}
+                                  className="text-base font-semibold transition-colors w-full py-3 px-4 rounded-xl border-2 border-slate-300 hover:bg-slate-50"
+                                  style={{color: '#004225'}}
+                                >
+                                  {gehaltExpanded ? 'Weniger Details' : 'Erweitert'}
+                                </button>
+                                
+                                {gehaltExpanded && (
+                                  <div className="mt-4 space-y-3 pt-4 border-t-2 border-slate-200">
+                                    <div>
+                                      <label className="block text-sm font-semibold text-slate-700 mb-2 text-center">
+                                        Brutto-Gehalt
+                                      </label>
+                                      <input 
+                                        type="number" 
+                                        value={gehaltDetails.brutto}
+                                        onChange={(e) => setGehaltDetails(prev => ({
+                                          ...prev, 
+                                          brutto: parseFloat(e.target.value) || 0
+                                        }))}
+                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-semibold text-slate-700 mb-2 text-center">
+                                        Zusatzleistungen
+                                      </label>
+                                      <input 
+                                        type="number" 
+                                        value={gehaltDetails.zusatzleistungen}
+                                        onChange={(e) => setGehaltDetails(prev => ({
+                                          ...prev, 
+                                          zusatzleistungen: parseFloat(e.target.value) || 0
+                                        }))}
+                                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-base"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="flex space-x-4 mt-6">
+                              <button 
+                                onClick={handleSave}
+                                className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
+                                style={{backgroundColor: '#004225'}}
+                              >
+                                Speichern
+                              </button>
+                              <button 
+                                onClick={handleCancel}
+                                className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                              >
+                                Zurück
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+        <Sidebar /> 
+        <NavigationButtons />
+      </div>
+    );
+  };
 
-        {/* Modal Overlay */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+  // Fixkosten Page mit mehreren Eingabefeldern pro Kategorie
+  const FixkostenPage = () => {
+    const [activeField, setActiveField] = useState(null);
+    const [tempFixkosten, setTempFixkosten] = useState({...fixkostenData});
+
+    const calculateKategorieTotal = (kategorie) => {
+      return tempFixkosten[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+    };
+
+    const addEintrag = (kategorie) => {
+      setTempFixkosten(prev => ({
+        ...prev,
+        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+      }));
+    };
+
+    const removeEintrag = (kategorie, index) => {
+      setTempFixkosten(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+      }));
+    };
+
+    const updateEintrag = (kategorie, index, field, value) => {
+      setTempFixkosten(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].map((item, i) => 
+          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+        )
+      }));
+    };
+
+    const handleSave = () => {
+      setFixkostenData(tempFixkosten);
+      const newTotal = Object.keys(tempFixkosten).reduce((total, key) => {
+        return total + calculateKategorieTotal(key);
+      }, 0);
+      setFinanzData(prev => ({ ...prev, fixkostenTotal: newTotal }));
+      setActiveField(null);
+    };
+
+    const handleCancel = () => {
+      setTempFixkosten({...fixkostenData});
+      setActiveField(null);
+    };
+
+    const fixkostenKategorien = [
+      { id: 'wohnen', name: 'Wohnen', icon: '🏠' },
+      { id: 'lebensmittel', name: 'Lebensmittel', icon: '🛒' },
+      { id: 'abos', name: 'Abos', icon: '📱' },
+      { id: 'mobilitaet', name: 'Mobilität', icon: '🚗' },
+      { id: 'sonstiges', name: 'Sonstiges', icon: '📋' }
+    ];
+
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+        <HeaderBars />
+        
+        <div className="h-screen flex flex-col">
+          <div className="h-1/4"></div>
+          
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="h-full flex flex-col">
+              
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-slate-800">Fixkosten</h2>
+                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.fixkostenTotal.toLocaleString()}€</p>
+              </div>
+              
+              <div className="flex-shrink-0 flex justify-center items-center py-8">
+                <div className="flex space-x-16">
+                  {fixkostenKategorien.map((kategorie) => (
+                    <div key={kategorie.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                          activeField === kategorie.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === kategorie.id ? '#004225' : 'white',
+                          borderColor: activeField === kategorie.id ? '#004225' : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== kategorie.id) {
+                            setActiveField(kategorie.id);
+                            setTempSicherheit({...sicherheitData});
+                          }
+                        }}
+                      >
+                        <span className="text-3xl mb-2">{kategorie.icon}</span>
+                        <span className="text-lg font-semibold text-center px-4 leading-tight">
+                          {kategorie.name}
+                        </span>
+                        <span className="text-2xl font-bold mt-2">
+                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                        </span>
+                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    {/* Einträge */}
-                    <div className="space-y-4">
-                      {tempSicherheit[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                          <div className="flex-1">
-                            <input
-                              type="text"
-                              value={eintrag.bezeichnung}
-                              onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                              placeholder="z.B. Versicherung, Rücklage..."
-                              className="w-full p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              value={eintrag.betrag}
-                              onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                              className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-right font-semibold"
-                            />
-                            <span className="text-lg font-semibold text-emerald-700">€</span>
-                          </div>
-                          {tempSicherheit[activeField].length > 1 && (
+              <div className="flex-1 flex items-start justify-center pt-6">
+                {activeField && (
+                  <div 
+                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(() => {
+                      const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
+                      return (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-bold text-slate-800 text-center">
+                            {aktiveKategorie.icon} {aktiveKategorie.name}
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {tempSicherheit[activeField].map((eintrag, index) => (
+                              <div key={index} className="flex gap-3 items-center">
+                                <input 
+                                  type="text"
+                                  value={eintrag.bezeichnung}
+                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                  placeholder="Bezeichnung"
+                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                                />
+                                <input 
+                                  type="number"
+                                  value={eintrag.betrag}
+                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                  placeholder="0"
+                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                                />
+                                <span className="text-lg font-semibold">€</span>
+                                {tempSicherheit[activeField].length > 1 && (
+                                  <button
+                                    onClick={() => removeEintrag(activeField, index)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                            
                             <button
-                              onClick={() => removeEintrag(activeField, index)}
-                              className="p-2 text-red-500 hover:bg-red-100 rounded-lg"
+                              onClick={() => addEintrag(activeField)}
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                             >
-                              ✕
+                              <span className="text-2xl">+</span>
+                              <span className="font-semibold">Neuen Eintrag hinzufügen</span>
                             </button>
-                          )}
+                          </div>
+                          
+                          <div className="border-t-2 border-slate-200 pt-4">
+                            <div className="flex justify-between items-center text-lg font-bold">
+                              <span>Gesamtsumme:</span>
+                              <span className="text-slate-700">
+                                {calculateKategorieTotal(activeField).toLocaleString()}€
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex space-x-4 justify-center">
+                            <button 
+                              onClick={handleSave}
+                              className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                            >
+                              Speichern
+                            </button>
+                            <button 
+                              onClick={handleCancel}
+                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                            >
+                              Zurück
+                            </button>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-
-                    {/* Aktionen */}
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg hover:bg-emerald-700 hover:scale-105"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
+                      );
+                    })()}
                   </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <Sidebar />
-      <NavigationButtons />
-    </div>
-  );
-};
-
-
-// WünschePage - OHNE Statistik-Banner, Fixkosten-Style
-const WuenschePage = () => {
-  const [activeField, setActiveField] = useState(null);
-  const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
-
-  const calculateKategorieTotal = (kategorie) => {
-    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
-  };
-
-  const handleSave = () => {
-    setWuenscheData(tempWuensche);
-    setActiveField(null);
-  };
-
-  const handleCancel = () => {
-    setTempWuensche({ ...wuenscheData });
-    setActiveField(null);
-  };
-
-  const wuenscheKategorien = [
-    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️', color: '#047857', beschreibung: 'Reisen & Abenteuer' },
-    { id: 'luxus', name: 'Luxus', icon: '💎', color: '#059669', beschreibung: 'Exklusive Anschaffungen' },
-    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉', color: '#10b981', beschreibung: 'Besondere Erfahrungen' },
-    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚', color: '#34d399', beschreibung: 'Studium & Kurse' },
-    { id: 'geschenke', name: 'Geschenke', icon: '🎁', color: '#6ee7b7', beschreibung: 'Für Freunde & Familie' }
-  ];
-
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-
-      <div className="h-screen flex flex-col pt-44">
-        <div className="flex-1 p-8">
-          <div className="h-full flex justify-center items-center">
-            <div className="flex space-x-12">
-              {wuenscheKategorien.map((kategorie) => (
-                <div key={kategorie.id} className="flex flex-col items-center">
-                  <div
-                    className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                      activeField === kategorie.id
-                        ? 'text-white shadow-2xl transform scale-105'
-                        : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                      borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
-                    }}
-                    onClick={() => {
-                      if (activeField !== kategorie.id) {
-                        setActiveField(kategorie.id);
-                        setTempWuensche({ ...wuenscheData });
-                      }
-                    }}
-                  >
-                    <span className="text-3xl mb-2">{kategorie.icon}</span>
-                    <span className="text-base font-bold text-center">{kategorie.name}</span>
-                    <span className="text-xl font-bold mt-2">
-                      {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                    </span>
-                  </div>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           </div>
         </div>
+        <Sidebar /> 
+        <NavigationButtons />
+      </div>
+    );
+  };
+  // Lifestyle Page
+  const LifestylePage = () => {
+    const [activeField, setActiveField] = useState(null);
+    const [tempLifestyle, setTempLifestyle] = useState({...lifestyleData});
 
-        {/* Modal Overlay */}
-        {activeField && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
-          >
-            <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <div className="text-center border-b border-emerald-200 pb-4">
-                      <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                        <span className="text-3xl">{aktiveKategorie.icon}</span>
-                        {aktiveKategorie.name}
-                      </h3>
-                      <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
+    const calculateKategorieTotal = (kategorie) => {
+      return tempLifestyle[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+    };
+
+    const addEintrag = (kategorie) => {
+      setTempLifestyle(prev => ({
+        ...prev,
+        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+      }));
+    };
+
+    const removeEintrag = (kategorie, index) => {
+      setTempLifestyle(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+      }));
+    };
+
+    const updateEintrag = (kategorie, index, field, value) => {
+      setTempLifestyle(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].map((item, i) => 
+          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+        )
+      }));
+    };
+
+    const handleSave = () => {
+      setLifestyleData(tempLifestyle);
+      const newTotal = Object.keys(tempLifestyle).reduce((total, key) => {
+        return total + calculateKategorieTotal(key);
+      }, 0);
+      setFinanzData(prev => ({ ...prev, lifestyleTotal: newTotal }));
+      setActiveField(null);
+    };
+
+    const handleCancel = () => {
+      setTempLifestyle({...lifestyleData});
+      setActiveField(null);
+    };
+
+    const lifestyleKategorien = [
+      { id: 'freizeit', name: 'Freizeit', icon: '🎭' },
+      { id: 'restaurant', name: 'Restaurant', icon: '🍽️' },
+      { id: 'shopping', name: 'Shopping', icon: '🛍️' },
+      { id: 'wellness', name: 'Wellness', icon: '💆' },
+      { id: 'hobbies', name: 'Hobbies', icon: '🎨' }
+    ];
+
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+        <HeaderBars />
+        
+        <div className="h-screen flex flex-col">
+          <div className="h-1/4"></div>
+          
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="h-full flex flex-col">
+              
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-slate-800">Lifestyle</h2>
+                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.lifestyleTotal.toLocaleString()}€</p>
+              </div>
+              
+              <div className="flex-shrink-0 flex justify-center items-center py-8">
+                <div className="flex space-x-16">
+                  {lifestyleKategorien.map((kategorie) => (
+                    <div key={kategorie.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                          activeField === kategorie.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-slate-500 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === kategorie.id ? '#64748b' : 'white',
+                          borderColor: activeField === kategorie.id ? '#64748b' : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== kategorie.id) {
+                            setActiveField(kategorie.id);
+                            setTempLifestyle({...lifestyleData});
+                          }
+                        }}
+                      >
+                        <span className="text-3xl mb-2">{kategorie.icon}</span>
+                        <span className="text-lg font-semibold text-center px-4 leading-tight">
+                          {kategorie.name}
+                        </span>
+                        <span className="text-2xl font-bold mt-2">
+                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                        </span>
+                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    <div className="space-y-4">
-                      {tempWuensche[activeField].map((eintrag, index) => (
-                        <div key={index} className="p-3 bg-emerald-50 rounded-lg">
-                          <div className="flex justify-between">
-                            <span className="font-semibold">{eintrag.bezeichnung}</span>
-                            <span className="text-sm text-emerald-600">
-                              Ziel: {eintrag.betrag}€ | Erreicht: {eintrag.erreicht}€
-                            </span>
+              <div className="flex-1 flex items-start justify-center pt-6">
+                {activeField && (
+                  <div 
+                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(() => {
+                      const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
+                      return (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-bold text-slate-800 text-center">
+                            {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {tempLifestyle[activeField].map((eintrag, index) => (
+                              <div key={index} className="flex gap-3 items-center">
+                                <input 
+                                  type="text"
+                                  value={eintrag.bezeichnung}
+                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                  placeholder="Bezeichnung"
+                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none"
+                                />
+                                <input 
+                                  type="number"
+                                  value={eintrag.betrag}
+                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                  placeholder="0"
+                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none text-right"
+                                />
+                                <span className="text-lg font-semibold">€</span>
+                                {tempLifestyle[activeField].length > 1 && (
+                                  <button
+                                    onClick={() => removeEintrag(activeField, index)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                            
+                            <button
+                              onClick={() => addEintrag(activeField)}
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <span className="text-2xl">+</span>
+                              <span className="font-semibold">Neue Ausgabe hinzufügen</span>
+                            </button>
                           </div>
-                          <div className="w-full bg-emerald-200 rounded-full h-2 mt-2">
-                            <div
-                              className="bg-emerald-600 h-2 rounded-full"
-                              style={{ width: `${(eintrag.erreicht / eintrag.betrag) * 100}%` }}
-                            />
+                          
+                          <div className="border-t-2 border-slate-200 pt-4">
+                            <div className="flex justify-between items-center text-lg font-bold">
+                              <span>Gesamtsumme:</span>
+                              <span className="text-slate-700">
+                                {calculateKategorieTotal(activeField).toLocaleString()}€
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex space-x-4 justify-center">
+                            <button 
+                              onClick={handleSave}
+                              className="px-8 py-3 text-base font-semibold text-white bg-slate-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-700"
+                            >
+                              Speichern
+                            </button>
+                            <button 
+                              onClick={handleCancel}
+                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                            >
+                              Zurück
+                            </button>
                           </div>
                         </div>
-                      ))}
-                    </div>
-
-                    <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                      <button
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
-                      >
-                        💾 Speichern
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                      >
-                        ↶ Zurück
-                      </button>
-                    </div>
+                      );
+                    })()}
                   </div>
-                );
-              })()}
+                )}
+              </div>
             </div>
           </div>
-        )}
+        </div>
+        <Sidebar />
+        <NavigationButtons />
       </div>
+    );
+  };
+// Sicherheit Page
+  const SicherheitPage = () => {
+    const [activeField, setActiveField] = useState(null);
+    const [tempSicherheit, setTempSicherheit] = useState({...sicherheitData});
 
-      <Sidebar />
-      <NavigationButtons />
-    </div>
-  );
-};
+    const calculateKategorieTotal = (kategorie) => {
+      return tempSicherheit[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+    };
 
+    const addEintrag = (kategorie) => {
+      setTempSicherheit(prev => ({
+        ...prev,
+        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+      }));
+    };
+
+    const removeEintrag = (kategorie, index) => {
+      setTempSicherheit(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+      }));
+    };
+
+    const updateEintrag = (kategorie, index, field, value) => {
+      setTempSicherheit(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].map((item, i) => 
+          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+        )
+      }));
+    };
+
+    const handleSave = () => {
+      setSicherheitData(tempSicherheit);
+      const newTotal = Object.keys(tempSicherheit).reduce((total, key) => {
+        return total + calculateKategorieTotal(key);
+      }, 0);
+      setFinanzData(prev => ({ ...prev, sicherheit: newTotal }));
+      setActiveField(null);
+    };
+
+    const handleCancel = () => {
+      setTempSicherheit({...sicherheitData});
+      setActiveField(null);
+    };
+
+    const sicherheitKategorien = [
+      { id: 'notgroschen', name: 'Notgroschen', icon: '🛡️' },
+      { id: 'versicherungen', name: 'Versicherungen', icon: '📄' },
+      { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴' },
+      { id: 'gesundheit', name: 'Gesundheit', icon: '🏥' },
+      { id: 'sparen', name: 'Sparen', icon: '💰' }
+    ];
+
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+        <HeaderBars />
+        
+        <div className="h-screen flex flex-col">
+          <div className="h-1/4"></div>
+          
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="h-full flex flex-col">
+              
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-slate-800">Sicherheit & Vorsorge</h2>
+                <p className="text-lg text-slate-600 mt-2">Gesamtsumme: {finanzData.sicherheit.toLocaleString()}€</p>
+              </div>
+              
+              <div className="flex-shrink-0 flex justify-center items-center py-8">
+                <div className="flex space-x-16">
+                  {sicherheitKategorien.map((kategorie) => (
+                    <div key={kategorie.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                          activeField === kategorie.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-slate-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === kategorie.id ? '#94a3b8' : 'white',
+                          borderColor: activeField === kategorie.id ? '#94a3b8' : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== kategorie.id)
+        {
+                            setActiveField(kategorie.id);
+                            setTempFixkosten({...fixkostenData});
+                          }
+                        }}
+                      >
+                        <span className="text-3xl mb-2">{kategorie.icon}</span>
+                        <span className="text-lg font-semibold text-center px-4 leading-tight">
+                          {kategorie.name}
+                        </span>
+                        <span className="text-2xl font-bold mt-2">
+                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-1 flex items-start justify-center pt-6">
+                {activeField && (
+                  <div 
+                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(() => {
+                      const aktiveKategorie = fixkostenKategorien.find(k => k.id === activeField);
+                      return (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-bold text-slate-800 text-center">
+                            {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {tempFixkosten[activeField].map((eintrag, index) => (
+                              <div key={index} className="flex gap-3 items-center">
+                                <input 
+                                  type="text"
+                                  value={eintrag.bezeichnung}
+                                  onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                                  placeholder="Bezeichnung"
+                                  className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                />
+                                <input 
+                                  type="number"
+                                  value={eintrag.betrag}
+                                  onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                  placeholder="0"
+                                  className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                />
+                                <span className="text-lg font-semibold">€</span>
+                                {tempFixkosten[activeField].length > 1 && (
+                                  <button
+                                    onClick={() => removeEintrag(activeField, index)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                            
+                            <button
+                              onClick={() => addEintrag(activeField)}
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <span className="text-2xl">+</span>
+                              <span className="font-semibold">Neue Ausgabe hinzufügen</span>
+                            </button>
+                          </div>
+                          
+                          <div className="border-t-2 border-slate-200 pt-4">
+                            <div className="flex justify-between items-center text-lg font-bold">
+                              <span>Gesamtsumme:</span>
+                              <span style={{color: '#004225'}}>
+                                {calculateKategorieTotal(activeField).toLocaleString()}€
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex space-x-4 justify-center">
+                            <button 
+                              onClick={handleSave}
+                              className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
+                              style={{backgroundColor: '#004225'}}
+                            >
+                              Speichern
+                            </button>
+                            <button 
+                              onClick={handleCancel}
+                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                            >
+                              Zurück
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <Sidebar /> 
+        <NavigationButtons />
+      </div>
+    );
+  };
+  // Wünsche & Ziele Page
+  const WuenschePage = () => {
+    const [activeField, setActiveField] = useState(null);
+    const [tempWuensche, setTempWuensche] = useState({...wuenscheData});
+
+    const calculateProgress = (erreicht, ziel) => {
+      return Math.min((erreicht / ziel) * 100, 100);
+    };
+
+    const calculateKategorieTotal = (kategorie) => {
+      return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+    };
+
+    const calculateKategorieErreicht = (kategorie) => {
+      return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
+    };
+
+    const addEintrag = (kategorie) => {
+      setTempWuensche(prev => ({
+        ...prev,
+        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0, erreicht: 0 }]
+      }));
+    };
+
+    const removeEintrag = (kategorie, index) => {
+      setTempWuensche(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+      }));
+    };
+
+    const updateEintrag = (kategorie, index, field, value) => {
+      setTempWuensche(prev => ({
+        ...prev,
+        [kategorie]: prev[kategorie].map((item, i) => 
+          i === index ? { ...item, [field]: parseFloat(value) || 0 } : item
+        )
+      }));
+    };
+
+    const handleSave = () => {
+      setWuenscheData(tempWuensche);
+      setActiveField(null);
+    };
+
+    const handleCancel = () => {
+      setTempWuensche({...wuenscheData});
+      setActiveField(null);
+    };
+
+    const wuenscheKategorien = [
+      { id: 'traumurlaub', name: 'Traumurlaub', icon: '✈️' },
+      { id: 'luxus', name: 'Luxusgüter', icon: '💎' },
+      { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎢' },
+      { id: 'weiterbildung', name: 'Weiterbildung', icon: '🎓' },
+      { id: 'geschenke', name: 'Geschenke', icon: '🎁' }
+    ];
+
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+        <HeaderBars />
+        
+        <div className="h-screen flex flex-col">
+          <div className="h-1/4"></div>
+          
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="h-full flex flex-col">
+              
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-slate-800">Wünsche & Ziele</h2>
+                <p className="text-lg text-slate-600 mt-2">Langfristige Träume verwirklichen</p>
+              </div>
+              
+              <div className="flex-shrink-0 flex justify-center items-center py-8">
+                <div className="flex space-x-16">
+                  {wuenscheKategorien.map((kategorie) => {
+                    const progress = calculateKategorieErreicht(kategorie.id) / calculateKategorieTotal(kategorie.id) * 100;
+                    return (
+                      <div key={kategorie.id} className="flex flex-col items-center">
+                        <div 
+                          className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
+                            activeField === kategorie.id 
+                              ? 'text-white shadow-xl' 
+                              : 'bg-white text-slate-700 hover:border-blue-700 shadow-lg'
+                          }`}
+                          style={{
+                            backgroundColor: activeField === kategorie.id ? '#004225' : 'white',
+                            borderColor: activeField === kategorie.id ? '#004225' : '#cbd5e1'
+                          }}
+                          onClick={() => {
+                            if (activeField !== kategorie.id) {
+                              setActiveField(kategorie.id);
+                              setTempWuensche({...wuenscheData});
+                            }
+                          }}
+                        >
+                          {/* Fortschrittsring */}
+                          <svg className="absolute inset-0 w-48 h-48">
+                            <circle
+                              cx="96"
+                              cy="96"
+                              r="94"
+                              fill="none"
+                              stroke="#e5e7eb"
+                              strokeWidth="4"
+                            />
+                            <circle
+                              cx="96"
+                              cy="96"
+                              r="94"
+                              fill="none"
+                              stroke="#004225"
+                              strokeWidth="4"
+                              strokeDasharray={`${progress * 5.9} 590`}
+                              strokeDashoffset="0"
+                              transform="rotate(-90 96 96)"
+                              className="transition-all duration-500"
+                            />
+                          </svg>
+                          <span className="text-3xl mb-2 z-10">{kategorie.icon}</span>
+                          <span className="text-lg font-semibold text-center px-4 leading-tight z-10">
+                            {kategorie.name}
+                          </span>
+                          <span className="text-sm font-bold mt-1 z-10">
+                            {progress.toFixed(0)}%
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex-1 flex items-start justify-center pt-6">
+                {activeField && (
+                  <div 
+                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-4xl shadow-xl max-h-[500px] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(() => {
+                      const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+                      return (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-bold text-slate-800 text-center">
+                            {aktiveKategorie.icon} {aktiveKategorie.name}
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {tempWuensche[activeField].map((eintrag, index) => (
+                              <div key={index} className="space-y-2 p-4 bg-slate-50 rounded-lg">
+                                <div className="flex gap-3 items-center">
+                                  <input 
+                                    type="text"
+                                    value={eintrag.bezeichnung}
+                                    onChange={(e) => setTempWuensche(prev => ({
+                                      ...prev,
+                                      [activeField]: prev[activeField].map((item, i) => 
+                                        i === index ? { ...item, bezeichnung: e.target.value } : item
+                                      )
+                                    }))}
+                                    placeholder="Bezeichnung"
+                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <input 
+                                      type="number"
+                                      value={eintrag.erreicht}
+                                      onChange={(e) => updateEintrag(activeField, index, 'erreicht', e.target.value)}
+                                      placeholder="0"
+                                      className="w-24 p-3 bg-white border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-right"
+                                    />
+                                    <span className="text-sm">/</span>
+                                    <input 
+                                      type="number"
+                                      value={eintrag.betrag}
+                                      onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                                      placeholder="0"
+                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
+                                    />
+                                    <span className="text-lg font-semibold">€</span>
+                                  </div>
+                                  {tempWuensche[activeField].length > 1 && (
+                                    <button
+                                      onClick={() => removeEintrag(activeField, index)}
+                                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
+                                </div>
+                                {/* Fortschrittsbalken */}
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                                    style={{width: `${calculateProgress(eintrag.erreicht, eintrag.betrag)}%`}}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                            
+                            <button
+                              onClick={() => addEintrag(activeField)}
+                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <span className="text-2xl">+</span>
+                              <span className="font-semibold">Neues Ziel hinzufügen</span>
+                            </button>
+                          </div>
+                          
+                          <div className="border-t-2 border-slate-200 pt-4">
+                            <div className="flex justify-between items-center text-lg font-bold">
+                              <span>Gesamtfortschritt:</span>
+                              <span style={{color: '#004225'}}>
+                                {calculateKategorieErreicht(activeField).toLocaleString()}€ / {calculateKategorieTotal(activeField).toLocaleString()}€
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex space-x-4 justify-center">
+                            <button 
+                              onClick={handleSave}
+                              className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
+                              style={{backgroundColor: '#004225'}}
+                            >
+                              Speichern
+                            </button>
+                            <button 
+                              onClick={handleCancel}
+                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                            >
+                              Zurück
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <Sidebar /> 
+        <NavigationButtons />
+      </div>
+    );
+  };
 
   // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
   const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => {
