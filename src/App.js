@@ -1799,7 +1799,7 @@ const FixkostenPage = () => {
 };
 
 
-// Lifestyle Page
+// LIFESTYLE PAGE - Pop-Up Modal Version
 const LifestylePage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempLifestyle, setTempLifestyle] = useState({...lifestyleData});
@@ -1903,98 +1903,103 @@ const LifestylePage = () => {
                 ))}
               </div>
             </div>
-
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <h3 className="text-2xl font-bold text-slate-800 text-center">
-                          {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
-                        </h3>
-                        
-                        <div className="space-y-4">
-                          {tempLifestyle[activeField].map((eintrag, index) => (
-                            <div key={index} className="flex gap-3 items-center">
-                              <input 
-                                type="text"
-                                value={eintrag.bezeichnung}
-                                onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                placeholder="Bezeichnung"
-                                className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none"
-                              />
-                              <input 
-                                type="number"
-                                value={eintrag.betrag}
-                                onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                placeholder="0"
-                                className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none text-right"
-                              />
-                              <span className="text-lg font-semibold">€</span>
-                              {tempLifestyle[activeField].length > 1 && (
-                                <button
-                                  onClick={() => removeEintrag(activeField, index)}
-                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                          >
-                            <span className="text-2xl">+</span>
-                            <span className="font-semibold">Neue Ausgabe hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        <div className="border-t-2 border-slate-200 pt-4">
-                          <div className="flex justify-between items-center text-lg font-bold">
-                            <span>Gesamtsumme:</span>
-                            <span className="text-slate-700">
-                              {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-slate-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-700"
-                          >
-                            Speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                          >
-                            Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Pop-Up Modal */}
+      {activeField && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const aktiveKategorie = lifestyleKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name} - Ausgaben
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {tempLifestyle[activeField].map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center">
+                        <input 
+                          type="text"
+                          value={eintrag.bezeichnung}
+                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                          placeholder="Bezeichnung"
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none"
+                        />
+                        <input 
+                          type="number"
+                          value={eintrag.betrag}
+                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                          placeholder="0"
+                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none text-right"
+                        />
+                        <span className="text-lg font-semibold">€</span>
+                        {tempLifestyle[activeField].length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neue Ausgabe hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtsumme:</span>
+                      <span className="text-slate-700">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-slate-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-700"
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
       <Sidebar />
       <NavigationButtons />
     </div>
   );
 };
 
-// SicherheitPage - OHNE Statistik-Banner, Fixkosten-Style
+// SICHERHEIT PAGE - Pop-Up Modal Version
 const SicherheitPage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempSicherheit, setTempSicherheit] = useState({ ...sicherheitData });
@@ -2098,91 +2103,95 @@ const SicherheitPage = () => {
                 ))}
               </div>
             </div>
-
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <h3 className="text-2xl font-bold text-slate-800 text-center">
-                          {aktiveKategorie.icon} {aktiveKategorie.name}
-                        </h3>
-                        
-                        <div className="space-y-4">
-                          {tempSicherheit[activeField].map((eintrag, index) => (
-                            <div key={index} className="flex gap-3 items-center">
-                              <input 
-                                type="text"
-                                value={eintrag.bezeichnung}
-                                onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                placeholder="Bezeichnung"
-                                className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
-                              />
-                              <input 
-                                type="number"
-                                value={eintrag.betrag}
-                                onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                placeholder="0"
-                                className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
-                              />
-                              <span className="text-lg font-semibold">€</span>
-                              {tempSicherheit[activeField].length > 1 && (
-                                <button
-                                  onClick={() => removeEintrag(activeField, index)}
-                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                          >
-                            <span className="text-2xl">+</span>
-                            <span className="font-semibold">Neuen Eintrag hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        <div className="border-t-2 border-slate-200 pt-4">
-                          <div className="flex justify-between items-center text-lg font-bold">
-                            <span>Gesamtsumme:</span>
-                            <span className="text-slate-700">
-                              {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
-                          >
-                            Speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                          >
-                            Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Pop-Up Modal */}
+      {activeField && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const aktiveKategorie = sicherheitKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {tempSicherheit[activeField].map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center">
+                        <input 
+                          type="text"
+                          value={eintrag.bezeichnung}
+                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                          placeholder="Bezeichnung"
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                        />
+                        <input 
+                          type="number"
+                          value={eintrag.betrag}
+                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                          placeholder="0"
+                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                        />
+                        <span className="text-lg font-semibold">€</span>
+                        {tempSicherheit[activeField].length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtsumme:</span>
+                      <span className="text-slate-700">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       <Sidebar />
       <NavigationButtons />
@@ -2190,8 +2199,7 @@ const SicherheitPage = () => {
   );
 };
 
-
-// WünschePage - OHNE Statistik-Banner, Fixkosten-Style
+// WÜNSCHE PAGE - Pop-Up Modal Version
 const WuenschePage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
@@ -2295,91 +2303,95 @@ const WuenschePage = () => {
                 ))}
               </div>
             </div>
-
-            <div className="flex-1 flex items-start justify-center pt-6">
-              {activeField && (
-                <div 
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl max-h-[500px] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(() => {
-                    const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
-                    return (
-                      <div className="space-y-6">
-                        <h3 className="text-2xl font-bold text-slate-800 text-center">
-                          {aktiveKategorie.icon} {aktiveKategorie.name}
-                        </h3>
-                        
-                        <div className="space-y-4">
-                          {tempWuensche[activeField].map((eintrag, index) => (
-                            <div key={index} className="flex gap-3 items-center">
-                              <input 
-                                type="text"
-                                value={eintrag.bezeichnung}
-                                onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                                placeholder="Bezeichnung"
-                                className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
-                              />
-                              <input 
-                                type="number"
-                                value={eintrag.betrag}
-                                onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                placeholder="0"
-                                className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
-                              />
-                              <span className="text-lg font-semibold">€</span>
-                              {tempWuensche[activeField].length > 1 && (
-                                <button
-                                  onClick={() => removeEintrag(activeField, index)}
-                                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          
-                          <button
-                            onClick={() => addEintrag(activeField)}
-                            className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                          >
-                            <span className="text-2xl">+</span>
-                            <span className="font-semibold">Neuen Eintrag hinzufügen</span>
-                          </button>
-                        </div>
-                        
-                        <div className="border-t-2 border-slate-200 pt-4">
-                          <div className="flex justify-between items-center text-lg font-bold">
-                            <span>Gesamtsumme:</span>
-                            <span className="text-slate-700">
-                              {calculateKategorieTotal(activeField).toLocaleString()}€
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-4 justify-center">
-                          <button 
-                            onClick={handleSave}
-                            className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
-                          >
-                            Speichern
-                          </button>
-                          <button 
-                            onClick={handleCancel}
-                            className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                          >
-                            Zurück
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Pop-Up Modal */}
+      {activeField && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {tempWuensche[activeField].map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center">
+                        <input 
+                          type="text"
+                          value={eintrag.bezeichnung}
+                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                          placeholder="Bezeichnung"
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                        />
+                        <input 
+                          type="number"
+                          value={eintrag.betrag}
+                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                          placeholder="0"
+                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                        />
+                        <span className="text-lg font-semibold">€</span>
+                        {tempWuensche[activeField].length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtsumme:</span>
+                      <span className="text-slate-700">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       <Sidebar />
       <NavigationButtons />
