@@ -1267,62 +1267,106 @@ const ZigarettenPage = () => {
     </div>
   );
 
-  // BasisAbsicherungPage
-  const BasisAbsicherungPage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempBasis, setTempBasis] = useState({ ...basisData });
+ // BASIS ABSICHERUNG PAGE - Pop-Up Modal Version mit grünem Hintergrund
+const BasisAbsicherungPage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempBasis, setTempBasis] = useState({ ...basisData });
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempBasis[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const calculateKategorieTotal = (kategorie) => {
+    return tempBasis[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
 
-    const handleSave = () => {
-      setBasisData(tempBasis);
-      setActiveField(null);
-    };
+  const addEintrag = (kategorie) => {
+    setTempBasis(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
 
-    const handleCancel = () => {
-      setTempBasis({ ...basisData });
-      setActiveField(null);
-    };
+  const removeEintrag = (kategorie, index) => {
+    setTempBasis(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
 
-    const basisKategorien = [
-      { id: 'krankenversicherung', name: 'Krankenversicherung', icon: '🏥', color: '#047857', beschreibung: 'Gesetzlich/Privat' },
-      { id: 'pflegeversicherung', name: 'Pflegeversicherung', icon: '❤️', color: '#059669', beschreibung: 'Pflegepflicht' },
-      { id: 'arbeitslosenversicherung', name: 'Arbeitslosenversicherung', icon: '💼', color: '#10b981', beschreibung: 'Sicherung im Jobverlust' },
-      { id: 'rentenversicherung', name: 'Rentenversicherung', icon: '👴', color: '#34d399', beschreibung: 'Pflichtbeiträge' }
-    ];
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempBasis(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-        <HeaderBars />
+  const handleSave = () => {
+    setBasisData(tempBasis);
+    setActiveField(null);
+  };
 
-        <div className="h-screen flex flex-col pt-44">
-          <div className="flex-1 p-8">
-            <div className="h-full flex justify-center items-center">
-              <div className="flex space-x-12">
+  const handleCancel = () => {
+    setTempBasis({ ...basisData });
+    setActiveField(null);
+  };
+
+  // Berechne Gesamtsumme für die Hauptüberschrift
+  const calculateGesamtSumme = () => {
+    return Object.keys(tempBasis).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+  };
+
+  const basisKategorien = [
+    { id: 'krankenversicherung', name: 'Krankenversicherung', icon: '🏥' },
+    { id: 'pflegeversicherung', name: 'Pflegeversicherung', icon: '❤️' },
+    { id: 'arbeitslosenversicherung', name: 'Arbeitslosenversicherung', icon: '💼' },
+    { id: 'rentenversicherung', name: 'Rentenversicherung', icon: '👴' }
+  ];
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
+      <div className="h-screen flex flex-col">
+        <div className="h-1/4"></div>
+        
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            {/* Hauptüberschrift - identisches Layout wie Fixkosten */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">🛡️ Basis Absicherung</h1>
+              <p className="text-lg text-slate-600 mb-4">Ihre grundlegenden Versicherungen und Absicherungen</p>
+              <p className="text-lg text-slate-600">Gesamtsumme: {calculateGesamtSumme().toLocaleString()}€</p>
+            </div>
+            
+            {/* Kreise - identisches Layout wie Fixkosten */}
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-16">
                 {basisKategorien.map((kategorie) => (
                   <div key={kategorie.id} className="flex flex-col items-center">
-                    <div
-                      className={`w-44 h-44 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative group ${
-                        activeField === kategorie.id
-                          ? 'text-white shadow-2xl transform scale-105'
-                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                    <div 
+                      className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-xl' 
+                          : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
                       }`}
                       style={{
-                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white',
-                        borderColor: activeField === kategorie.id ? kategorie.color : '#cbd5e1'
+                        backgroundColor: activeField === kategorie.id ? '#047857' : 'white',
+                        borderColor: activeField === kategorie.id ? '#047857' : '#cbd5e1'
                       }}
                       onClick={() => {
                         if (activeField !== kategorie.id) {
                           setActiveField(kategorie.id);
-                          setTempBasis({ ...basisData });
+                          setTempBasis({...basisData});
                         }
                       }}
                     >
                       <span className="text-3xl mb-2">{kategorie.icon}</span>
-                      <span className="text-base font-bold text-center">{kategorie.name}</span>
-                      <span className="text-xl font-bold mt-2">
+                      <span className="text-lg font-semibold text-center px-4 leading-tight">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-2xl font-bold mt-2">
                         {calculateKategorieTotal(kategorie.id).toLocaleString()}€
                       </span>
                     </div>
@@ -1331,84 +1375,100 @@ const ZigarettenPage = () => {
               </div>
             </div>
           </div>
-
-          {activeField && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-              onClick={() => setActiveField(null)}
-            >
-              <div
-                className="bg-white/95 backdrop-blur-lg rounded-2xl border-2 border-emerald-200/50 p-8 w-full max-w-4xl shadow-2xl mx-8"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {(() => {
-                  const aktiveKategorie = basisKategorien.find(k => k.id === activeField);
-                  return (
-                    <div className="space-y-6">
-                      <div className="text-center border-b border-emerald-200 pb-4">
-                        <h3 className="text-2xl font-bold text-emerald-800 flex items-center justify-center gap-3">
-                          <span className="text-3xl">{aktiveKategorie.icon}</span>
-                          {aktiveKategorie.name}
-                        </h3>
-                        <p className="text-emerald-600 mt-1">{aktiveKategorie.beschreibung}</p>
-                      </div>
-
-                      <div className="space-y-4">
-                        {tempBasis[activeField].map((eintrag, index) => (
-                          <div key={index} className="flex gap-3 items-center p-3 bg-emerald-50 rounded-lg">
-                            <input
-                              type="text"
-                              value={eintrag.bezeichnung}
-                              onChange={(e) => {
-                                const newArr = [...tempBasis[activeField]];
-                                newArr[index].bezeichnung = e.target.value;
-                                setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
-                              }}
-                              placeholder="Bezeichnung"
-                              className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg"
-                            />
-                            <input
-                              type="number"
-                              value={eintrag.betrag}
-                              onChange={(e) => {
-                                const newArr = [...tempBasis[activeField]];
-                                newArr[index].betrag = parseFloat(e.target.value) || 0;
-                                setTempBasis(prev => ({ ...prev, [activeField]: newArr }));
-                              }}
-                              placeholder="0"
-                              className="w-28 p-3 bg-white border-2 border-emerald-300 rounded-lg text-right"
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex space-x-4 justify-center pt-4 border-t border-emerald-200">
-                        <button
-                          onClick={handleSave}
-                          className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl shadow-lg"
-                        >
-                          💾 Speichern
-                        </button>
-                        <button
-                          onClick={handleCancel}
-                          className="px-8 py-3 text-base font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-                        >
-                          ↶ Zurück
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
         </div>
-
-        <Sidebar />
-        <NavigationButtons />
       </div>
-    );
-  };
+
+      {/* Pop-Up Modal - identisches Layout wie Fixkosten */}
+      {activeField && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const aktiveKategorie = basisKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {tempBasis[activeField].map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center">
+                        <input 
+                          type="text"
+                          value={eintrag.bezeichnung}
+                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                          placeholder="Bezeichnung"
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                        />
+                        <input 
+                          type="number"
+                          value={eintrag.betrag}
+                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                          placeholder="0"
+                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                        />
+                        <span className="text-lg font-semibold">€</span>
+                        {tempBasis[activeField].length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtsumme:</span>
+                      <span className="text-slate-700">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-emerald-700"
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      <Sidebar /> 
+      <NavigationButtons />
+    </div>
+  );
+};
 
   // BudgetPage
   const BudgetPage = () => {
