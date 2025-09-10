@@ -1012,7 +1012,7 @@ const ZigarettenPage = () => {
         <img 
           src="http://unitedhandscapital.de/wp-content/uploads/2025/07/Firefly_Ein-inspirierendes-modernes-Bild-das-ganzheitliche-Beratung-symbolisiert-Eine-Bera-781677-scaled.jpg"
           alt="United Hands Capital Logo"
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover opacity-10"
         />
       </div>
 
