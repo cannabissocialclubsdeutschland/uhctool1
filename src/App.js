@@ -2569,8 +2569,8 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
                             : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
                         }`}
                         style={{
-                          backgroundColor: activeField === kategorie.id ? color : 'white',
-                          borderColor: activeField === kategorie.id ? color : '#cbd5e1'
+                          backgroundColor: activeField === kategorie.id ? '#047857' : 'white',
+                          borderColor: activeField === kategorie.id ? '#047857' : '#cbd5e1'
                         }}
                         onClick={() => {
                           if (activeField !== kategorie.id) {
