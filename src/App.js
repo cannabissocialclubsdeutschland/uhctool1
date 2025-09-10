@@ -833,7 +833,7 @@ const ZigarettenPage = () => {
   ];
 
   return (
-    <div className={`h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+    <div className={`h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
       <div className="fixed top-0 left-0 right-0 h-32 bg-white/70 backdrop-blur-lg border-b border-slate-200/50 z-50">
         <div className="h-full flex items-center px-8 relative">
           <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
@@ -1006,7 +1006,7 @@ const ZigarettenPage = () => {
 
   // Overview Page
   const OverviewPage = () => (
-    <div className={`h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+    <div className={`h-screen w-full bg-gradient-to-br from-emerald-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
       
       <div className="absolute inset-0 pointer-events-none z-0">
         <img 
@@ -1524,7 +1524,7 @@ const BasisAbsicherungPage = () => {
     ];
 
     return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+      <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
         <HeaderBars />
         
         <div className="h-screen flex flex-col">
@@ -1722,7 +1722,7 @@ const FixkostenPage = () => {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
       
       <div className="h-screen flex flex-col">
@@ -1923,7 +1923,7 @@ const LifestylePage = () => {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
       
       <div className="h-screen flex flex-col">
@@ -2123,7 +2123,7 @@ const SicherheitPage = () => {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
 
       <div className="h-screen flex flex-col">
@@ -2323,7 +2323,7 @@ const WuenschePage = () => {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
 
       <div className="h-screen flex flex-col">
@@ -2535,7 +2535,7 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
       <HeaderBars />
       
       <div className="h-screen flex flex-col">
