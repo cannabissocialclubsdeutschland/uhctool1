@@ -932,12 +932,13 @@ const ZigarettenPage = () => {
           </div>
 
           <div className="flex justify-end">
-            <button
-              onClick={() => setCurrentPage('zigaretten')}
-              className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-red-700"
-            >
-              🚬 Zigaretten
-            </button>
+      <button
+        onClick={() => setCurrentPage('zigarettenpage')}
+        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+      >
+        ⏮️
+      </button>
+
           </div>
         </div>
       </div>
