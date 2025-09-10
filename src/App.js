@@ -2410,247 +2410,269 @@ const WuenschePage = () => {
 
 
 
-  // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
-  const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempData, setTempData] = useState({...data});
+ // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
+// Jetzt mit Pop-Up Modal Layout wie bei Fixkosten
+const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempData, setTempData] = useState({...data});
 
-    const calculateProgress = (erreicht, ziel) => {
-      return Math.min((erreicht / ziel) * 100, 100);
-    };
+  const calculateProgress = (erreicht, ziel) => {
+    return Math.min((erreicht / ziel) * 100, 100);
+  };
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempData[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const calculateKategorieTotal = (kategorie) => {
+    return tempData[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
 
-    const calculateKategorieErreicht = (kategorie) => {
-      return tempData[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
-    };
+  const calculateKategorieErreicht = (kategorie) => {
+    return tempData[kategorie].reduce((sum, item) => sum + (parseFloat(item.erreicht) || 0), 0);
+  };
 
-    const addEintrag = (kategorie) => {
-      setTempData(prev => ({
-        ...prev,
-        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0, erreicht: 0 }]
-      }));
-    };
+  const addEintrag = (kategorie) => {
+    setTempData(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0, erreicht: 0 }]
+    }));
+  };
 
-    const removeEintrag = (kategorie, index) => {
-      setTempData(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-      }));
-    };
+  const removeEintrag = (kategorie, index) => {
+    setTempData(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
 
-    const updateEintrag = (kategorie, index, field, value) => {
-      setTempData(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].map((item, i) => 
-          i === index ? { ...item, [field]: parseFloat(value) || 0 } : item
-        )
-      }));
-    };
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempData(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' || field === 'erreicht' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
 
-    const handleSave = () => {
-      setData(tempData);
-      setActiveField(null);
-    };
+  const handleSave = () => {
+    setData(tempData);
+    setActiveField(null);
+  };
 
-    const handleCancel = () => {
-      setTempData({...data});
-      setActiveField(null);
-    };
+  const handleCancel = () => {
+    setTempData({...data});
+    setActiveField(null);
+  };
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-        <HeaderBars />
+  // Berechne Gesamtsummen für die Hauptüberschrift
+  const calculateGesamtZiel = () => {
+    return Object.keys(tempData).reduce((total, key) => {
+      return total + calculateKategorieTotal(key);
+    }, 0);
+  };
+
+  const calculateGesamtErreicht = () => {
+    return Object.keys(tempData).reduce((total, key) => {
+      return total + calculateKategorieErreicht(key);
+    }, 0);
+  };
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
+      <div className="h-screen flex flex-col">
+        <div className="h-1/4"></div>
         
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-slate-800">{title}</h2>
-                <p className="text-lg text-slate-600 mt-2">{subtitle}</p>
-              </div>
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {kategorien.map((kategorie) => {
-                    const progress = calculateKategorieErreicht(kategorie.id) / calculateKategorieTotal(kategorie.id) * 100 || 0;
-                    return (
-                      <div key={kategorie.id} className="flex flex-col items-center">
-                        <div 
-                          className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
-                            activeField === kategorie.id 
-                              ? 'text-white shadow-xl' 
-                              : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
-                          }`}
-                          style={{
-                            backgroundColor: activeField === kategorie.id ? color : 'white',
-                            borderColor: activeField === kategorie.id ? color : '#cbd5e1'
-                          }}
-                          onClick={() => {
-                            if (activeField !== kategorie.id) {
-                              setActiveField(kategorie.id);
-                              setTempData({...data});
-                            }
-                          }}
-                        >
-                          <svg className="absolute inset-0 w-48 h-48">
-                            <circle
-                              cx="96"
-                              cy="96"
-                              r="94"
-                              fill="none"
-                              stroke="#e5e7eb"
-                              strokeWidth="4"
-                            />
-                            <circle
-                              cx="96"
-                              cy="96"
-                              r="94"
-                              fill="none"
-                              stroke={color}
-                              strokeWidth="4"
-                              strokeDasharray={`${progress * 5.9} 590`}
-                              strokeDashoffset="0"
-                              transform="rotate(-90 96 96)"
-                              className="transition-all duration-500"
-                            />
-                          </svg>
-                          <span className="text-3xl mb-2 z-10">{kategorie.icon}</span>
-                          <span className="text-lg font-semibold text-center px-4 leading-tight z-10">
-                            {kategorie.name}
-                          </span>
-                          <span className="text-sm font-bold mt-1 z-10">
-                            {progress.toFixed(0)}%
-                          </span>
-                        </div>
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            {/* Hauptüberschrift - identisches Layout wie Fixkosten */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">{title}</h1>
+              <p className="text-lg text-slate-600 mb-4">{subtitle}</p>
+              <p className="text-lg text-slate-600">
+                Gesamtfortschritt: {calculateGesamtErreicht().toLocaleString()}€ / {calculateGesamtZiel().toLocaleString()}€
+              </p>
+            </div>
+            
+            {/* Kreise - identisches Layout wie Fixkosten */}
+            <div className="flex-shrink-0 flex justify-center items-center py-8">
+              <div className="flex space-x-16">
+                {kategorien.map((kategorie) => {
+                  const progress = calculateKategorieTotal(kategorie.id) > 0 
+                    ? (calculateKategorieErreicht(kategorie.id) / calculateKategorieTotal(kategorie.id) * 100) 
+                    : 0;
+                  return (
+                    <div key={kategorie.id} className="flex flex-col items-center">
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
+                          activeField === kategorie.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === kategorie.id ? color : 'white',
+                          borderColor: activeField === kategorie.id ? color : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== kategorie.id) {
+                            setActiveField(kategorie.id);
+                            setTempData({...data});
+                          }
+                        }}
+                      >
+                        {/* Progress Ring für Sparziele */}
+                        <svg className="absolute inset-0 w-48 h-48">
+                          <circle
+                            cx="96"
+                            cy="96"
+                            r="94"
+                            fill="none"
+                            stroke="#e5e7eb"
+                            strokeWidth="4"
+                          />
+                          <circle
+                            cx="96"
+                            cy="96"
+                            r="94"
+                            fill="none"
+                            stroke={color}
+                            strokeWidth="4"
+                            strokeDasharray={`${progress * 5.9} 590`}
+                            strokeDashoffset="0"
+                            transform="rotate(-90 96 96)"
+                            className="transition-all duration-500"
+                          />
+                        </svg>
+                        <span className="text-3xl mb-2 z-10">{kategorie.icon}</span>
+                        <span className="text-lg font-semibold text-center px-4 leading-tight z-10">
+                          {kategorie.name}
+                        </span>
+                        <span className="text-sm font-bold mt-1 z-10">
+                          {progress.toFixed(0)}%
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex-1 flex items-start justify-center pt-6">
-                {activeField && (
-                  <div 
-                    className="bg-white/80 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-4xl shadow-xl max-h-[500px] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {(() => {
-                      const aktiveKategorie = kategorien.find(k => k.id === activeField);
-                      return (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-bold text-slate-800 text-center">
-                            {aktiveKategorie.icon} {aktiveKategorie.name}
-                          </h3>
-                          
-                          <div className="space-y-4">
-                            {tempData[activeField].map((eintrag, index) => (
-                              <div key={index} className="space-y-2 p-4 bg-slate-50 rounded-lg">
-                                <div className="flex gap-3 items-center">
-                                  <input 
-                                    type="text"
-                                    value={eintrag.bezeichnung}
-                                    onChange={(e) => setTempData(prev => ({
-                                      ...prev,
-                                      [activeField]: prev[activeField].map((item, i) => 
-                                        i === index ? { ...item, bezeichnung: e.target.value } : item
-                                      )
-                                    }))}
-                                    placeholder="Bezeichnung"
-                                    className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                  />
-                                  <div className="flex items-center gap-2">
-                                    <input 
-                                      type="number"
-                                      value={eintrag.erreicht}
-                                      onChange={(e) => updateEintrag(activeField, index, 'erreicht', e.target.value)}
-                                      placeholder="0"
-                                      className="w-24 p-3 bg-white border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-right"
-                                    />
-                                    <span className="text-sm">/</span>
-                                    <input 
-                                      type="number"
-                                      value={eintrag.betrag}
-                                      onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                                      placeholder="0"
-                                      className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-right"
-                                    />
-                                    <span className="text-lg font-semibold">€</span>
-                                  </div>
-                                  {tempData[activeField].length > 1 && (
-                                    <button
-                                      onClick={() => removeEintrag(activeField, index)}
-                                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                    >
-                                      ✕
-                                    </button>
-                                  )}
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div 
-                                    className="h-2 rounded-full transition-all duration-500"
-                                    style={{
-                                      width: `${calculateProgress(eintrag.erreicht, eintrag.betrag)}%`,
-                                      backgroundColor: color
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                            
-                            <button
-                              onClick={() => addEintrag(activeField)}
-                              className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <span className="text-2xl">+</span>
-                              <span className="font-semibold">Neues Ziel hinzufügen</span>
-                            </button>
-                          </div>
-                          
-                          <div className="border-t-2 border-slate-200 pt-4">
-                            <div className="flex justify-between items-center text-lg font-bold">
-                              <span>Gesamtfortschritt:</span>
-                              <span style={{color: color}}>
-                                {calculateKategorieErreicht(activeField).toLocaleString()}€ / {calculateKategorieTotal(activeField).toLocaleString()}€
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex space-x-4 justify-center">
-                            <button 
-                              onClick={handleSave}
-                              className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
-                              style={{backgroundColor: color}}
-                            >
-                              Speichern
-                            </button>
-                            <button 
-                              onClick={handleCancel}
-                              className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                            >
-                              Zurück
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
-        <Sidebar /> 
-        <NavigationButtons />
       </div>
-    );
-  };
 
+      {/* Pop-Up Modal - identisches Layout wie Fixkosten */}
+      {activeField && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const aktiveKategorie = kategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {tempData[activeField].map((eintrag, index) => (
+                      <div key={index} className="space-y-2 p-4 bg-slate-50 rounded-lg">
+                        <div className="flex gap-3 items-center">
+                          <input 
+                            type="text"
+                            value={eintrag.bezeichnung}
+                            onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                            placeholder="Bezeichnung"
+                            className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
+                          />
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number"
+                              value={eintrag.erreicht}
+                              onChange={(e) => updateEintrag(activeField, index, 'erreicht', e.target.value)}
+                              placeholder="0"
+                              className="w-24 p-3 bg-white border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-right"
+                            />
+                            <span className="text-sm">/</span>
+                            <input 
+                              type="number"
+                              value={eintrag.betrag}
+                              onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                              placeholder="0"
+                              className="w-24 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
+                            />
+                            <span className="text-lg font-semibold">€</span>
+                          </div>
+                          {tempData[activeField].length > 1 && (
+                            <button
+                              onClick={() => removeEintrag(activeField, index)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                        {/* Progress Bar für jeden Eintrag */}
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="h-2 rounded-full transition-all duration-500"
+                            style={{
+                              width: `${calculateProgress(eintrag.erreicht, eintrag.betrag)}%`,
+                              backgroundColor: color
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neues Ziel hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtfortschritt:</span>
+                      <span className="text-slate-700">
+                        {calculateKategorieErreicht(activeField).toLocaleString()}€ / {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
+                      style={{backgroundColor: color}}
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Zurück
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      <Sidebar /> 
+      <NavigationButtons />
+    </div>
+  );
+};
   // Render je nach aktueller Seite
   const renderCurrentPage = () => {
     switch(currentPage) {
