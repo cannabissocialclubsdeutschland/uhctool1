@@ -115,7 +115,8 @@ const [langfristigData, setLangfristigData] = useState({
       fixkostenData,
       lifestyleData,
       sicherheitData,
-      wuenscheData,
+      kurzfristigWuensche,
+      langfristigWuensche,
       kurzfristigData,
       mittelfristigData,
       langfristigData,
@@ -145,7 +146,8 @@ const [langfristigData, setLangfristigData] = useState({
         if (data.fixkostenData) setFixkostenData(data.fixkostenData);
         if (data.lifestyleData) setLifestyleData(data.lifestyleData);
         if (data.sicherheitData) setSicherheitData(data.sicherheitData);
-        if (data.wuenscheData) setWuenscheData(data.wuenscheData);
+        if (data.kurzfristigWuensche) setKurzfristigWuensche(data.kurzfristigWuensche);
+        if (data.langfristigWuensche) setLangfristigWuensche(data.langfristigWuensche);
         if (data.kurzfristigData) setKurzfristigData(data.kurzfristigData);
         if (data.mittelfristigData) setMittelfristigData(data.mittelfristigData);
         if (data.langfristigData) setLangfristigData(data.langfristigData);
