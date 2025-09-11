@@ -3,11 +3,13 @@ import { useState } from 'react';
 // Kombinierte Wünsche-Komponente mit Toggle
 const WuenscheKombiniert = ({
   HeaderBars,
+  Sidebar,
   kurzfristigData,
   setKurzfristigData,
   langfristigData,
   setLangfristigData
 }) => {
+
 
   const [activeTab, setActiveTab] = useState('kurz'); // 'kurz' oder 'lang'
   const [activeField, setActiveField] = useState(null);
