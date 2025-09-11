@@ -3005,28 +3005,17 @@ const renderCurrentPage = () => {
       return <LifestylePage />;
     case 'sicherheit':
       return <SicherheitPage />;
-    case 'wuensche-kurz':
-      return (
-        <WuenschePage 
-          data={kurzfristigWuensche}
-          setData={setKurzfristigWuensche}
-          title="Kurzfristige Wünsche"
-          subtitle="Träume für die nächsten 12 Monate"
-          color="#047857"
-          showRetirement={false}
-        />
-      );
-    case 'wuensche-lang':
-      return (
-        <WuenschePage 
-          data={langfristigWuensche}
-          setData={setLangfristigWuensche}
-          title="Mittel- & Langfristige Wünsche"
-          subtitle="Große Ziele für die Zukunft"
-          color="#059669"
-          showRetirement={true}
-        />
-      );
+   case 'wuensche':
+  return (
+    <WuenschePage 
+      data={kurzfristigWuensche}
+      setData={setKurzfristigWuensche}
+      title="Kurzfristige Wünsche"
+      subtitle="Träume für die nächsten 12 Monate"
+      color="#047857"
+      showRetirement={false}
+    />
+  );
     case 'kurzfristig':
       return (
         <SparzielPage 
