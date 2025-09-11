@@ -4,6 +4,7 @@ import { useState } from 'react';
 const WuenscheKombiniert = ({
   HeaderBars,
   Sidebar,
+  NavigationButtons,
   kurzfristigData,
   setKurzfristigData,
   langfristigData,
