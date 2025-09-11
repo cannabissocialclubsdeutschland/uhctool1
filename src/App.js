@@ -73,32 +73,32 @@ const [budgetData, setBudgetData] = useState({
     geschenke: [{ bezeichnung: 'Hochzeitsgeschenk', betrag: 0 }]
   });
 
-  // Kurzfristige Anschaffungen
-  const [kurzfristigData, setKurzfristigData] = useState({
-    elektronik: [{ bezeichnung: 'Neues Smartphone', betrag: 0 }],
-    haushalt: [{ bezeichnung: 'Staubsauger', betrag: 0 }],
-    kleidung: [{ bezeichnung: 'Winterjacke', betrag: 0 }],
-    reparaturen: [{ bezeichnung: 'Fahrrad-Service', betrag: 0 }],
-    gesundheit: [{ bezeichnung: 'Neue Brille', betrag: 0 }]
-  });
+// Kurzfristige Anlagen
+const [kurzfristigData, setKurzfristigData] = useState({
+  girokonto: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  tagesgeld: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  festgeld: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  wertpapiere: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  sonstige: [{ bezeichnung: '', betrag: 0, erreicht: 0 }]
+});
 
-  // Mittelfristige Anschaffungen
-  const [mittelfristigData, setMittelfristigData] = useState({
-    moebel: [{ bezeichnung: 'Neue Couch', betrag: 0 }],
-    technik: [{ bezeichnung: 'Gaming PC', betrag: 0 }],
-    urlaub: [{ bezeichnung: 'Sommerurlaub 2025', betrag: 0 }],
-    auto: [{ bezeichnung: 'Autoreparatur', betrag: 0 }],
-    renovation: [{ bezeichnung: 'Bad renovieren', betrag: 0 }]
-  });
+// Mittelfristige Anlagen
+const [mittelfristigData, setMittelfristigData] = useState({
+  depot: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  crypto: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  vwl: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  sonstige: [{ bezeichnung: '', betrag: 0, erreicht: 0 }]
+});
 
-  // Langfristige Anschaffungen
-  const [langfristigData, setLangfristigData] = useState({
-    immobilie: [{ bezeichnung: 'Eigenheim-Anzahlung', betrag: 0 }],
-    fahrzeug: [{ bezeichnung: 'Neues Auto', betrag: 0 }],
-    bildung: [{ bezeichnung: 'Kinder-Studium', betrag: 0 }],
-    altersvorsorge: [{ bezeichnung: 'Private Zusatzrente', betrag: 0 }],
-    unternehmen: [{ bezeichnung: 'Geschäftsgründung', betrag: 0 }]
-  });
+// Langfristige Anlagen
+const [langfristigData, setLangfristigData] = useState({
+  gesamtrente: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  gesetzlich: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  betrieblich: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  riester: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  basis: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
+  privat: [{ bezeichnung: '', betrag: 0, erreicht: 0 }]
+});
 
   const [gehaltExpanded, setGehaltExpanded] = useState(false);
   const [gehaltDetails, setGehaltDetails] = useState({
@@ -2819,60 +2819,58 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
       case 'wuensche':
         return <WuenschePage />;
       case 'kurzfristig':
-        return (
-          <SparzielPage 
-            data={kurzfristigData}
-            setData={setKurzfristigData}
-            title="Kurzfristige Anschaffungen"
-            subtitle="Ziele für 1-6 Monate"
-            kategorien={[
-              { id: 'elektronik', name: 'Elektronik', icon: '📱' },
-              { id: 'haushalt', name: 'Haushalt', icon: '🏠' },
-              { id: 'kleidung', name: 'Kleidung', icon: '👔' },
-              { id: 'reparaturen', name: 'Reparaturen', icon: '🔧' },
-              { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️' }
-            ]}
-            color="#64748b"
-          />
-        );
-      case 'mittelfristig':
-        return (
-          <SparzielPage 
-            data={mittelfristigData}
-            setData={setMittelfristigData}
-            title="Mittelfristige Anschaffungen"
-            subtitle="Ziele für 6-24 Monate"
-            kategorien={[
-              { id: 'moebel', name: 'Möbel', icon: '🛋️' },
-              { id: 'technik', name: 'Technik', icon: '💻' },
-              { id: 'urlaub', name: 'Urlaub', icon: '🏖️' },
-              { id: 'auto', name: 'Auto', icon: '🚙' },
-              { id: 'renovation', name: 'Renovation', icon: '🔨' }
-            ]}
-            color="#94a3b8"
-          />
-        );
-      case 'langfristig':
-        return (
-          <SparzielPage 
-            data={langfristigData}
-            setData={setLangfristigData}
-            title="Langfristige Anschaffungen"
-            subtitle="Ziele für 2+ Jahre"
-            kategorien={[
-              { id: 'immobilie', name: 'Immobilie', icon: '🏡' },
-              { id: 'fahrzeug', name: 'Fahrzeug', icon: '🚗' },
-              { id: 'bildung', name: 'Bildung', icon: '📚' },
-              { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '🏦' },
-              { id: 'unternehmen', name: 'Unternehmen', icon: '🏢' }
-            ]}
-            color="#475569"
-          />
-        );
-      default:
-        return <OverviewPage />;
-    }
-  };
+  return (
+    <SparzielPage 
+      data={kurzfristigData}
+      setData={setKurzfristigData}
+      title="Kurzfristige Anlagen"
+      subtitle="Liquidität für 1-6 Monate"
+      kategorien={[
+        { id: 'girokonto', name: 'Girokonto', icon: '💳' },
+        { id: 'tagesgeld', name: 'Tagesgeldkonto', icon: '🏦' },
+        { id: 'festgeld', name: 'Festgeld', icon: '🔒' },
+        { id: 'wertpapiere', name: 'Verzinsliche & Sichere Wertpapiere', icon: '📈' },
+        { id: 'sonstige', name: 'Sonstige', icon: '📋' }
+      ]}
+      color="#64748b"
+    />
+  );
+
+case 'mittelfristig':
+  return (
+    <SparzielPage 
+      data={mittelfristigData}
+      setData={setMittelfristigData}
+      title="Mittelfristige Anlagen"
+      subtitle="Vermögensaufbau für 6-24 Monate"
+      kategorien={[
+        { id: 'depot', name: 'Depot', icon: '📊' },
+        { id: 'crypto', name: 'Crypto', icon: '₿' },
+        { id: 'vwl', name: 'VWL', icon: '💼' },
+        { id: 'sonstige', name: 'Sonstige', icon: '📝' }
+      ]}
+      color="#94a3b8"
+    />
+  );
+
+case 'langfristig':
+  return (
+    <SparzielPage 
+      data={langfristigData}
+      setData={setLangfristigData}
+      title="Langfristige Anlagen"
+      subtitle="Altersvorsorge für 2+ Jahre"
+      kategorien={[
+        { id: 'gesamtrente', name: 'Gesamt-Rente (Vor SO und ST)', icon: '🎯' },
+        { id: 'gesetzlich', name: 'Gesetzliche Rente', icon: '🏛️' },
+        { id: 'betrieblich', name: 'Betriebliche Altersvorsorge', icon: '🏢' },
+        { id: 'riester', name: 'Riesterrente', icon: '🏦' },
+        { id: 'basis', name: 'Basisrente', icon: '📄' },
+        { id: 'privat', name: 'Private Vorsorge (Schicht 3)', icon: '💰' }
+      ]}
+      color="#475569"
+    />
+  );
 
   return renderCurrentPage();
 };
