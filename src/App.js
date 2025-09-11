@@ -561,7 +561,7 @@ const [langfristigData, setLangfristigData] = useState({
             <div 
               className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
               style={{backgroundColor: '#065f46'}}
-              onClick={() => setCurrentPage('kurzfristigWuensche')}
+              onClick={() => setCurrentPage('wuensche_kurz')}
             >
               <span className="text-xs text-white font-medium">Wünsche</span>
             </div>
