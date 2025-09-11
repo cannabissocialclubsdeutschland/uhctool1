@@ -67,7 +67,6 @@ const [budgetData, setBudgetData] = useState({
   // Wünsche Daten
   const [kurzfristigWuensche, setKurzfristigWuensche] = useState([]);
   const [langfristigWuensche, setLangfristigWuensche] = useState([]);
-  const [currentPage, setCurrentPage] = useState('overview');
   });
   
 // Kurzfristige Anlagen
@@ -276,7 +275,7 @@ const [langfristigData, setLangfristigData] = useState({
   };
 
   // Seitenreihenfolge für Navigation
-  const pageOrder = ['overview', 'basisabsicherung', 'zigaretten', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche', 'kurzfristig', 'mittelfristig', 'langfristig'];
+  const pageOrder = ['overview', 'basisabsicherung', 'zigaretten', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche_kurz', 'kurzfristig', 'mittelfristig', 'langfristig'];
   
   const getNextPage = () => {
     const currentIndex = pageOrder.indexOf(currentPage);
@@ -506,7 +505,7 @@ const [langfristigData, setLangfristigData] = useState({
             {currentPage === 'fixkosten' && 'Fixkosten-Verwaltung'}
             {currentPage === 'lifestyle' && 'Lifestyle-Ausgaben'}
             {currentPage === 'sicherheit' && 'Sicherheit & Vorsorge'}
-            {currentPage === 'wuensche' && 'Wünsche & Ziele'}
+            {currentPage === 'wuensche_kurz' && 'Wünsche & Ziele'}
             {currentPage === 'kurzfristig' && 'Kurzfristige Anschaffungen'}
             {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
             {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
