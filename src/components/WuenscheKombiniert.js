@@ -127,7 +127,6 @@ const WuenscheKombiniert = ({
       <HeaderBars />
       
       <div className="h-screen flex flex-col">
-        <div className="h-1/4"></div>
         
         <div className="flex-1 p-8 overflow-y-auto">
           <div className="h-full flex flex-col">
