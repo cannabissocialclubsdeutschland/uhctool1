@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import WuenscheKombiniert from './components/WuenscheKombiniert';
 
 const FinanzTool = () => {
   const [currentPage, setCurrentPage] = useState('overview');
@@ -504,7 +505,7 @@ const [langfristigData, setLangfristigData] = useState({
             {currentPage === 'fixkosten' && 'Fixkosten-Verwaltung'}
             {currentPage === 'lifestyle' && 'Lifestyle-Ausgaben'}
             {currentPage === 'sicherheit' && 'Sicherheit & Vorsorge'}
-            {currentPage === 'wuensche_kurz' && 'Wünsche & Ziele'}
+            {currentPage === 'wuensche_kombiniert' && 'Wünsche & Ziele'}
             {currentPage === 'kurzfristig' && 'Kurzfristige Anschaffungen'}
             {currentPage === 'mittelfristig' && 'Mittelfristige Anschaffungen'}
             {currentPage === 'langfristig' && 'Langfristige Anschaffungen'}
@@ -561,7 +562,7 @@ const [langfristigData, setLangfristigData] = useState({
             <div 
               className="w-20 h-24 rounded-t-lg flex items-end justify-center pb-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
               style={{backgroundColor: '#065f46'}}
-              onClick={() => setCurrentPage('wuensche_kurz')}
+              onClick={() => setCurrentPage('wuensche_kombiniert')}
             >
               <span className="text-xs text-white font-medium">Wünsche</span>
             </div>
@@ -3006,28 +3007,15 @@ const renderCurrentPage = () => {
       return <LifestylePage />;
     case 'sicherheit':
       return <SicherheitPage />;
-    case 'wuensche_kurz':
+    case 'wuensche_kombiniert':
       return (
-    <WuenschePage
-      data={kurzfristigWuensche}
-      setData={setKurzfristigWuensche}
-      title="Kurzfristige Wünsche"
-      subtitle="Ziele für die nächsten Monate"
-      color="#10b981"
-    />
-  );
-
-    case 'wuensche_lang':
-      return (
-    <WuenschePage
-      data={langfristigWuensche}
-      setData={setLangfristigWuensche}
-      title="Langfristige Wünsche"
-      subtitle="Ziele für die nächsten Jahre"
-      color="#475569"
-      showRetirement={true}
-    />
-  );
+        <WuenscheKombiniert
+          kurzfristigData={kurzfristigWuensche}
+          setKurzfristigData={setKurzfristigWuensche}
+          langfristigData={langfristigWuensche}
+          setLangfristigData={setLangfristigWuensche}
+        />
+      );
 
     case 'kurzfristig':
       return (
