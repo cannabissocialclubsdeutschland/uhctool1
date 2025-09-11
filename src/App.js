@@ -3032,12 +3032,7 @@ const renderCurrentPage = () => {
         />
       );
 
-return (
-  <div>
-    {renderCurrentPage()}
-  </div>
-);
+  return renderCurrentPage();
+};
 
-}; 
-
-export default FinanzTool; // MUSS außerhalb der Komponente sein
+export default FinanzTool; 
