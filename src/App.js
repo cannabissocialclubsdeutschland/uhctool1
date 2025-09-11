@@ -61,9 +61,6 @@ const [budgetData, setBudgetData] = useState({
   // Sicherheit Daten
   const [sicherheitData, setSicherheitData] = useState({
     notgroschen: [{ bezeichnung: 'Rücklage', betrag: 0 }],
-    versicherungen: [{ bezeichnung: 'Haftpflicht', betrag: 0 }],
-    altersvorsorge: [{ bezeichnung: 'Private Rente', betrag: 0 }],
-    gesundheit: [{ bezeichnung: 'Zusatzversicherung', betrag: 0 }],
     sparen: [{ bezeichnung: 'Sparkonto', betrag: 0 }]
   });
 
@@ -2188,9 +2185,6 @@ const SicherheitPage = () => {
 
   const sicherheitKategorien = [
     { id: 'notgroschen', name: 'Notgroschen', icon: '💰' },
-    { id: 'versicherungen', name: 'Versicherungen', icon: '🛡️' },
-    { id: 'altersvorsorge', name: 'Altersvorsorge', icon: '👴' },
-    { id: 'gesundheit', name: 'Gesundheit', icon: '⚕️' },
     { id: 'sparen', name: 'Sparen', icon: '🏦' }
   ];
 
