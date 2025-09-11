@@ -65,9 +65,11 @@ const [budgetData, setBudgetData] = useState({
   });
 
   // Wünsche Daten
-const [kurzfristigWuensche, setKurzfristigWuensche] = useState([]);
-const [langfristigWuensche, setLangfristigWuensche] = useState([]);
-
+  const [kurzfristigWuensche, setKurzfristigWuensche] = useState([]);
+  const [langfristigWuensche, setLangfristigWuensche] = useState([]);
+  const [currentPage, setCurrentPage] = useState('overview');
+  });
+  
 // Kurzfristige Anlagen
 const [kurzfristigData, setKurzfristigData] = useState({
   girokonto: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
@@ -1162,7 +1164,7 @@ const ZigarettenPage = () => {
         <div className="flex h-full gap-4 p-4">
           {[
             { 
-              id: 'wuensche_kurz ', 
+              id: 'wuensche_kurz', 
               name: 'Wünsche & Ziele', 
               color: '#004225',
               description: ['Persönliche Träume', '& Lebensziele', 'verwirklichen']
