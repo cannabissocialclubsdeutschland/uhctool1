@@ -67,7 +67,6 @@ const [budgetData, setBudgetData] = useState({
   // Wünsche Daten
   const [kurzfristigWuensche, setKurzfristigWuensche] = useState([]);
   const [langfristigWuensche, setLangfristigWuensche] = useState([]);
-  });
   
 // Kurzfristige Anlagen
 const [kurzfristigData, setKurzfristigData] = useState({
