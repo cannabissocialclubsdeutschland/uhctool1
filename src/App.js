@@ -73,6 +73,10 @@ const [budgetData, setBudgetData] = useState({
     geschenke: [{ bezeichnung: 'Hochzeitsgeschenk', betrag: 0 }]
   });
 
+  // Wünsche Daten
+const [kurzfristigWuensche, setKurzfristigWuensche] = useState([]);
+const [langfristigWuensche, setLangfristigWuensche] = useState([]);
+
 // Kurzfristige Anlagen
 const [kurzfristigData, setKurzfristigData] = useState({
   girokonto: [{ bezeichnung: '', betrag: 0, erreicht: 0 }],
@@ -2334,64 +2338,73 @@ const SicherheitPage = () => {
   );
 };
 
-// WÜNSCHE PAGE - Pop-Up Modal Version
-const WuenschePage = () => {
+// Generische Wünsche-Page-Komponente
+const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = false }) => {
   const [activeField, setActiveField] = useState(null);
-  const [tempWuensche, setTempWuensche] = useState({ ...wuenscheData });
+  const [tempData, setTempData] = useState([...data]);
 
-  const calculateKategorieTotal = (kategorie) => {
-    return tempWuensche[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  const calculateProgress = (vorhandenesKapital, betrag) => {
+    if (!betrag || betrag === 0) return 0;
+    return Math.min((vorhandenesKapital / betrag) * 100, 100);
   };
 
-  const addEintrag = (kategorie) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-    }));
+  const calculateMonthlyRequired = (wunsch) => {
+    if (wunsch.sparmodusTyp === 'datum' && wunsch.zieldatum) {
+      const heute = new Date();
+      const ziel = new Date(wunsch.zieldatum);
+      const monate = Math.max(1, (ziel.getFullYear() - heute.getFullYear()) * 12 + (ziel.getMonth() - heute.getMonth()));
+      const restbetrag = wunsch.betrag - wunsch.vorhandenesKapital;
+      return restbetrag > 0 ? Math.ceil(restbetrag / monate) : 0;
+    }
+    return wunsch.zielbetrag || 0;
   };
 
-  const removeEintrag = (kategorie, index) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-    }));
+  const addWunsch = () => {
+    const neuerWunsch = {
+      id: Date.now(),
+      bezeichnung: '',
+      betrag: 0,
+      vorhandenesKapital: 0,
+      sparmodusTyp: 'datum',
+      zieldatum: '',
+      zielbetrag: 0,
+      prioritaet: 5,
+      icon: '🎯'
+    };
+    setTempData([...tempData, neuerWunsch]);
   };
 
-  const updateEintrag = (kategorie, index, field, value) => {
-    setTempWuensche(prev => ({
-      ...prev,
-      [kategorie]: prev[kategorie].map((item, i) =>
-        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-      )
-    }));
+  const removeWunsch = (id) => {
+    setTempData(tempData.filter(w => w.id !== id));
+  };
+
+  const updateWunsch = (id, field, value) => {
+    setTempData(tempData.map(wunsch => 
+      wunsch.id === id 
+        ? { ...wunsch, [field]: field === 'betrag' || field === 'vorhandenesKapital' || field === 'zielbetrag' || field === 'prioritaet'
+            ? (parseFloat(value) || 0) 
+            : value } 
+        : wunsch
+    ));
   };
 
   const handleSave = () => {
-    setWuenscheData(tempWuensche);
-    const newTotal = Object.keys(tempWuensche).reduce((total, key) => {
-      return total + calculateKategorieTotal(key);
-    }, 0);
-    setFinanzData(prev => ({ ...prev, wuenscheTotal: newTotal }));
+    setData(tempData);
     setActiveField(null);
   };
 
   const handleCancel = () => {
-    setTempWuensche({ ...wuenscheData });
+    setTempData([...data]);
     setActiveField(null);
   };
 
-  const wuenscheKategorien = [
-    { id: 'traumurlaub', name: 'Traumurlaub', icon: '🏝️' },
-    { id: 'luxus', name: 'Luxus', icon: '💎' },
-    { id: 'erlebnisse', name: 'Erlebnisse', icon: '🎉' },
-    { id: 'weiterbildung', name: 'Weiterbildung', icon: '📚' },
-    { id: 'geschenke', name: 'Geschenke', icon: '🎁' }
-  ];
+  const iconOptions = ['🎯', '✈️', '🏠', '🚗', '💍', '📱', '💻', '🎮', '📚', '🎸', '🏖️', '⛷️', '🚴', '🎨', '📷'];
+
+  // Sortiere Wünsche nach Priorität (1 = höchste Priorität)
+  const sortedData = [...tempData].sort((a, b) => a.prioritaet - b.prioritaet);
 
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-      <HeaderBars />
-
       <div className="h-screen flex flex-col">
         <div className="h-1/4"></div>
         
@@ -2400,42 +2413,91 @@ const WuenschePage = () => {
             
             {/* Hauptüberschrift */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-slate-800 mb-2">🎁 Wünsche</h1>
-              <p className="text-lg text-slate-600 mb-4">Erfassen Sie Ihre Wünsche und Ziele</p>
-              <p className="text-lg text-slate-600">Gesamtsumme: {finanzData.wuenscheTotal?.toLocaleString() || 0}€</p>
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">{title}</h1>
+              <p className="text-lg text-slate-600">{subtitle}</p>
             </div>
             
-            <div className="flex-shrink-0 flex justify-center items-center py-8">
-              <div className="flex space-x-16">
-                {wuenscheKategorien.map((kategorie) => (
-                  <div key={kategorie.id} className="flex flex-col items-center">
-                    <div 
-                      className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                        activeField === kategorie.id 
-                          ? 'text-white shadow-xl' 
-                          : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
-                      }`}
-                      style={{
-                        backgroundColor: activeField === kategorie.id ? '#059669' : 'white',
-                        borderColor: activeField === kategorie.id ? '#059669' : '#cbd5e1'
-                      }}
-                      onClick={() => {
-                        if (activeField !== kategorie.id) {
-                          setActiveField(kategorie.id);
-                          setTempWuensche({...wuenscheData});
-                        }
-                      }}
-                    >
-                      <span className="text-3xl mb-2">{kategorie.icon}</span>
-                      <span className="text-lg font-semibold text-center px-4 leading-tight">
-                        {kategorie.name}
-                      </span>
-                      <span className="text-2xl font-bold mt-2">
-                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                      </span>
+            {/* Kreise Grid */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="grid grid-cols-3 gap-12 max-w-4xl">
+                {sortedData.map((wunsch) => {
+                  const progress = calculateProgress(wunsch.vorhandenesKapital, wunsch.betrag);
+                  const monthlyRequired = calculateMonthlyRequired(wunsch);
+                  
+                  return (
+                    <div key={wunsch.id} className="flex flex-col items-center relative">
+                      {/* Priorität Nummer */}
+                      <div className="absolute -top-6 z-20 bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                        {wunsch.prioritaet}
+                      </div>
+                      
+                      <div 
+                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
+                          activeField === wunsch.id 
+                            ? 'text-white shadow-xl' 
+                            : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg'
+                        }`}
+                        style={{
+                          backgroundColor: activeField === wunsch.id ? '#047857' : 'white',
+                          borderColor: activeField === wunsch.id ? '#047857' : '#cbd5e1'
+                        }}
+                        onClick={() => {
+                          if (activeField !== wunsch.id) {
+                            setActiveField(wunsch.id);
+                            setTempData([...data]);
+                          }
+                        }}
+                      >
+                        {/* Progress Ring */}
+                        <svg className="absolute inset-0 w-48 h-48">
+                          <circle
+                            cx="96"
+                            cy="96"
+                            r="94"
+                            fill="none"
+                            stroke="#e5e7eb"
+                            strokeWidth="4"
+                          />
+                          <circle
+                            cx="96"
+                            cy="96"
+                            r="94"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="4"
+                            strokeDasharray={`${progress * 5.9} 590`}
+                            strokeDashoffset="0"
+                            transform="rotate(-90 96 96)"
+                            className="transition-all duration-500"
+                          />
+                        </svg>
+                        <span className="text-3xl mb-2 z-10">{wunsch.icon}</span>
+                        <span className="text-base font-semibold text-center px-4 leading-tight z-10">
+                          {wunsch.bezeichnung || 'Neuer Wunsch'}
+                        </span>
+                        <span className="text-sm font-bold mt-1 z-10">
+                          {progress.toFixed(0)}%
+                        </span>
+                        {monthlyRequired > 0 && (
+                          <span className="text-xs mt-1 z-10">
+                            {monthlyRequired}€/Monat
+                          </span>
+                        )}
+                      </div>
                     </div>
+                  );
+                })}
+                
+                {/* Hinzufügen Button */}
+                <div className="flex flex-col items-center">
+                  <div 
+                    className="w-48 h-48 rounded-full border-4 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:border-gray-400 hover:bg-gray-100"
+                    onClick={addWunsch}
+                  >
+                    <span className="text-5xl text-gray-400">+</span>
+                    <span className="text-sm font-semibold text-gray-500 mt-2">Wunsch hinzufügen</span>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
@@ -2449,77 +2511,208 @@ const WuenschePage = () => {
           onClick={() => setActiveField(null)}
         >
           <div 
-            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-2xl shadow-xl mx-8"
             onClick={(e) => e.stopPropagation()}
           >
             {(() => {
-              const aktiveKategorie = wuenscheKategorien.find(k => k.id === activeField);
+              const aktuellerWunsch = tempData.find(w => w.id === activeField);
+              if (!aktuellerWunsch) return null;
+              
               return (
                 <div className="space-y-6">
                   <h3 className="text-2xl font-bold text-slate-800 text-center">
-                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                    Wunsch bearbeiten
                   </h3>
                   
                   <div className="space-y-4">
-                    {tempWuensche[activeField].map((eintrag, index) => (
-                      <div key={index} className="flex gap-3 items-center">
-                        <input 
-                          type="text"
-                          value={eintrag.bezeichnung}
-                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                          placeholder="Bezeichnung"
-                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
-                        />
-                        <input 
-                          type="number"
-                          value={eintrag.betrag}
-                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                          placeholder="0"
-                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
-                        />
-                        <span className="text-lg font-semibold">€</span>
-                        {tempWuensche[activeField].length > 1 && (
+                    {/* Icon Auswahl */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Icon auswählen</label>
+                      <div className="flex flex-wrap gap-2">
+                        {iconOptions.map(icon => (
                           <button
-                            onClick={() => removeEintrag(activeField, index)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            key={icon}
+                            onClick={() => updateWunsch(activeField, 'icon', icon)}
+                            className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-all ${
+                              aktuellerWunsch.icon === icon 
+                                ? 'bg-emerald-600 text-white' 
+                                : 'bg-gray-100 hover:bg-gray-200'
+                            }`}
                           >
-                            ✕
+                            {icon}
                           </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Bezeichnung */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Bezeichnung</label>
+                      <input 
+                        type="text"
+                        value={aktuellerWunsch.bezeichnung}
+                        onChange={(e) => updateWunsch(activeField, 'bezeichnung', e.target.value)}
+                        placeholder="z.B. Traumurlaub Malediven"
+                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    {/* Betrag und Vorhandenes Kapital */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Zielbetrag</label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="number"
+                            value={aktuellerWunsch.betrag}
+                            onChange={(e) => updateWunsch(activeField, 'betrag', e.target.value)}
+                            placeholder="0"
+                            className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none text-right"
+                          />
+                          <span className="text-lg font-semibold">€</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Vorhandenes Kapital</label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="number"
+                            value={aktuellerWunsch.vorhandenesKapital}
+                            onChange={(e) => updateWunsch(activeField, 'vorhandenesKapital', e.target.value)}
+                            placeholder="0"
+                            className="flex-1 p-3 bg-white border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none text-right"
+                          />
+                          <span className="text-lg font-semibold">€</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ziel Dropdown */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4">
+                        <label className="text-sm font-semibold text-slate-700">Ziel:</label>
+                        <select
+                          value={aktuellerWunsch.sparmodusTyp}
+                          onChange={(e) => updateWunsch(activeField, 'sparmodusTyp', e.target.value)}
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none"
+                        >
+                          <option value="datum">Datum</option>
+                          <option value="betrag">Betrag</option>
+                          {showRetirement && (
+                            <>
+                              <option value="freiheit">Finanzielle Freiheit</option>
+                              <option value="ruhestand">Ruhestand</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Conditional Input basierend auf Sparmodus */}
+                    {aktuellerWunsch.sparmodusTyp === 'datum' ? (
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Zieldatum</label>
+                        <input 
+                          type="date"
+                          value={aktuellerWunsch.zieldatum}
+                          onChange={(e) => updateWunsch(activeField, 'zieldatum', e.target.value)}
+                          className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none"
+                        />
+                        {aktuellerWunsch.zieldatum && (
+                          <p className="text-sm text-slate-600">
+                            Benötigter Sparbetrag: <span className="font-bold">{calculateMonthlyRequired(aktuellerWunsch)}€/Monat</span>
+                          </p>
                         )}
                       </div>
-                    ))}
-                    
-                    <button
-                      onClick={() => addEintrag(activeField)}
-                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <span className="text-2xl">+</span>
-                      <span className="font-semibold">Neuen Eintrag hinzufügen</span>
-                    </button>
-                  </div>
-                  
-                  <div className="border-t-2 border-slate-200 pt-4">
-                    <div className="flex justify-between items-center text-lg font-bold">
-                      <span>Gesamtsumme:</span>
-                      <span className="text-slate-700">
-                        {calculateKategorieTotal(activeField).toLocaleString()}€
-                      </span>
+                    ) : aktuellerWunsch.sparmodusTyp === 'betrag' ? (
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Monatlicher Sparbetrag</label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="number"
+                            value={aktuellerWunsch.zielbetrag}
+                            onChange={(e) => updateWunsch(activeField, 'zielbetrag', e.target.value)}
+                            placeholder="0"
+                            className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none text-right"
+                          />
+                          <span className="text-lg font-semibold">€/Monat</span>
+                        </div>
+                        {aktuellerWunsch.zielbetrag > 0 && (
+                          <p className="text-sm text-slate-600">
+                            Spardauer: <span className="font-bold">
+                              {Math.ceil((aktuellerWunsch.betrag - aktuellerWunsch.vorhandenesKapital) / aktuellerWunsch.zielbetrag)} Monate
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                    ) : aktuellerWunsch.sparmodusTyp === 'freiheit' ? (
+                      <div className="p-4 bg-emerald-50 rounded-lg">
+                        <p className="text-sm text-emerald-700">
+                          Ziel: Finanzielle Freiheit erreichen - Passives Einkommen aufbauen
+                        </p>
+                      </div>
+                    ) : aktuellerWunsch.sparmodusTyp === 'ruhestand' ? (
+                      <div className="p-4 bg-emerald-50 rounded-lg">
+                        <p className="text-sm text-emerald-700">
+                          Ziel: Ruhestand - Altersvorsorge für den wohlverdienten Lebensabend
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {/* Priorität */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Priorität (1 = höchste, 10 = niedrigste)</label>
+                      <input 
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={aktuellerWunsch.prioritaet}
+                        onChange={(e) => updateWunsch(activeField, 'prioritaet', Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                        className="w-full p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm text-slate-600">
+                        <span>Fortschritt</span>
+                        <span>{calculateProgress(aktuellerWunsch.vorhandenesKapital, aktuellerWunsch.betrag).toFixed(0)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="h-3 rounded-full transition-all duration-500 bg-emerald-500"
+                          style={{
+                            width: `${calculateProgress(aktuellerWunsch.vorhandenesKapital, aktuellerWunsch.betrag)}%`
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="flex space-x-4 justify-center">
-                    <button 
-                      onClick={handleSave}
-                      className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
+                  {/* Buttons */}
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={() => removeWunsch(activeField)}
+                      className="px-6 py-3 text-base font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                     >
-                      Speichern
+                      Löschen
                     </button>
-                    <button 
-                      onClick={handleCancel}
-                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                    >
-                      Zurück
-                    </button>
+                    
+                    <div className="flex space-x-4">
+                      <button 
+                        onClick={handleSave}
+                        className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-md hover:shadow-lg"
+                      >
+                        Speichern
+                      </button>
+                      <button 
+                        onClick={handleCancel}
+                        className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                      >
+                        Abbrechen
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -2527,13 +2720,9 @@ const WuenschePage = () => {
           </div>
         </div>
       )}
-
-      <Sidebar />
-      <NavigationButtons />
     </div>
   );
 };
-
 
 
  // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
@@ -2819,71 +3008,36 @@ const renderCurrentPage = () => {
       return <SicherheitPage />;
     case 'wuensche':
       return <WuenschePage />;
-    case 'kurzfristig':
+    case 'wuensche-kurz':
       return (
-        <SparzielPage 
-          data={kurzfristigData}
-          setData={setKurzfristigData}
-          title="Kurzfristige Anlagen"
-          subtitle="Liquidität für 1-6 Monate"
-          kategorien={[
-            { id: 'girokonto', name: 'Girokonto', icon: '💳' },
-            { id: 'tagesgeld', name: 'Tagesgeldkonto', icon: '🏦' },
-            { id: 'festgeld', name: 'Festgeld', icon: '🔒' },
-            { id: 'wertpapiere', name: 'Verzinsliche & Sichere Wertpapiere', icon: '📈' },
-            { id: 'sonstige', name: 'Sonstige', icon: '📋' }
-          ]}
-          color="#64748b"
+        <WuenschePage 
+          data={kurzfristigWuensche}
+          setData={setKurzfristigWuensche}
+          title="Kurzfristige Wünsche"
+          subtitle="Träume für die nächsten 12 Monate"
+          color="#047857"
+          showRetirement={false}
         />
       );
-    case 'mittelfristig':
+    
+    case 'wuensche-lang':
       return (
-        <SparzielPage 
-          data={mittelfristigData}
-          setData={setMittelfristigData}
-          title="Mittelfristige Anlagen"
-          subtitle="Vermögensaufbau für 6-24 Monate"
-          kategorien={[
-            { id: 'depot', name: 'Depot', icon: '📊' },
-            { id: 'crypto', name: 'Crypto', icon: '₿' },
-            { id: 'vwl', name: 'VWL', icon: '💼' },
-            { id: 'sonstige', name: 'Sonstige', icon: '📝' }
-          ]}
-          color="#94a3b8"
+        <WuenschePage 
+          data={langfristigWuensche}
+          setData={setLangfristigWuensche}
+          title="Mittel- & Langfristige Wünsche"
+          subtitle="Große Ziele für die Zukunft"
+          color="#059669"
+          showRetirement={true}
         />
       );
-    case 'langfristig':
-      return (
-        <SparzielPage 
-          data={langfristigData}
-          setData={setLangfristigData}
-          title="Langfristige Anlagen"
-          subtitle="Altersvorsorge für 2+ Jahre"
-          kategorien={[
-            { id: 'gesamtrente', name: 'Gesamt-Rente (Vor SO und ST)', icon: '🎯' },
-            { id: 'gesetzlich', name: 'Gesetzliche Rente', icon: '🏛️' },
-            { id: 'betrieblich', name: 'Betriebliche Altersvorsorge', icon: '🏢' },
-            { id: 'riester', name: 'Riesterrente', icon: '🏦' },
-            { id: 'basis', name: 'Basisrente', icon: '📄' },
-            { id: 'privat', name: 'Private Vorsorge (Schicht 3)', icon: '💰' }
-          ]}
-          color="#475569"
-        />
-      );
-    default:
-      return <OverviewPage />; // Fallback falls keine case zutrifft
-  }
-};
 
-// ... weiterer Code deiner FinanzTool Komponente ...
-
-// Am Ende der FinanzTool Komponente:
 return (
   <div>
     {renderCurrentPage()}
   </div>
 );
 
-}; // Ende der FinanzTool Komponente
+}; 
 
 export default FinanzTool; // MUSS außerhalb der Komponente sein
