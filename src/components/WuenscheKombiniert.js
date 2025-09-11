@@ -127,7 +127,9 @@ const WuenscheKombiniert = ({
       <HeaderBars />
       
       <div className="h-screen flex flex-col">
-        
+        <div className="h-1/4"></div>
+
+    
         <div className="flex-1 p-8 overflow-y-auto">
           <div className="h-full flex flex-col">
             
@@ -166,7 +168,7 @@ const WuenscheKombiniert = ({
             </div>
             
             {/* Kreise Grid */}
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-start justify-center">
               <div className="grid grid-cols-3 gap-12 max-w-4xl">
                 {sortedData.map((wunsch) => {
                   const progress = calculateProgress(wunsch.vorhandenesKapital, wunsch.betrag);
