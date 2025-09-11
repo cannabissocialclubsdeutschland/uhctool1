@@ -19,13 +19,13 @@ const FinanzTool = () => {
     ueberschuss: -100
   });
 
- // ÄNDERN Sie diese Zeile in Ihrem Hauptcode:
-const [budgetData, setBudgetData] = useState({
-  gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
-  zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
-  kapitalertraege: [{ bezeichnung: 'Dividenden', betrag: 0 }],
-  mieteinnahmen: [{ bezeichnung: 'Wohnung', betrag: 0 }],
-  individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }]
+const budgetData = {
+  gehaltNetto: [{ bezeichnung: '', betrag: 0 }],
+  zusatzeinkommen: [{ bezeichnung: '', betrag: 0 }],
+  kapitalertraege: [{ bezeichnung: '', betrag: 0 }],
+  mieteinnahmen: [{ bezeichnung: '', betrag: 0 }],
+  individuell: [{ bezeichnung: '', betrag: 0 }]
+};
 });
 
   // NEUE STATE VARIABLEN FÜR BASIS-ABSICHERUNG
@@ -1471,7 +1471,7 @@ const BasisAbsicherungPage = () => {
   );
 };
 
-// BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
+// BudgetPage - Korrigierte Version
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempBudget, setTempBudget] = useState({...budgetData});
@@ -1534,9 +1534,9 @@ const BudgetPage = () => {
     setActiveField(null);
   };
 
-  // Neue Einnahme-Kategorien
+  // KORRIGIERT: IDs stimmen jetzt mit handleSave überein
   const budgetKategorien = [
-    { id: 'gehalt', name: 'Gehalt', icon: '💼', color: '#065f46', description: 'Nettolohn und feste Bezüge' },
+    { id: 'gehaltNetto', name: 'Gehalt', icon: '💼', color: '#065f46', description: 'Nettolohn und feste Bezüge' },
     { id: 'zusatzeinkommen', name: 'Zusatzeinkommen', icon: '💰', color: '#047857', description: 'Nebenjob, Freelancing, etc.' },
     { id: 'kapitalertraege', name: 'Kapitalerträge', icon: '📈', color: '#059669', description: 'Dividenden, Zinsen, Kursgewinne' },
     { id: 'mieteinnahmen', name: 'Mieteinnahmen', icon: '🏘️', color: '#10b981', description: 'Vermietung, Immobilien' },
@@ -1666,7 +1666,8 @@ const BudgetPage = () => {
                   </p>
                   
                   <div className="space-y-4">
-                    {tempBudget[activeField]?.map((eintrag, index) => (
+                    {/* KORRIGIERT: Überprüfung ob Array existiert */}
+                    {(tempBudget[activeField] || []).map((eintrag, index) => (
                       <div key={index} className="flex gap-3 items-center">
                         <input 
                           type="text"
