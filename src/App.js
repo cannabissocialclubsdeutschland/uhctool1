@@ -25,7 +25,6 @@ const budgetData = {
   kapitalertraege: [{ bezeichnung: '', betrag: 0 }],
   mieteinnahmen: [{ bezeichnung: '', betrag: 0 }],
   individuell: [{ bezeichnung: '', betrag: 0 }]
-};
 });
 
   // NEUE STATE VARIABLEN FÜR BASIS-ABSICHERUNG
