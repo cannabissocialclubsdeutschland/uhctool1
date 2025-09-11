@@ -3010,6 +3010,7 @@ const renderCurrentPage = () => {
     case 'wuensche_kombiniert':
       return (
         <WuenscheKombiniert
+          HeaderBars={HeaderBars}
           kurzfristigData={kurzfristigWuensche}
           setKurzfristigData={setKurzfristigWuensche}
           langfristigData={langfristigWuensche}
