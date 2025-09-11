@@ -1470,202 +1470,273 @@ const BasisAbsicherungPage = () => {
   );
 };
 
-  // BudgetPage
-  const BudgetPage = () => {
-    const [activeField, setActiveField] = useState(null);
-    const [tempBudget, setTempBudget] = useState({...budgetData});
+  // BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
+const BudgetPage = () => {
+  const [activeField, setActiveField] = useState(null);
+  const [tempBudget, setTempBudget] = useState({...budgetData});
 
-    const calculateKategorieTotal = (kategorie) => {
-      return tempBudget[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
-    };
+  const calculateKategorieTotal = (kategorie) => {
+    return tempBudget[kategorie].reduce((sum, item) => sum + (parseFloat(item.betrag) || 0), 0);
+  };
 
-    const addEintrag = (kategorie) => {
-      setTempBudget(prev => ({
-        ...prev,
-        [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
-      }));
-    };
+  const addEintrag = (kategorie) => {
+    setTempBudget(prev => ({
+      ...prev,
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
+    }));
+  };
 
-    const removeEintrag = (kategorie, index) => {
-      setTempBudget(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].filter((_, i) => i !== index)
-      }));
-    };
+  const removeEintrag = (kategorie, index) => {
+    setTempBudget(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].filter((_, i) => i !== index)
+    }));
+  };
 
-    const updateEintrag = (kategorie, index, field, value) => {
-      setTempBudget(prev => ({
-        ...prev,
-        [kategorie]: prev[kategorie].map((item, i) => 
-          i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
-        )
-      }));
-    };
+  const updateEintrag = (kategorie, index, field, value) => {
+    setTempBudget(prev => ({
+      ...prev,
+      [kategorie]: prev[kategorie].map((item, i) => 
+        i === index ? { ...item, [field]: field === 'betrag' ? (parseFloat(value) || 0) : value } : item
+      )
+    }));
+  };
 
-    const handleSave = () => {
-      setBudgetData(tempBudget);
-      const newTotal = Object.keys(tempBudget).reduce((total, key) => {
-        return total + calculateKategorieTotal(key);
-      }, 0);
-      setFinanzData(prev => ({ ...prev, budget: newTotal }));
-      setActiveField(null);
-    };
+  const handleSave = () => {
+    setBudgetData(tempBudget);
+    
+    // Aktualisiere die einzelnen Werte in finanzData basierend auf den Budget-Kategorien
+    const gehaltNetto = calculateKategorieTotal('gehalt');
+    const zusatzeinkommen = calculateKategorieTotal('zusatzeinkommen');
+    const kapitalertraege = calculateKategorieTotal('kapitalertraege');
+    const mieteinnahmen = calculateKategorieTotal('mieteinnahmen');
+    const individuell = calculateKategorieTotal('individuell');
+    
+    // Gesamtbudget berechnen
+    const newBudgetTotal = gehaltNetto + zusatzeinkommen + kapitalertraege + mieteinnahmen + individuell;
+    
+    setFinanzData(prev => ({
+      ...prev,
+      gehaltNetto: gehaltNetto,
+      zusatzeinkommen: zusatzeinkommen,
+      kapitalertraege: kapitalertraege,
+      mieteinnahmen: mieteinnahmen,
+      individuell: individuell,
+      budgetTotal: newBudgetTotal
+    }));
+    
+    setActiveField(null);
+  };
 
-    const handleCancel = () => {
-      setTempBudget({...budgetData});
-      setActiveField(null);
-    };
+  const handleCancel = () => {
+    setTempBudget({...budgetData});
+    setActiveField(null);
+  };
 
-    const budgetKategorien = [
-      { id: 'einnahmen', name: 'Einnahmen', icon: '💶' },
-      { id: 'ausgaben', name: 'Ausgaben', icon: '💸' },
-      { id: 'investitionen', name: 'Investitionen', icon: '📈' },
-      { id: 'ruecklagen', name: 'Rücklagen', icon: '🏦' }
-    ];
+  // Neue Einnahme-Kategorien
+  const budgetKategorien = [
+    { id: 'gehalt', name: 'Gehalt', icon: '💼', color: '#065f46', description: 'Nettolohn und feste Bezüge' },
+    { id: 'zusatzeinkommen', name: 'Zusatzeinkommen', icon: '💰', color: '#047857', description: 'Nebenjob, Freelancing, etc.' },
+    { id: 'kapitalertraege', name: 'Kapitalerträge', icon: '📈', color: '#059669', description: 'Dividenden, Zinsen, Kursgewinne' },
+    { id: 'mieteinnahmen', name: 'Mieteinnahmen', icon: '🏘️', color: '#10b981', description: 'Vermietung, Immobilien' },
+    { id: 'individuell', name: 'Individuell', icon: '⭐', color: '#34d399', description: 'Sonstige Einnahmen' }
+  ];
 
-    return (
-      <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
-        <HeaderBars />
+  // Gesamtbudget berechnen
+  const calculateTotalBudget = () => {
+    return budgetKategorien.reduce((total, kategorie) => {
+      return total + calculateKategorieTotal(kategorie.id);
+    }, 0);
+  };
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
+      <div className="h-screen flex flex-col">
+        <div className="h-1/4"></div>
         
-        <div className="h-screen flex flex-col">
-          <div className="h-1/4"></div>
-          
-          <div className="flex-1 p-8 overflow-y-auto">
-            <div className="h-full flex flex-col">
-              
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-slate-800 mb-2">💰 Budget</h1>
-                <p className="text-lg text-slate-600 mt-2">Erfassen Sie Ihr monatliches Budget</p>
-                <p className="text-lg text-slate-600">Gesamtsumme: {finanzData.budget?.toLocaleString() || 0}€</p>
-              </div>
-              
-              <div className="flex-shrink-0 flex justify-center items-center py-8">
-                <div className="flex space-x-16">
-                  {budgetKategorien.map((kategorie) => (
-                    <div key={kategorie.id} className="flex flex-col items-center">
-                      <div 
-                        className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          activeField === kategorie.id 
-                            ? 'text-white shadow-xl' 
-                            : 'bg-white text-slate-700 hover:border-blue-400 shadow-lg'
-                        }`}
-                        style={{
-                          backgroundColor: activeField === kategorie.id ? '#065f46' : 'white',
-                          borderColor: activeField === kategorie.id ? '#065f46' : '#cbd5e1'
-                        }}
-                        onClick={() => {
-                          if (activeField !== kategorie.id) {
-                            setActiveField(kategorie.id);
-                            setTempBudget({...budgetData});
-                          }
-                        }}
-                      >
-                        <span className="text-3xl mb-2">{kategorie.icon}</span>
-                        <span className="text-lg font-semibold text-center px-4 leading-tight">
-                          {kategorie.name}
-                        </span>
-                        <span className="text-2xl font-bold mt-2">
-                          {calculateKategorieTotal(kategorie.id).toLocaleString()}€
-                        </span>
-                      </div>
+        <div className="flex-1 p-8 overflow-y-auto">
+          <div className="h-full flex flex-col">
+            
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">💰 Budget - Einnahmen</h1>
+              <p className="text-lg text-slate-600 mt-2">Erfassen Sie Ihre monatlichen Einnahmen</p>
+              <p className="text-2xl font-bold text-emerald-700 mt-4">
+                Gesamteinnahmen: {calculateTotalBudget().toLocaleString()}€
+              </p>
+            </div>
+            
+            <div className="flex-shrink-0 flex justify-center items-center py-4">
+              <div className="grid grid-cols-3 gap-8 max-w-6xl">
+                {/* Erste Reihe: 3 Kacheln */}
+                {budgetKategorien.slice(0, 3).map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-40 h-40 rounded-2xl border-3 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl border-white' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg border-slate-200'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempBudget({...budgetData});
+                        }
+                      }}
+                    >
+                      <span className="text-2xl mb-2">{kategorie.icon}</span>
+                      <span className="text-sm font-semibold text-center px-2 leading-tight mb-1">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-lg font-bold">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-xs text-slate-500 text-center mt-2 max-w-32">
+                      {kategorie.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Zweite Reihe: 2 Kacheln zentriert */}
+            <div className="flex justify-center items-center pb-8">
+              <div className="flex gap-8">
+                {budgetKategorien.slice(3, 5).map((kategorie) => (
+                  <div key={kategorie.id} className="flex flex-col items-center">
+                    <div 
+                      className={`w-40 h-40 rounded-2xl border-3 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                        activeField === kategorie.id 
+                          ? 'text-white shadow-2xl border-white' 
+                          : 'bg-white text-slate-700 hover:border-emerald-400 shadow-lg border-slate-200'
+                      }`}
+                      style={{
+                        backgroundColor: activeField === kategorie.id ? kategorie.color : 'white'
+                      }}
+                      onClick={() => {
+                        if (activeField !== kategorie.id) {
+                          setActiveField(kategorie.id);
+                          setTempBudget({...budgetData});
+                        }
+                      }}
+                    >
+                      <span className="text-2xl mb-2">{kategorie.icon}</span>
+                      <span className="text-sm font-semibold text-center px-2 leading-tight mb-1">
+                        {kategorie.name}
+                      </span>
+                      <span className="text-lg font-bold">
+                        {calculateKategorieTotal(kategorie.id).toLocaleString()}€
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 text-center mt-2 max-w-32">
+                      {kategorie.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {activeField && (
+      {activeField && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setActiveField(null)}
+        >
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setActiveField(null)}
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div 
-              className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-3xl shadow-xl mx-8 max-h-[500px] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
-                return (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-slate-800 text-center">
-                      {aktiveKategorie.icon} {aktiveKategorie.name}
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {tempBudget[activeField].map((eintrag, index) => (
-                        <div key={index} className="flex gap-3 items-center">
-                          <input 
-                            type="text"
-                            value={eintrag.bezeichnung}
-                            onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
-                            placeholder="Bezeichnung"
-                            className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none"
-                          />
-                          <input 
-                            type="number"
-                            value={eintrag.betrag}
-                            onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
-                            placeholder="0"
-                            className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-right"
-                          />
-                          <span className="text-lg font-semibold">€</span>
-                          {tempBudget[activeField].length > 1 && (
-                            <button
-                              onClick={() => removeEintrag(activeField, index)}
-                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      
-                      <button
-                        onClick={() => addEintrag(activeField)}
-                        className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <span className="text-2xl">+</span>
-                        <span className="font-semibold">Neuen Eintrag hinzufügen</span>
-                      </button>
-                    </div>
-                    
-                    <div className="border-t-2 border-slate-200 pt-4">
-                      <div className="flex justify-between items-center text-lg font-bold">
-                        <span>Gesamtsumme:</span>
-                        <span className="text-slate-700">
-                          {calculateKategorieTotal(activeField).toLocaleString()}€
-                        </span>
+            {(() => {
+              const aktiveKategorie = budgetKategorien.find(k => k.id === activeField);
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-slate-800 text-center">
+                    {aktiveKategorie.icon} {aktiveKategorie.name}
+                  </h3>
+                  <p className="text-sm text-slate-600 text-center">
+                    {aktiveKategorie.description}
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {tempBudget[activeField]?.map((eintrag, index) => (
+                      <div key={index} className="flex gap-3 items-center">
+                        <input 
+                          type="text"
+                          value={eintrag.bezeichnung}
+                          onChange={(e) => updateEintrag(activeField, index, 'bezeichnung', e.target.value)}
+                          placeholder="Bezeichnung eingeben..."
+                          className="flex-1 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none"
+                        />
+                        <input 
+                          type="number"
+                          value={eintrag.betrag}
+                          onChange={(e) => updateEintrag(activeField, index, 'betrag', e.target.value)}
+                          placeholder="0"
+                          className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none text-right"
+                        />
+                        <span className="text-lg font-semibold text-emerald-700">€</span>
+                        {tempBudget[activeField]?.length > 1 && (
+                          <button
+                            onClick={() => removeEintrag(activeField, index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
-                    </div>
+                    ))}
                     
-                    <div className="flex space-x-4 justify-center">
-                      <button 
-                        onClick={handleSave}
-                        className="px-8 py-3 text-base font-semibold text-white bg-slate-500 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-slate-600"
-                      >
-                        Speichern
-                      </button>
-                      <button 
-                        onClick={handleCancel}
-                        className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
-                      >
-                        Zurück
-                      </button>
+                    <button
+                      onClick={() => addEintrag(activeField)}
+                      className="w-full p-3 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2 text-emerald-700"
+                    >
+                      <span className="text-2xl">+</span>
+                      <span className="font-semibold">Neuen Eintrag hinzufügen</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t-2 border-slate-200 pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Gesamtsumme {aktiveKategorie.name}:</span>
+                      <span className="text-emerald-700 text-xl">
+                        {calculateKategorieTotal(activeField).toLocaleString()}€
+                      </span>
                     </div>
                   </div>
-                );
-              })()}
-            </div>
+                  
+                  <div className="flex space-x-4 justify-center">
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-3 text-base font-semibold text-white bg-emerald-600 rounded-xl transition-colors shadow-md hover:shadow-lg hover:bg-emerald-700"
+                    >
+                      Speichern
+                    </button>
+                    <button 
+                      onClick={handleCancel}
+                      className="px-8 py-3 text-base font-semibold bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-xl transition-colors shadow-md"
+                    >
+                      Abbrechen
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
-        )}
+        </div>
+      )}
 
-        <Sidebar />
-        <NavigationButtons />
-      </div>
-    );
-  };
+      <Sidebar />
+      <NavigationButtons />
+    </div>
+  );
+};
 
  // FIXKOSTEN PAGE - Pop-Up Modal Version
 const FixkostenPage = () => {
