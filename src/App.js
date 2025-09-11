@@ -1471,7 +1471,7 @@ const BasisAbsicherungPage = () => {
   );
 };
 
- // BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
+// BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempBudget, setTempBudget] = useState({...budgetData});
