@@ -19,13 +19,14 @@ const FinanzTool = () => {
     ueberschuss: -100
   });
 
-  // NEUE STATE VARIABLEN FÜR BUDGET
-  const [budgetData, setBudgetData] = useState({
-    einnahmen: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
-    ausgaben: [{ bezeichnung: 'Fixkosten', betrag: 1830 }],
-    investitionen: [{ bezeichnung: 'Aktien', betrag: 200 }],
-    ruecklagen: [{ bezeichnung: 'Notgroschen', betrag: 300 }]
-  });
+ // ÄNDERN Sie diese Zeile in Ihrem Hauptcode:
+const [budgetData, setBudgetData] = useState({
+  gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
+  zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
+  kapitalertraege: [{ bezeichnung: 'Dividenden', betrag: 0 }],
+  mieteinnahmen: [{ bezeichnung: 'Wohnung', betrag: 0 }],
+  individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }]
+});
 
   // NEUE STATE VARIABLEN FÜR BASIS-ABSICHERUNG
   const [basisData, setBasisData] = useState({
