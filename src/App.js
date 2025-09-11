@@ -2371,11 +2371,17 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
       prioritaet: 5,
       icon: '🎯'
     };
-    setTempData([...tempData, neuerWunsch]);
+    const newData = [...tempData, neuerWunsch];
+    setTempData(newData);
+    setData(newData); // Direkt speichern
+    setActiveField(neuerWunsch.id); // Öffne direkt das Bearbeitungsmenü
   };
 
   const removeWunsch = (id) => {
-    setTempData(tempData.filter(w => w.id !== id));
+    const newData = tempData.filter(w => w.id !== id);
+    setTempData(newData);
+    setData(newData);
+    setActiveField(null);
   };
 
   const updateWunsch = (id, field, value) => {
@@ -2428,10 +2434,12 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
                   
                   return (
                     <div key={wunsch.id} className="flex flex-col items-center relative">
-                      {/* Priorität Nummer */}
-                      <div className="absolute -top-6 z-20 bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
-                        {wunsch.prioritaet}
-                      </div>
+                      {/* Priorität Nummer - nur anzeigen wenn Wunsch ausgefüllt ist */}
+                      {wunsch.bezeichnung && (
+                        <div className="absolute -top-6 z-20 bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                          {wunsch.prioritaet}
+                        </div>
+                      )}
                       
                       <div 
                         className={`w-48 h-48 rounded-full border-4 flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 relative ${
@@ -2444,10 +2452,8 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
                           borderColor: activeField === wunsch.id ? '#047857' : '#cbd5e1'
                         }}
                         onClick={() => {
-                          if (activeField !== wunsch.id) {
-                            setActiveField(wunsch.id);
-                            setTempData([...data]);
-                          }
+                          setActiveField(wunsch.id);
+                          setTempData([...data]);
                         }}
                       >
                         {/* Progress Ring */}
@@ -3011,15 +3017,34 @@ const renderCurrentPage = () => {
       return <SicherheitPage />;
    case 'wuensche':
   return (
-    <WuenschePage 
-      data={kurzfristigWuensche}
-      setData={setKurzfristigWuensche}
-      title="Kurzfristige Wünsche"
-      subtitle="Träume für die nächsten 12 Monate"
-      color="#047857"
-      showRetirement={false}
-    />
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 flex items-center justify-center">
+      <HeaderBars />
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-slate-800 mb-8">Wünsche & Träume</h1>
+        <div className="flex gap-8 justify-center">
+          <button
+            onClick={() => setCurrentPage('wuensche-kurz')}
+            className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            <span className="text-6xl mb-4 block">🎯</span>
+            <h2 className="text-xl font-bold text-slate-800">Kurzfristige Wünsche</h2>
+            <p className="text-slate-600">Bis 12 Monate</p>
+          </button>
+          <button
+            onClick={() => setCurrentPage('wuensche-lang')}
+            className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            <span className="text-6xl mb-4 block">🏔️</span>
+            <h2 className="text-xl font-bold text-slate-800">Mittel- & Langfristige Wünsche</h2>
+            <p className="text-slate-600">Über 12 Monate</p>
+          </button>
+        </div>
+      </div>
+      <Sidebar />
+      <NavigationButtons />
+    </div>
   );
+      
     case 'kurzfristig':
       return (
         <SparzielPage 
