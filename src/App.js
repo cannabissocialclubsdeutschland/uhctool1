@@ -54,8 +54,8 @@ const [budgetData, setBudgetData] = useState({
     freizeit: [{ bezeichnung: 'Kino', betrag: 0 }],
     ausgehen: [{ bezeichnung: 'Essen gehen', betrag: 0 }],
     shopping: [{ bezeichnung: 'Kleidung', betrag: 0 }],
-    urlaub: [{ bezeichnung: 'Fitness', betrag: 0 }],
-    individuell: [{ bezeichnung: 'Sport', betrag: 0 }]
+    urlaub: [{ bezeichnung: 'Karibik', betrag: 0 }],
+    individuell: [{ bezeichnung: 'Hobby', betrag: 0 }]
   });
 
   // Sicherheit Daten
@@ -1988,10 +1988,10 @@ const LifestylePage = () => {
 
   const lifestyleKategorien = [
     { id: 'freizeit', name: 'Freizeit', icon: '🎭' },
-    { id: 'restaurant', name: 'Restaurant', icon: '🍽️' },
+    { id: 'ausgehen', name: 'Ausgehen', icon: '🍽️' },
     { id: 'shopping', name: 'Shopping', icon: '🛍️' },
-    { id: 'wellness', name: 'Wellness', icon: '💆' },
-    { id: 'hobbies', name: 'Hobbies', icon: '🎨' }
+    { id: 'urlaub', name: 'Urlaub', icon: '💆' },
+    { id: 'individuell', name: 'Individuell', icon: '🎨' }
   ];
 
   return (
