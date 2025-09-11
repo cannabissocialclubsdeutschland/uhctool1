@@ -1790,7 +1790,7 @@ const FixkostenPage = () => {
     { id: 'lebensmittel', name: 'Lebensmittel', icon: '🛒' },
     { id: 'abos', name: 'Abos', icon: '📱' },
     { id: 'mobilitaet', name: 'Mobilität', icon: '🚗' },
-    { id: 'sonstiges', name: 'Sonstiges', icon: '📋' }
+    { id: 'sonstiges', name: 'Individuell', icon: '📋' }
   ];
 
   return (
