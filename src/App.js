@@ -2799,80 +2799,91 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
     </div>
   );
 };
-  // Render je nach aktueller Seite
-  const renderCurrentPage = () => {
-    switch(currentPage) {
-      case 'overview':
-        return <OverviewPage />;
-      case 'budget':
-        return <BudgetPage />;
-      case 'basisabsicherung':
-        return <BasisAbsicherungPage />;
-      case 'zigaretten':
-        return <ZigarettenPage />;
-      case 'fixkosten':
-        return <FixkostenPage />;
-      case 'lifestyle':
-        return <LifestylePage />;
-      case 'sicherheit':
-        return <SicherheitPage />;
-      case 'wuensche':
-        return <WuenschePage />;
-      case 'kurzfristig':
-  return (
-    <SparzielPage 
-      data={kurzfristigData}
-      setData={setKurzfristigData}
-      title="Kurzfristige Anlagen"
-      subtitle="Liquidität für 1-6 Monate"
-      kategorien={[
-        { id: 'girokonto', name: 'Girokonto', icon: '💳' },
-        { id: 'tagesgeld', name: 'Tagesgeldkonto', icon: '🏦' },
-        { id: 'festgeld', name: 'Festgeld', icon: '🔒' },
-        { id: 'wertpapiere', name: 'Verzinsliche & Sichere Wertpapiere', icon: '📈' },
-        { id: 'sonstige', name: 'Sonstige', icon: '📋' }
-      ]}
-      color="#64748b"
-    />
-  );
 
-case 'mittelfristig':
-  return (
-    <SparzielPage 
-      data={mittelfristigData}
-      setData={setMittelfristigData}
-      title="Mittelfristige Anlagen"
-      subtitle="Vermögensaufbau für 6-24 Monate"
-      kategorien={[
-        { id: 'depot', name: 'Depot', icon: '📊' },
-        { id: 'crypto', name: 'Crypto', icon: '₿' },
-        { id: 'vwl', name: 'VWL', icon: '💼' },
-        { id: 'sonstige', name: 'Sonstige', icon: '📝' }
-      ]}
-      color="#94a3b8"
-    />
-  );
-
-case 'langfristig':
-  return (
-    <SparzielPage 
-      data={langfristigData}
-      setData={setLangfristigData}
-      title="Langfristige Anlagen"
-      subtitle="Altersvorsorge für 2+ Jahre"
-      kategorien={[
-        { id: 'gesamtrente', name: 'Gesamt-Rente (Vor SO und ST)', icon: '🎯' },
-        { id: 'gesetzlich', name: 'Gesetzliche Rente', icon: '🏛️' },
-        { id: 'betrieblich', name: 'Betriebliche Altersvorsorge', icon: '🏢' },
-        { id: 'riester', name: 'Riesterrente', icon: '🏦' },
-        { id: 'basis', name: 'Basisrente', icon: '📄' },
-        { id: 'privat', name: 'Private Vorsorge (Schicht 3)', icon: '💰' }
-      ]}
-      color="#475569"
-    />
-  );
-
-  return renderCurrentPage();
+// Render je nach aktueller Seite
+const renderCurrentPage = () => {
+  switch(currentPage) {
+    case 'overview':
+      return <OverviewPage />;
+    case 'budget':
+      return <BudgetPage />;
+    case 'basisabsicherung':
+      return <BasisAbsicherungPage />;
+    case 'zigaretten':
+      return <ZigarettenPage />;
+    case 'fixkosten':
+      return <FixkostenPage />;
+    case 'lifestyle':
+      return <LifestylePage />;
+    case 'sicherheit':
+      return <SicherheitPage />;
+    case 'wuensche':
+      return <WuenschePage />;
+    case 'kurzfristig':
+      return (
+        <SparzielPage 
+          data={kurzfristigData}
+          setData={setKurzfristigData}
+          title="Kurzfristige Anlagen"
+          subtitle="Liquidität für 1-6 Monate"
+          kategorien={[
+            { id: 'girokonto', name: 'Girokonto', icon: '💳' },
+            { id: 'tagesgeld', name: 'Tagesgeldkonto', icon: '🏦' },
+            { id: 'festgeld', name: 'Festgeld', icon: '🔒' },
+            { id: 'wertpapiere', name: 'Verzinsliche & Sichere Wertpapiere', icon: '📈' },
+            { id: 'sonstige', name: 'Sonstige', icon: '📋' }
+          ]}
+          color="#64748b"
+        />
+      );
+    case 'mittelfristig':
+      return (
+        <SparzielPage 
+          data={mittelfristigData}
+          setData={setMittelfristigData}
+          title="Mittelfristige Anlagen"
+          subtitle="Vermögensaufbau für 6-24 Monate"
+          kategorien={[
+            { id: 'depot', name: 'Depot', icon: '📊' },
+            { id: 'crypto', name: 'Crypto', icon: '₿' },
+            { id: 'vwl', name: 'VWL', icon: '💼' },
+            { id: 'sonstige', name: 'Sonstige', icon: '📝' }
+          ]}
+          color="#94a3b8"
+        />
+      );
+    case 'langfristig':
+      return (
+        <SparzielPage 
+          data={langfristigData}
+          setData={setLangfristigData}
+          title="Langfristige Anlagen"
+          subtitle="Altersvorsorge für 2+ Jahre"
+          kategorien={[
+            { id: 'gesamtrente', name: 'Gesamt-Rente (Vor SO und ST)', icon: '🎯' },
+            { id: 'gesetzlich', name: 'Gesetzliche Rente', icon: '🏛️' },
+            { id: 'betrieblich', name: 'Betriebliche Altersvorsorge', icon: '🏢' },
+            { id: 'riester', name: 'Riesterrente', icon: '🏦' },
+            { id: 'basis', name: 'Basisrente', icon: '📄' },
+            { id: 'privat', name: 'Private Vorsorge (Schicht 3)', icon: '💰' }
+          ]}
+          color="#475569"
+        />
+      );
+    default:
+      return <OverviewPage />; // Fallback falls keine case zutrifft
+  }
 };
 
-export default FinanzTool;
+// ... weiterer Code deiner FinanzTool Komponente ...
+
+// Am Ende der FinanzTool Komponente:
+return (
+  <div>
+    {renderCurrentPage()}
+  </div>
+);
+
+}; // Ende der FinanzTool Komponente
+
+export default FinanzTool; // MUSS außerhalb der Komponente sein
