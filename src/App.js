@@ -3017,8 +3017,6 @@ const renderCurrentPage = () => {
       return <SicherheitPage />;
     case 'wuensche':
       return <WuenschePage />;
-        );
-      
     case 'kurzfristig':
       return (
         <SparzielPage 
