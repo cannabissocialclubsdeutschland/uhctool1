@@ -19,12 +19,12 @@ const FinanzTool = () => {
     ueberschuss: -100
   });
 
-const budgetData = {
-  gehaltNetto: [{ bezeichnung: '', betrag: 0 }],
-  zusatzeinkommen: [{ bezeichnung: '', betrag: 0 }],
-  kapitalertraege: [{ bezeichnung: '', betrag: 0 }],
-  mieteinnahmen: [{ bezeichnung: '', betrag: 0 }],
-  individuell: [{ bezeichnung: '', betrag: 0 }]
+const [budgetData, setBudgetData] = useState({
+  gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
+  zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
+  kapitalertraege: [{ bezeichnung: 'Dividenden', betrag: 0 }],
+  mieteinnahmen: [{ bezeichnung: 'Wohnung', betrag: 0 }],
+  individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }],  // ✅ Komma ist OK
 });
 
   // NEUE STATE VARIABLEN FÜR BASIS-ABSICHERUNG
