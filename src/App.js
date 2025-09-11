@@ -3012,12 +3012,12 @@ const renderCurrentPage = () => {
         <WuenscheKombiniert
           HeaderBars={HeaderBars}
           Sidebar={Sidebar}
+          NavigationButtons={NavigationButtons}
           kurzfristigData={kurzfristigWuensche}
           setKurzfristigData={setKurzfristigWuensche}
           langfristigData={langfristigWuensche}
           setLangfristigData={setLangfristigWuensche}
         />
-
       );
 
     case 'kurzfristig':
