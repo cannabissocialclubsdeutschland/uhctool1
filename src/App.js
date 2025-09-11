@@ -1162,7 +1162,7 @@ const ZigarettenPage = () => {
         <div className="flex h-full gap-4 p-4">
           {[
             { 
-              id: 'wuensche', 
+              id: 'wuensche_kurz ', 
               name: 'Wünsche & Ziele', 
               color: '#004225',
               description: ['Persönliche Träume', '& Lebensziele', 'verwirklichen']
