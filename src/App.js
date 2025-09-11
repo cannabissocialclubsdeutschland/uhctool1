@@ -275,7 +275,7 @@ const [langfristigData, setLangfristigData] = useState({
   };
 
   // Seitenreihenfolge für Navigation
-  const pageOrder = ['overview', 'basisabsicherung', 'zigaretten', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche_kurz', 'kurzfristig', 'mittelfristig', 'langfristig'];
+  const pageOrder = ['overview', 'basisabsicherung', 'zigaretten', 'budget', 'fixkosten', 'lifestyle', 'sicherheit', 'wuensche_kombiniert', 'kurzfristig', 'mittelfristig', 'langfristig'];
   
   const getNextPage = () => {
     const currentIndex = pageOrder.indexOf(currentPage);
@@ -1163,7 +1163,7 @@ const ZigarettenPage = () => {
         <div className="flex h-full gap-4 p-4">
           {[
             { 
-              id: 'wuensche_kurz', 
+              id: 'wuensche_kombiniert', 
               name: 'Wünsche & Ziele', 
               color: '#004225',
               description: ['Persönliche Träume', '& Lebensziele', 'verwirklichen']
