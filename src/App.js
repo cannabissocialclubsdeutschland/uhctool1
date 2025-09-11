@@ -3015,35 +3015,9 @@ const renderCurrentPage = () => {
       return <LifestylePage />;
     case 'sicherheit':
       return <SicherheitPage />;
-   case 'wuensche':
-  return (
-    <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 flex items-center justify-center">
-      <HeaderBars />
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-slate-800 mb-8">Wünsche & Träume</h1>
-        <div className="flex gap-8 justify-center">
-          <button
-            onClick={() => setCurrentPage('wuensche-kurz')}
-            className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            <span className="text-6xl mb-4 block">🎯</span>
-            <h2 className="text-xl font-bold text-slate-800">Kurzfristige Wünsche</h2>
-            <p className="text-slate-600">Bis 12 Monate</p>
-          </button>
-          <button
-            onClick={() => setCurrentPage('wuensche-lang')}
-            className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            <span className="text-6xl mb-4 block">🏔️</span>
-            <h2 className="text-xl font-bold text-slate-800">Mittel- & Langfristige Wünsche</h2>
-            <p className="text-slate-600">Über 12 Monate</p>
-          </button>
-        </div>
-      </div>
-      <Sidebar />
-      <NavigationButtons />
-    </div>
-  );
+    case 'wuensche':
+      return <WuenschePage />;
+        );
       
     case 'kurzfristig':
       return (
