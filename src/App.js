@@ -1471,7 +1471,7 @@ const BasisAbsicherungPage = () => {
   );
 };
 
-  // BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
+ // BudgetPage - Aktualisiert mit 5 Einnahme-Kacheln
 const BudgetPage = () => {
   const [activeField, setActiveField] = useState(null);
   const [tempBudget, setTempBudget] = useState({...budgetData});
@@ -1507,7 +1507,7 @@ const BudgetPage = () => {
     setBudgetData(tempBudget);
     
     // Aktualisiere die einzelnen Werte in finanzData basierend auf den Budget-Kategorien
-    const gehaltNetto = calculateKategorieTotal('gehalt');
+    const gehaltNetto = calculateKategorieTotal('gehaltNetto');
     const zusatzeinkommen = calculateKategorieTotal('zusatzeinkommen');
     const kapitalertraege = calculateKategorieTotal('kapitalertraege');
     const mieteinnahmen = calculateKategorieTotal('mieteinnahmen');
@@ -1683,7 +1683,7 @@ const BudgetPage = () => {
                           className="w-32 p-3 bg-white border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none text-right"
                         />
                         <span className="text-lg font-semibold text-emerald-700">€</span>
-                        {tempBudget[activeField]?.length > 1 && (
+                        {(tempBudget[activeField] || []).length > 1 && (
                           <button
                             onClick={() => removeEintrag(activeField, index)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
