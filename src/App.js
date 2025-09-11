@@ -2405,6 +2405,8 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
 
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 to-slate-100 font-sans">
+      <HeaderBars />
+      
       <div className="h-screen flex flex-col">
         <div className="h-1/4"></div>
         
@@ -2511,7 +2513,7 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
           onClick={() => setActiveField(null)}
         >
           <div 
-            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-2xl shadow-xl mx-8"
+            className="bg-white/90 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-8 w-full max-w-2xl shadow-xl mx-8 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {(() => {
@@ -2720,10 +2722,12 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
           </div>
         </div>
       )}
+
+      <Sidebar />
+      <NavigationButtons />
     </div>
   );
 };
-
 
  // Generische Sparziel-Page-Komponente für kurz-, mittel- und langfristige Anschaffungen
 // Jetzt mit Pop-Up Modal Layout wie bei Fixkosten
