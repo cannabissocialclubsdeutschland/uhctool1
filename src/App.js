@@ -51,56 +51,56 @@ const [budgetData, setBudgetData] = useState({
 
   // Lifestyle Daten
   const [lifestyleData, setLifestyleData] = useState({
-    freizeit: [{ bezeichnung: 'Kino', betrag: 30 }],
-    restaurant: [{ bezeichnung: 'Essen gehen', betrag: 150 }],
-    shopping: [{ bezeichnung: 'Kleidung', betrag: 100 }],
-    wellness: [{ bezeichnung: 'Fitness', betrag: 40 }],
-    hobbies: [{ bezeichnung: 'Sport', betrag: 50 }]
+    freizeit: [{ bezeichnung: 'Kino', betrag: 0 }],
+    ausgehen: [{ bezeichnung: 'Essen gehen', betrag: 0 }],
+    shopping: [{ bezeichnung: 'Kleidung', betrag: 0 }],
+    urlaub: [{ bezeichnung: 'Fitness', betrag: 0 }],
+    individuell: [{ bezeichnung: 'Sport', betrag: 0 }]
   });
 
   // Sicherheit Daten
   const [sicherheitData, setSicherheitData] = useState({
-    notgroschen: [{ bezeichnung: 'Rücklage', betrag: 500 }],
-    versicherungen: [{ bezeichnung: 'Haftpflicht', betrag: 30 }],
-    altersvorsorge: [{ bezeichnung: 'Private Rente', betrag: 200 }],
-    gesundheit: [{ bezeichnung: 'Zusatzversicherung', betrag: 50 }],
-    sparen: [{ bezeichnung: 'Sparkonto', betrag: 390 }]
+    notgroschen: [{ bezeichnung: 'Rücklage', betrag: 0 }],
+    versicherungen: [{ bezeichnung: 'Haftpflicht', betrag: 0 }],
+    altersvorsorge: [{ bezeichnung: 'Private Rente', betrag: 0 }],
+    gesundheit: [{ bezeichnung: 'Zusatzversicherung', betrag: 0 }],
+    sparen: [{ bezeichnung: 'Sparkonto', betrag: 0 }]
   });
 
   // Wünsche & Ziele Daten
   const [wuenscheData, setWuenscheData] = useState({
-    traumurlaub: [{ bezeichnung: 'Weltreise', betrag: 15000, erreicht: 3000 }],
-    luxus: [{ bezeichnung: 'Designeruhr', betrag: 5000, erreicht: 500 }],
-    erlebnisse: [{ bezeichnung: 'Fallschirmsprung', betrag: 500, erreicht: 200 }],
-    weiterbildung: [{ bezeichnung: 'MBA Studium', betrag: 30000, erreicht: 5000 }],
-    geschenke: [{ bezeichnung: 'Hochzeitsgeschenk', betrag: 1000, erreicht: 100 }]
+    traumurlaub: [{ bezeichnung: 'Weltreise', betrag: 0 }],
+    luxus: [{ bezeichnung: 'Designeruhr', betrag: 0, 0: 0 }],
+    erlebnisse: [{ bezeichnung: 'Fallschirmsprung', betrag: 0 }],
+    weiterbildung: [{ bezeichnung: 'MBA Studium', betrag: 0 }],
+    geschenke: [{ bezeichnung: 'Hochzeitsgeschenk', betrag: 0 }]
   });
 
   // Kurzfristige Anschaffungen
   const [kurzfristigData, setKurzfristigData] = useState({
-    elektronik: [{ bezeichnung: 'Neues Smartphone', betrag: 800, erreicht: 400 }],
-    haushalt: [{ bezeichnung: 'Staubsauger', betrag: 300, erreicht: 150 }],
-    kleidung: [{ bezeichnung: 'Winterjacke', betrag: 200, erreicht: 100 }],
-    reparaturen: [{ bezeichnung: 'Fahrrad-Service', betrag: 150, erreicht: 50 }],
-    gesundheit: [{ bezeichnung: 'Neue Brille', betrag: 400, erreicht: 200 }]
+    elektronik: [{ bezeichnung: 'Neues Smartphone', betrag: 0 }],
+    haushalt: [{ bezeichnung: 'Staubsauger', betrag: 0 }],
+    kleidung: [{ bezeichnung: 'Winterjacke', betrag: 0 }],
+    reparaturen: [{ bezeichnung: 'Fahrrad-Service', betrag: 0 }],
+    gesundheit: [{ bezeichnung: 'Neue Brille', betrag: 0 }]
   });
 
   // Mittelfristige Anschaffungen
   const [mittelfristigData, setMittelfristigData] = useState({
-    moebel: [{ bezeichnung: 'Neue Couch', betrag: 2000, erreicht: 500 }],
-    technik: [{ bezeichnung: 'Gaming PC', betrag: 1500, erreicht: 300 }],
-    urlaub: [{ bezeichnung: 'Sommerurlaub 2025', betrag: 3000, erreicht: 1000 }],
-    auto: [{ bezeichnung: 'Autoreparatur', betrag: 2500, erreicht: 800 }],
-    renovation: [{ bezeichnung: 'Bad renovieren', betrag: 5000, erreicht: 1000 }]
+    moebel: [{ bezeichnung: 'Neue Couch', betrag: 0 }],
+    technik: [{ bezeichnung: 'Gaming PC', betrag: 0 }],
+    urlaub: [{ bezeichnung: 'Sommerurlaub 2025', betrag: 0 }],
+    auto: [{ bezeichnung: 'Autoreparatur', betrag: 0 }],
+    renovation: [{ bezeichnung: 'Bad renovieren', betrag: 0 }]
   });
 
   // Langfristige Anschaffungen
   const [langfristigData, setLangfristigData] = useState({
-    immobilie: [{ bezeichnung: 'Eigenheim-Anzahlung', betrag: 50000, erreicht: 10000 }],
-    fahrzeug: [{ bezeichnung: 'Neues Auto', betrag: 25000, erreicht: 5000 }],
-    bildung: [{ bezeichnung: 'Kinder-Studium', betrag: 40000, erreicht: 8000 }],
-    altersvorsorge: [{ bezeichnung: 'Private Zusatzrente', betrag: 100000, erreicht: 15000 }],
-    unternehmen: [{ bezeichnung: 'Geschäftsgründung', betrag: 30000, erreicht: 3000 }]
+    immobilie: [{ bezeichnung: 'Eigenheim-Anzahlung', betrag: 0 }],
+    fahrzeug: [{ bezeichnung: 'Neues Auto', betrag: 0 }],
+    bildung: [{ bezeichnung: 'Kinder-Studium', betrag: 0 }],
+    altersvorsorge: [{ bezeichnung: 'Private Zusatzrente', betrag: 0 }],
+    unternehmen: [{ bezeichnung: 'Geschäftsgründung', betrag: 0 }]
   });
 
   const [gehaltExpanded, setGehaltExpanded] = useState(false);
@@ -2563,7 +2563,7 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
   const addEintrag = (kategorie) => {
     setTempData(prev => ({
       ...prev,
-      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0, erreicht: 0 }]
+      [kategorie]: [...prev[kategorie], { bezeichnung: '', betrag: 0 }]
     }));
   };
 
