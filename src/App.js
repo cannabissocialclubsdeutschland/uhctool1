@@ -2527,25 +2527,7 @@ const WuenschePage = ({ data, setData, title, subtitle, color, showRetirement = 
                   </h3>
                   
                   <div className="space-y-4">
-                    {/* Icon Auswahl */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Icon auswählen</label>
-                      <div className="flex flex-wrap gap-2">
-                        {iconOptions.map(icon => (
-                          <button
-                            key={icon}
-                            onClick={() => updateWunsch(activeField, 'icon', icon)}
-                            className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-all ${
-                              aktuellerWunsch.icon === icon 
-                                ? 'bg-emerald-600 text-white' 
-                                : 'bg-gray-100 hover:bg-gray-200'
-                            }`}
-                          >
-                            {icon}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                
 
                     {/* Bezeichnung */}
                     <div className="space-y-2">
