@@ -263,7 +263,7 @@ const calculateEuroValue = (percentage) => {
                 #047857 20%,
                 #059669 40%,
                 #10b981 60%,
-                #34d399 80%,
+                #004225 80%,
                 #065f46 100%
               );
               background-size: 200% 200%;
