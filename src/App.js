@@ -310,163 +310,195 @@ const [langfristigData, setLangfristigData] = useState({
 
   const percentages = calculatePercentages();
 
-  // Mini-Kuchendiagramm für Header
-  const createMiniPieChart = () => {
-    const radius = headerHovered ? 75 : 55;
-    const centerX = 120;
-    const centerY = 200;
-    
-    let cumulativePercentage = 0;
-    const slices = [
-      { 
-        name: 'Fixkosten', 
-        value: percentages.fixkosten, 
-        color: '#065f46',
-        page: 'fixkosten',
-        emoji: '🏠'
-      },
-      { 
-        name: 'Lifestyle', 
-        value: percentages.lifestyle, 
-        color: '#047857',
-        page: 'lifestyle',
-        emoji: '🎭'
-      },
-      { 
-        name: 'Sicherheit', 
-        value: percentages.sicherheit, 
-        color: '#059669',
-        page: 'sicherheit',
-        emoji: '🛡️'
-      },
-      { 
-        name: 'Überschuss', 
-        value: percentages.ueberschuss, 
-        color: percentages.ueberschuss < 0 ? '#dc2626' : '#10b981',
-        page: null,
-        emoji: percentages.ueberschuss < 0 ? '⚠️' : '💰'
-      }
-    ];
-
-    return (
-      <svg 
-        width="240" 
-        height="280"
-        className="transition-all duration-500 ease-out"
-        onMouseEnter={() => setHeaderHovered(true)}
-        onMouseLeave={() => setHeaderHovered(false)}
-      >
-        {slices.map((slice, index) => {
-          const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
-          const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
-          
-          const x1 = centerX + radius * Math.cos(startAngle);
-          const y1 = centerY + radius * Math.sin(startAngle);
-          const x2 = centerX + radius * Math.cos(endAngle);
-          const y2 = centerY + radius * Math.sin(endAngle);
-          
-          const largeArcFlag = slice.value > 50 ? 1 : 0;
-          
-          const pathData = [
-            `M ${centerX} ${centerY}`,
-            `L ${x1} ${y1}`,
-            `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-            'Z'
-          ].join(' ');
-          
-          const midAngle = (startAngle + endAngle) / 2;
-          const emojiDistance = headerHovered ? radius * 0.75 : radius * 0.65;
-          const emojiX = centerX + emojiDistance * Math.cos(midAngle);
-          const emojiY = centerY + emojiDistance * Math.sin(midAngle);
-          
-          cumulativePercentage += slice.value;
-          
-          return (
-            <g key={index}>
-              <path
-                d={pathData}
-                fill={slice.color}
-                stroke="white"
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-300 hover:opacity-80 hover:brightness-110"
-                onClick={() => slice.page && setCurrentPage(slice.page)}
-                style={{
-                  filter: headerHovered ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' : ''
-                }}
-              />
-              
-              {headerHovered && slice.value > 8 && (
-                <text
-                  x={emojiX}
-                  y={emojiY}
-                  textAnchor="middle"
-                  className="text-lg pointer-events-none animate-fadeIn"
-                  dy="6"
-                >
-                  {slice.emoji}
-                </text>
-              )}
-              
-              {headerHovered && slice.value > 5 && (
-                <text
-                  x={emojiX}
-                  y={emojiY + (slice.value > 8 ? 18 : 0)}
-                  textAnchor="middle"
-                  className="text-[10px] font-bold fill-white pointer-events-none animate-fadeIn"
-                  dy="3"
-                  style={{ 
-                    textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-                    filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))'
-                  }}
-                >
-                  {slice.value.toFixed(0)}%
-                </text>
-              )}
-            </g>
-          );
-        })}
-        
-        <circle
-          cx={centerX}
-          cy={centerY}
-          r={headerHovered ? 32 : 28}
-          fill="white"
-          stroke="#065f46"
-          strokeWidth="2"
-          className="cursor-pointer transition-all duration-300 hover:stroke-4"
-          onClick={() => setCurrentPage('budget')}
-        />
-        <text 
-          x={centerX} 
-          y={centerY - 5} 
-          textAnchor="middle" 
-          className="text-[12px] font-medium fill-slate-600 pointer-events-none"
-        >
-          Budget
-        </text>
-        <text 
-          x={centerX} 
-          y={centerY + 6} 
-          textAnchor="middle" 
-          className="text-[10px] font-bold pointer-events-none" 
-          style={{fill: '#065f46'}}
-        >
-          {calculateBudget()}€
-        </text>
-        
-        {headerHovered && (
-          <text
-            x={centerX}
-            y={centerY + 55}
-            textAnchor="middle"
-            className="text-[8px] fill-slate-500 pointer-events-none animate-fadeIn"
-          >
-            Klicken zum Navigieren
-          </text>
-        )}
-      </svg>
-    );
+  // Mini-Kuchendiagramm für Header (aktualisierte Version)
+const createMiniPieChart = () => {
+  const radius = headerHovered ? 75 : 55;
+  const centerX = 120;
+  const centerY = 200;
+  
+  // Verwende dieselbe Normalisierung wie beim Hauptdiagramm
+  const budgetAmount = calculateBudget();
+  const absoluteValues = {
+    fixkosten: Math.abs((percentages.fixkosten * budgetAmount) / 100),
+    lifestyle: Math.abs((percentages.lifestyle * budgetAmount) / 100),
+    sicherheit: Math.abs((percentages.sicherheit * budgetAmount) / 100),
+    ueberschuss: Math.abs((percentages.ueberschuss * budgetAmount) / 100)
   };
+  
+  const totalAbsolute = absoluteValues.fixkosten + absoluteValues.lifestyle + 
+                        absoluteValues.sicherheit + absoluteValues.ueberschuss;
+  
+  const normalizedPercentages = totalAbsolute > 0 ? {
+    fixkosten: (absoluteValues.fixkosten / totalAbsolute) * 100,
+    lifestyle: (absoluteValues.lifestyle / totalAbsolute) * 100,
+    sicherheit: (absoluteValues.sicherheit / totalAbsolute) * 100,
+    ueberschuss: (absoluteValues.ueberschuss / totalAbsolute) * 100
+  } : {
+    fixkosten: 0,
+    lifestyle: 0,
+    sicherheit: 0,
+    ueberschuss: 0
+  };
+  
+  let cumulativePercentage = 0;
+  const slices = [
+    { 
+      name: 'Fixkosten', 
+      value: normalizedPercentages.fixkosten, 
+      color: '#004225', // GLEICHE FARBEN WIE HAUPTDIAGRAMM
+      page: 'fixkosten',
+      emoji: '🏠',
+      originalValue: percentages.fixkosten
+    },
+    { 
+      name: 'Lifestyle', 
+      value: normalizedPercentages.lifestyle, 
+      color: '#1f5f3f', // GLEICHE FARBEN WIE HAUPTDIAGRAMM
+      page: 'lifestyle',
+      emoji: '🎭',
+      originalValue: percentages.lifestyle
+    },
+    { 
+      name: 'Sicherheit', 
+      value: normalizedPercentages.sicherheit, 
+      color: '#4d7c5f', // GLEICHE FARBEN WIE HAUPTDIAGRAMM
+      page: 'sicherheit',
+      emoji: '🛡️',
+      originalValue: percentages.sicherheit
+    },
+    { 
+      name: 'Überschuss/Defizit', // GLEICHER NAME WIE HAUPTDIAGRAMM
+      value: normalizedPercentages.ueberschuss, 
+      color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981', // GLEICHE FARBEN WIE HAUPTDIAGRAMM
+      page: null,
+      emoji: percentages.ueberschuss < 0 ? '⚠️' : '💰',
+      originalValue: percentages.ueberschuss
+    }
+  ];
+
+  return (
+    <svg 
+      width="240" 
+      height="280"
+      className="transition-all duration-500 ease-out"
+      onMouseEnter={() => setHeaderHovered(true)}
+      onMouseLeave={() => setHeaderHovered(false)}
+    >
+      {slices.map((slice, index) => {
+        // Überspringe sehr kleine Segmente
+        if (slice.value < 0.1) return null;
+        
+        const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
+        const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
+        
+        const x1 = centerX + radius * Math.cos(startAngle);
+        const y1 = centerY + radius * Math.sin(startAngle);
+        const x2 = centerX + radius * Math.cos(endAngle);
+        const y2 = centerY + radius * Math.sin(endAngle);
+        
+        const largeArcFlag = slice.value > 50 ? 1 : 0;
+        
+        const pathData = [
+          `M ${centerX} ${centerY}`,
+          `L ${x1} ${y1}`,
+          `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+          'Z'
+        ].join(' ');
+        
+        const midAngle = (startAngle + endAngle) / 2;
+        const emojiDistance = headerHovered ? radius * 0.75 : radius * 0.65;
+        const emojiX = centerX + emojiDistance * Math.cos(midAngle);
+        const emojiY = centerY + emojiDistance * Math.sin(midAngle);
+        
+        cumulativePercentage += slice.value;
+        
+        return (
+          <g key={index}>
+            <path
+              d={pathData}
+              fill={slice.color}
+              stroke="white"
+              strokeWidth="2"
+              className="cursor-pointer transition-all duration-300 hover:opacity-80 hover:brightness-110"
+              onClick={() => slice.page && setCurrentPage(slice.page)}
+              style={{
+                filter: headerHovered ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' : ''
+              }}
+              title={`${slice.name}: ${slice.originalValue.toFixed(1)}%`}
+            />
+            
+            {headerHovered && slice.value > 8 && (
+              <text
+                x={emojiX}
+                y={emojiY}
+                textAnchor="middle"
+                className="text-lg pointer-events-none animate-fadeIn"
+                dy="6"
+              >
+                {slice.emoji}
+              </text>
+            )}
+            
+            {headerHovered && slice.value > 5 && (
+              <text
+                x={emojiX}
+                y={emojiY + (slice.value > 8 ? 18 : 0)}
+                textAnchor="middle"
+                className="text-[10px] font-bold fill-white pointer-events-none animate-fadeIn"
+                dy="3"
+                style={{ 
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+                  filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))'
+                }}
+              >
+                {slice.originalValue.toFixed(0)}%
+              </text>
+            )}
+          </g>
+        );
+      }).filter(Boolean)}
+      
+      <circle
+        cx={centerX}
+        cy={centerY}
+        r={headerHovered ? 32 : 28}
+        fill="white"
+        stroke="#065f46"
+        strokeWidth="2"
+        className="cursor-pointer transition-all duration-300 hover:stroke-4"
+        onClick={() => setCurrentPage('budget')}
+      />
+      <text 
+        x={centerX} 
+        y={centerY - 5} 
+        textAnchor="middle" 
+        className="text-[12px] font-medium fill-slate-600 pointer-events-none"
+      >
+        Budget
+      </text>
+      <text 
+        x={centerX} 
+        y={centerY + 6} 
+        textAnchor="middle" 
+        className="text-[10px] font-bold pointer-events-none" 
+        style={{fill: '#065f46'}}
+      >
+        {calculateBudget()}€
+      </text>
+      
+      {headerHovered && (
+        <text
+          x={centerX}
+          y={centerY + 55}
+          textAnchor="middle"
+          className="text-[8px] fill-slate-500 pointer-events-none animate-fadeIn"
+        >
+          Klicken zum Navigieren
+        </text>
+      )}
+    </svg>
+  );
+};
 
   // Navigation Buttons
   const NavigationButtons = () => {
