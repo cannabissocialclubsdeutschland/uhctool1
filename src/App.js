@@ -1471,6 +1471,7 @@ return (
       `}</style>
     </div>
   );
+};
 
  // BASIS ABSICHERUNG PAGE - Pop-Up Modal Version mit grünem Hintergrund
 const BasisAbsicherungPage = () => {
