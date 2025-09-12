@@ -1097,7 +1097,7 @@ const ZigarettenPage = () => {
 
 
   // Overview Page
-  const OverviewPage = () => (
+  const OverviewPage = () => {
     // PDF Export Button Komponente
 const exportPDF = () => {
   const pdfContent = `
@@ -1158,14 +1158,7 @@ const exportPDF = () => {
   }, 500);
 };
 
-// Der Button selbst
-<button
-  onClick={exportPDF}
-  className="px-4 py-2 bg-white/80 backdrop-blur text-slate-700 text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-white hover:shadow-md"
-  title="Als PDF exportieren"
->
-  📄 PDF
-</button>
+return (
     <div className={`h-screen w-full bg-gradient-to-br from-emerald-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
       
       <div className="absolute inset-0 pointer-events-none z-0">
