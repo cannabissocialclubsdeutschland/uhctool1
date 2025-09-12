@@ -106,6 +106,9 @@ const [langfristigData, setLangfristigData] = useState({
     zusatzleistungen: 0
   });
 
+  // State für Kundennamen (füge das zu deinen anderen States hinzu)
+const [kundenName, setKundenName] = useState('');
+  
   // Animation states
   const [pageTransition, setPageTransition] = useState(false);
 
@@ -1098,8 +1101,7 @@ const ZigarettenPage = () => {
 
   // Overview Page
   const OverviewPage = () => {
-    // PDF Export Button Komponente
-const exportPDF = () => {
+   const exportPDF = () => {
   const pdfContent = `
     <!DOCTYPE html>
     <html lang="de">
@@ -1108,42 +1110,190 @@ const exportPDF = () => {
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; color: #1a1a1a; padding: 20px; }
-        .header { background: linear-gradient(135deg, #004225 0%, #00694e 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
-        .section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #004225; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .card { background: white; padding: 15px; border-radius: 6px; }
-        .card-label { font-size: 12px; color: #6b7280; text-transform: uppercase; }
-        .card-value { font-size: 20px; font-weight: 700; }
+        body { font-family: 'Inter', sans-serif; color: #1a1a1a; padding: 20px; font-size: 14px; }
+        .header { background: linear-gradient(135deg, #004225 0%, #00694e 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header .client-name { font-size: 18px; margin-bottom: 5px; }
+        .header .date { font-size: 12px; opacity: 0.9; }
+        .section { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #004225; page-break-inside: avoid; }
+        .section-title { font-size: 16px; font-weight: 600; color: #004225; margin-bottom: 12px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .card { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .card-label { font-size: 11px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px; }
+        .card-value { font-size: 18px; font-weight: 700; }
         .positive { color: #10b981; }
         .negative { color: #ef4444; }
-        @media print { body { print-color-adjust: exact; } }
+        .table { width: 100%; margin-top: 10px; }
+        .table th { background: #e5e7eb; padding: 8px; text-align: left; font-size: 12px; font-weight: 600; }
+        .table td { padding: 8px; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+        .wish-item { background: white; padding: 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .wish-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .wish-title { font-weight: 600; font-size: 13px; }
+        .wish-amount { color: #004225; font-weight: 700; }
+        .progress-bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; margin-top: 5px; }
+        .progress-fill { height: 100%; background: #004225; border-radius: 3px; }
+        .summary-box { background: #004225; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
       </style>
     </head>
     <body>
       <div class="header">
         <h1>United Hands Capital - Finanzberatung</h1>
-        <div>${new Date().toLocaleDateString('de-DE')}</div>
+        <div class="client-name">Kunde: ${kundenName || 'Nicht angegeben'}</div>
+        <div class="date">Erstellt am ${new Date().toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
       </div>
+      
+      <!-- Budget Übersicht -->
       <div class="section">
-        <h2>Budget Übersicht</h2>
+        <div class="section-title">📊 Budget Übersicht</div>
         <div class="grid">
           <div class="card">
-            <div class="card-label">Gesamtbudget</div>
-            <div class="card-value">${calculateBudget().toLocaleString()} €</div>
+            <div class="card-label">Gesamteinkommen</div>
+            <div class="card-value positive">${(finanzData.budgetTotal || 0).toLocaleString()} €</div>
           </div>
           <div class="card">
             <div class="card-label">Fixkosten</div>
-            <div class="card-value">${finanzData.fixkostenTotal?.toLocaleString() || 0} €</div>
+            <div class="card-value">${(finanzData.fixkostenTotal || 0).toLocaleString()} €</div>
           </div>
           <div class="card">
             <div class="card-label">Lifestyle</div>
-            <div class="card-value">${finanzData.lifestyleTotal?.toLocaleString() || 0} €</div>
+            <div class="card-value">${(finanzData.lifestyleTotal || 0).toLocaleString()} €</div>
           </div>
           <div class="card">
-            <div class="card-label">Überschuss</div>
-            <div class="card-value ${finanzData.ueberschuss >= 0 ? 'positive' : 'negative'}">${finanzData.ueberschuss?.toLocaleString() || 0} €</div>
+            <div class="card-label">Sicherheit</div>
+            <div class="card-value">${(finanzData.sicherheit || 0).toLocaleString()} €</div>
           </div>
+          <div class="card">
+            <div class="card-label">Überschuss/Defizit</div>
+            <div class="card-value ${finanzData.ueberschuss >= 0 ? 'positive' : 'negative'}">${(finanzData.ueberschuss || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Sparquote</div>
+            <div class="card-value">${finanzData.budgetTotal > 0 ? Math.round((finanzData.sicherheit / finanzData.budgetTotal) * 100) : 0}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Einkommensquellen -->
+      <div class="section">
+        <div class="section-title">💰 Einkommensquellen</div>
+        <table class="table">
+          <tr>
+            <th>Kategorie</th>
+            <th style="text-align: right;">Betrag</th>
+          </tr>
+          <tr>
+            <td>Gehalt (Netto)</td>
+            <td style="text-align: right; font-weight: 600;">${(finanzData.gehaltNetto || 0).toLocaleString()} €</td>
+          </tr>
+          ${finanzData.zusatzeinkommen > 0 ? `<tr><td>Zusatzeinkommen</td><td style="text-align: right; font-weight: 600;">${finanzData.zusatzeinkommen.toLocaleString()} €</td></tr>` : ''}
+          ${finanzData.kapitalertraege > 0 ? `<tr><td>Kapitalerträge</td><td style="text-align: right; font-weight: 600;">${finanzData.kapitalertraege.toLocaleString()} €</td></tr>` : ''}
+          ${finanzData.mieteinnahmen > 0 ? `<tr><td>Mieteinnahmen</td><td style="text-align: right; font-weight: 600;">${finanzData.mieteinnahmen.toLocaleString()} €</td></tr>` : ''}
+          ${finanzData.individuell > 0 ? `<tr><td>Sonstige</td><td style="text-align: right; font-weight: 600;">${finanzData.individuell.toLocaleString()} €</td></tr>` : ''}
+        </table>
+      </div>
+
+      <!-- Ausgaben Details -->
+      <div class="section">
+        <div class="section-title">💳 Ausgabenübersicht</div>
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="card-label">Wohnen</div>
+            <div class="card-value">${(fixkostenData?.wohnen?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Lebensmittel</div>
+            <div class="card-value">${(fixkostenData?.lebensmittel?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Mobilität</div>
+            <div class="card-value">${(fixkostenData?.mobilitaet?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Freizeit</div>
+            <div class="card-value">${(lifestyleData?.freizeit?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Shopping</div>
+            <div class="card-value">${(lifestyleData?.shopping?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Urlaub</div>
+            <div class="card-value">${(lifestyleData?.urlaub?.reduce((sum, item) => sum + item.betrag, 0) || 0).toLocaleString()} €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wünsche und Ziele -->
+      ${kurzfristigWuensche && kurzfristigWuensche.length > 0 ? `
+      <div class="section">
+        <div class="section-title">🎯 Kurzfristige Wünsche & Ziele</div>
+        ${kurzfristigWuensche.map(wunsch => `
+          <div class="wish-item">
+            <div class="wish-header">
+              <span class="wish-title">${wunsch.icon || '📌'} ${wunsch.bezeichnung}</span>
+              <span class="wish-amount">${wunsch.betrag.toLocaleString()} €</span>
+            </div>
+            <div style="font-size: 11px; color: #6b7280;">
+              Fortschritt: ${wunsch.vorhandenesKapital.toLocaleString()} € von ${wunsch.betrag.toLocaleString()} €
+              ${wunsch.zieldatum ? ` | Ziel: ${new Date(wunsch.zieldatum).toLocaleDateString('de-DE')}` : ''}
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${Math.min(100, (wunsch.vorhandenesKapital / wunsch.betrag) * 100)}%"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      ` : ''}
+
+      <!-- Kapitalanlagen -->
+      <div class="section">
+        <div class="section-title">📈 Kapitalanlagen & Vorsorge</div>
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="card-label">Kurzfristig</div>
+            <div class="card-value">${((kurzfristigData?.tagesgeld?.[0]?.betrag || 0) + (kurzfristigData?.girokonto?.[0]?.betrag || 0)).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Mittelfristig</div>
+            <div class="card-value">${((mittelfristigData?.depot?.[0]?.betrag || 0) + (mittelfristigData?.vwl?.[0]?.betrag || 0)).toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Langfristig</div>
+            <div class="card-value">${(langfristigData?.betrieblich?.[0]?.betrag || 0).toLocaleString()} €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basis-Absicherung -->
+      ${basisData ? `
+      <div class="section">
+        <div class="section-title">🛡️ Basis-Absicherung</div>
+        <table class="table">
+          <tr>
+            <th>Versicherung</th>
+            <th style="text-align: right;">Monatsbeitrag</th>
+          </tr>
+          ${basisData.krankenversicherung?.[0]?.betrag > 0 ? `<tr><td>Krankenversicherung</td><td style="text-align: right;">${basisData.krankenversicherung[0].betrag.toLocaleString()} €</td></tr>` : ''}
+          ${basisData.pflegeversicherung?.[0]?.betrag > 0 ? `<tr><td>Pflegeversicherung</td><td style="text-align: right;">${basisData.pflegeversicherung[0].betrag.toLocaleString()} €</td></tr>` : ''}
+          ${basisData.arbeitslosenversicherung?.[0]?.betrag > 0 ? `<tr><td>Arbeitslosenversicherung</td><td style="text-align: right;">${basisData.arbeitslosenversicherung[0].betrag.toLocaleString()} €</td></tr>` : ''}
+          ${basisData.rentenversicherung?.[0]?.betrag > 0 ? `<tr><td>Rentenversicherung</td><td style="text-align: right;">${basisData.rentenversicherung[0].betrag.toLocaleString()} €</td></tr>` : ''}
+        </table>
+      </div>
+      ` : ''}
+
+      <!-- Zusammenfassung -->
+      <div class="summary-box">
+        <div style="font-weight: 600; margin-bottom: 10px;">📋 Zusammenfassung & Empfehlungen</div>
+        <div style="font-size: 12px; line-height: 1.6;">
+          ${finanzData.ueberschuss < 0 ? 
+            '⚠️ Ihr monatlicher Überschuss ist negativ. Priorität sollte die Ausgabenreduzierung haben.' : 
+            '✅ Sie haben einen positiven monatlichen Überschuss von ' + finanzData.ueberschuss.toLocaleString() + ' €.'}
+          <br>
+          💡 Empfehlung: ${finanzData.sicherheit < finanzData.budgetTotal * 0.1 ? 
+            'Erhöhen Sie Ihre Sparquote auf mindestens 10% Ihres Einkommens.' : 
+            'Ihre Sparquote ist gut. Prüfen Sie langfristige Anlagemöglichkeiten.'}
         </div>
       </div>
     </body>
@@ -1157,7 +1307,7 @@ const exportPDF = () => {
     printWindow.print();
   }, 500);
 };
-
+    
 return (
     <div className={`h-screen w-full bg-gradient-to-br from-emerald-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
       
@@ -1170,37 +1320,48 @@ return (
       </div>
 
       <div className="bg-white/70 backdrop-blur-lg border-b border-slate-200/50 relative z-10">
-        <div className="grid grid-cols-3 items-center px-8 py-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
-            <p className="text-slate-600 font-medium">Finanzberatungstool</p>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
-            <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
-          </div>
-
-        <div className="flex justify-end gap-2">  {/* gap-2 hinzufügen für Abstand */}
-  {/* PDF Button HIER */}
-  <button
-    onClick={exportPDF}
-    className="px-4 py-2 bg-white/80 backdrop-blur text-slate-700 text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-white hover:shadow-md"
-    title="Als PDF exportieren"
-  >
-    📄 PDF
-  </button>
-  
-  {/* Bestehender Back-Button */}
-  <button
-    onClick={() => setCurrentPage('zigaretten')}
-    className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
-  >
-    ⏮️
-  </button>
-</div>
-        </div>
+  <div className="grid grid-cols-3 items-center px-8 py-4">
+    <div className="flex items-center gap-4">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800">United Hands Capital</h1>
+        <p className="text-slate-600 font-medium">Finanzberatungstool</p>
       </div>
+      <div className="flex flex-col">
+        <label className="text-xs text-slate-500 mb-1">Kundenname:</label>
+        <input
+          type="text"
+          value={kundenName}
+          onChange={(e) => setKundenName(e.target.value)}
+          placeholder="Name eingeben..."
+          className="px-3 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/80"
+          style={{ width: '180px' }}
+        />
+      </div>
+    </div>
+
+    <div className="text-center">
+      <p className="text-sm text-slate-500 uppercase tracking-wider font-medium">Gesamtbudget</p>
+      <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
+    </div>
+
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={exportPDF}
+        className="px-4 py-2 bg-white/80 backdrop-blur text-slate-700 text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-white hover:shadow-md"
+        title="Als PDF exportieren"
+      >
+        📄 PDF
+      </button>
+      
+      <button
+        onClick={() => setCurrentPage('zigaretten')}
+        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+      >
+        ⏮️
+      </button>
+    </div>
+  </div>
+</div>
       
       <div className="flex-1 flex items-center justify-center relative z-10" style={{ height: 'calc(100vh - 120px - 33.333vh)' }}>
         <div className="flex w-full max-w-6xl justify-center items-center px-8 gap-8">
