@@ -28,6 +28,9 @@ const [budgetData, setBudgetData] = useState({
   individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }],  // ✅ Komma ist OK
 });
 
+  // Euro-Anzeige 
+  const [showEuroValues, setShowEuroValues] = useState(false);
+  
   // NEUE STATE VARIABLEN FÜR BASIS-ABSICHERUNG
   const [basisData, setBasisData] = useState({
     krankenversicherung: [{ bezeichnung: 'Gesetzliche KV', betrag: 450 }],
@@ -193,6 +196,12 @@ const [langfristigData, setLangfristigData] = useState({
     return () => clearTimeout(timer);
   }, [currentPage]);
 
+// Funktion zur Berechnung der Euro-Werte
+const calculateEuroValue = (percentage) => {
+  const budgetAmount = calculateBudget();
+  return Math.abs((percentage * budgetAmount) / 100);
+};
+  
   // Sidebar Komponente
   const Sidebar = () => {
     const sidebarItems = [
@@ -1221,27 +1230,71 @@ const ZigarettenPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
-              <h3 className="text-lg font-bold mb-3 text-slate-900 text-center">Budget-Verteilung</h3>
-              <div className="space-y-2">
-                {[
-                  { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
-                  { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
-                  { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
-                  { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
-                      <span className="text-xs font-medium text-slate-700">{item.name}</span>
-                    </div>
-                    <span className="text-xs font-bold text-slate-900">{item.value.toFixed(1)}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          // Die aktualisierte Legende
+<div className="flex justify-center">
+  <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
+    <div className="flex items-center justify-between mb-3">
+      <h3 className="text-lg font-bold text-slate-900">Budget-Verteilung</h3>
+      
+      {/* Toggle Switch */}
+      <button
+        onClick={() => setShowEuroValues(!showEuroValues)}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+          showEuroValues ? 'bg-green-600' : 'bg-slate-300'
+        }`}
+      >
+        <span className="sr-only">Euro-Werte anzeigen</span>
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+            showEuroValues ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
+    
+    {/* Kleiner Hinweistext */}
+    <div className="text-[10px] text-slate-500 text-center mb-2">
+      {showEuroValues ? 'Euro-Beträge' : 'Prozentuale Aufteilung'}
+    </div>
+    
+    <div className="space-y-2">
+      {[
+        { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225' },
+        { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f' },
+        { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f' },
+        { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+      ].map((item, index) => (
+        <div key={index} className="flex items-center justify-between gap-3 hover:bg-slate-50 p-1 rounded transition-colors">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{backgroundColor: item.color}}></div>
+            <span className="text-xs font-medium text-slate-700">{item.name}</span>
           </div>
+          <span className="text-xs font-bold text-slate-900">
+            {showEuroValues ? (
+              <>
+                {calculateEuroValue(item.value).toLocaleString('de-DE', { 
+                  minimumFractionDigits: 0, 
+                  maximumFractionDigits: 0 
+                })}€
+              </>
+            ) : (
+              `${item.value.toFixed(1)}%`
+            )}
+          </span>
+        </div>
+      ))}
+    </div>
+    
+    {/* Zusätzliche Info bei Euro-Anzeige */}
+    {showEuroValues && (
+      <div className="mt-3 pt-2 border-t border-slate-200">
+        <div className="text-[10px] text-slate-600 text-center">
+          Basis: {calculateBudget().toLocaleString('de-DE')}€ Budget
+        </div>
+      </div>
+    )}
+  </div>
+</div>
         </div>
 
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
