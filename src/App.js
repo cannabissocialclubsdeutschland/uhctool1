@@ -1282,20 +1282,6 @@ const ZigarettenPage = () => {
         </table>
       </div>
       ` : ''}
-
-      <!-- Zusammenfassung -->
-      <div class="summary-box">
-        <div style="font-weight: 600; margin-bottom: 10px;">📋 Zusammenfassung & Empfehlungen</div>
-        <div style="font-size: 12px; line-height: 1.6;">
-          ${finanzData.ueberschuss < 0 ? 
-            '⚠️ Ihr monatlicher Überschuss ist negativ. Priorität sollte die Ausgabenreduzierung haben.' : 
-            '✅ Sie haben einen positiven monatlichen Überschuss von ' + finanzData.ueberschuss.toLocaleString() + ' €.'}
-          <br>
-          💡 Empfehlung: ${finanzData.sicherheit < finanzData.budgetTotal * 0.1 ? 
-            'Erhöhen Sie Ihre Sparquote auf mindestens 10% Ihres Einkommens.' : 
-            'Ihre Sparquote ist gut. Prüfen Sie langfristige Anlagemöglichkeiten.'}
-        </div>
-      </div>
     </body>
     </html>
   `;
