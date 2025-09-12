@@ -1230,7 +1230,6 @@ const ZigarettenPage = () => {
             </div>
           </div>
 
-          // Die aktualisierte Legende
 <div className="flex justify-center">
   <div className="bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 p-4 animate-fadeIn hover:shadow-xl transition-shadow duration-300 w-60" style={{ animationDelay: '0.3s' }}>
     <div className="flex items-center justify-between mb-3">
