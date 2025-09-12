@@ -615,54 +615,54 @@ const [langfristigData, setLangfristigData] = useState({
     </div>
   );
 
-  // Kuchendiagramm erstellen
-  const createPieChart = () => {
-    const radius = 180;
-    const centerX = 225;
-    const centerY = 225;
+const createPieChart = () => {
+  const radius = 180;
+  const centerX = 225;
+  const centerY = 225;
+  
+  let cumulativePercentage = 0;
+  const slices = [
+    { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225', page: 'fixkosten' },
+    { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f', page: 'lifestyle' },
+    { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f', page: 'sicherheit' },
+    { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+  ];
+  
+  return slices.map((slice, index) => {
+    // Hier ist die wichtige Änderung: - Math.PI / 2 hinzufügen
+    const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
+    const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
     
-    let cumulativePercentage = 0;
-    const slices = [
-      { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225', page: 'fixkosten' },
-      { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f', page: 'lifestyle' },
-      { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f', page: 'sicherheit' },
-      { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
-    ];
-
-    return slices.map((slice, index) => {
-      const startAngle = (cumulativePercentage / 100) * 2 * Math.PI;
-      const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI;
-      
-      const x1 = centerX + radius * Math.cos(startAngle);
-      const y1 = centerY + radius * Math.sin(startAngle);
-      const x2 = centerX + radius * Math.cos(endAngle);
-      const y2 = centerY + radius * Math.sin(endAngle);
-      
-      const largeArcFlag = slice.value > 50 ? 1 : 0;
-      
-      const pathData = [
-        `M ${centerX} ${centerY}`,
-        `L ${x1} ${y1}`,
-        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-        'Z'
-      ].join(' ');
-      
-      cumulativePercentage += slice.value;
-      
-      return (
-        <path
-          key={index}
-          d={pathData}
-          fill={slice.color}
-          stroke="white"
-          strokeWidth="4"
-          className="transition-all duration-300 cursor-pointer hover:brightness-110 hover:scale-105"
-          style={{ transformOrigin: `${centerX}px ${centerY}px` }}
-          onClick={() => slice.page && setCurrentPage(slice.page)}
-        />
-      );
-    });
-  };
+    const x1 = centerX + radius * Math.cos(startAngle);
+    const y1 = centerY + radius * Math.sin(startAngle);
+    const x2 = centerX + radius * Math.cos(endAngle);
+    const y2 = centerY + radius * Math.sin(endAngle);
+    
+    const largeArcFlag = slice.value > 50 ? 1 : 0;
+    
+    const pathData = [
+      `M ${centerX} ${centerY}`,
+      `L ${x1} ${y1}`,
+      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+      'Z'
+    ].join(' ');
+    
+    cumulativePercentage += slice.value;
+    
+    return (
+      <path
+        key={index}
+        d={pathData}
+        fill={slice.color}
+        stroke="white"
+        strokeWidth="4"
+        className="transition-all duration-300 cursor-pointer hover:brightness-110 hover:scale-105"
+        style={{ transformOrigin: `${centerX}px ${centerY}px` }}
+        onClick={() => slice.page && setCurrentPage(slice.page)}
+      />
+    );
+  });
+};
 
  // Zigaretten-Investment-Vergleich Page
 const ZigarettenPage = () => {
