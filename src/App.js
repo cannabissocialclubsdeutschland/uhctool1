@@ -1098,6 +1098,74 @@ const ZigarettenPage = () => {
 
   // Overview Page
   const OverviewPage = () => (
+    // PDF Export Button Komponente
+const exportPDF = () => {
+  const pdfContent = `
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: #1a1a1a; padding: 20px; }
+        .header { background: linear-gradient(135deg, #004225 0%, #00694e 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        .section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #004225; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .card { background: white; padding: 15px; border-radius: 6px; }
+        .card-label { font-size: 12px; color: #6b7280; text-transform: uppercase; }
+        .card-value { font-size: 20px; font-weight: 700; }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        @media print { body { print-color-adjust: exact; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>United Hands Capital - Finanzberatung</h1>
+        <div>${new Date().toLocaleDateString('de-DE')}</div>
+      </div>
+      <div class="section">
+        <h2>Budget Übersicht</h2>
+        <div class="grid">
+          <div class="card">
+            <div class="card-label">Gesamtbudget</div>
+            <div class="card-value">${calculateBudget().toLocaleString()} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Fixkosten</div>
+            <div class="card-value">${finanzData.fixkostenTotal?.toLocaleString() || 0} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Lifestyle</div>
+            <div class="card-value">${finanzData.lifestyleTotal?.toLocaleString() || 0} €</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Überschuss</div>
+            <div class="card-value ${finanzData.ueberschuss >= 0 ? 'positive' : 'negative'}">${finanzData.ueberschuss?.toLocaleString() || 0} €</div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(pdfContent);
+  printWindow.document.close();
+  setTimeout(() => {
+    printWindow.print();
+  }, 500);
+};
+
+// Der Button selbst
+<button
+  onClick={exportPDF}
+  className="px-4 py-2 bg-white/80 backdrop-blur text-slate-700 text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-white hover:shadow-md"
+  title="Als PDF exportieren"
+>
+  📄 PDF
+</button>
     <div className={`h-screen w-full bg-gradient-to-br from-emerald-50 to-slate-100 overflow-hidden font-sans relative ${pageTransition ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
       
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -1120,15 +1188,24 @@ const ZigarettenPage = () => {
             <p className="text-3xl font-bold" style={{color: '#004225'}}>{calculateBudget().toLocaleString()} €</p>
           </div>
 
-          <div className="flex justify-end">
-      <button
-        onClick={() => setCurrentPage('zigaretten')}
-        className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
-      >
-        ⏮️
-      </button>
-
-          </div>
+        <div className="flex justify-end gap-2">  {/* gap-2 hinzufügen für Abstand */}
+  {/* PDF Button HIER */}
+  <button
+    onClick={exportPDF}
+    className="px-4 py-2 bg-white/80 backdrop-blur text-slate-700 text-sm rounded-lg transition-all duration-300 flex items-center gap-2 hover:bg-white hover:shadow-md"
+    title="Als PDF exportieren"
+  >
+    📄 PDF
+  </button>
+  
+  {/* Bestehender Back-Button */}
+  <button
+    onClick={() => setCurrentPage('zigaretten')}
+    className="px-4 py-2 bg-white0 text-black text-sm rounded-lg transition-all duration-300 flex items-left gap-2 opacity-0 hover:opacity-100"
+  >
+    ⏮️
+  </button>
+</div>
         </div>
       </div>
       
