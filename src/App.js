@@ -615,21 +615,43 @@ const [langfristigData, setLangfristigData] = useState({
     </div>
   );
 
+
+// Kuchendiagramm
+
 const createPieChart = () => {
   const radius = 180;
   const centerX = 225;
   const centerY = 225;
   
+  // KRITISCH: Erst die Prozentsätze normalisieren!
+  const totalIncome = budget; // Gesamteinkommen als Basis
+  const absoluteValues = {
+    fixkosten: Math.abs(totalExpenses.fixkosten),
+    lifestyle: Math.abs(totalExpenses.lifestyle), 
+    sicherheit: Math.abs(totalExpenses.sicherheit),
+    ueberschuss: Math.abs(percentages.ueberschuss * budget / 100)
+  };
+  
+  // Berechne Prozentsätze basierend auf dem Gesamteinkommen
+  const normalizedPercentages = {
+    fixkosten: (absoluteValues.fixkosten / totalIncome) * 100,
+    lifestyle: (absoluteValues.lifestyle / totalIncome) * 100,
+    sicherheit: (absoluteValues.sicherheit / totalIncome) * 100,
+    ueberschuss: (absoluteValues.ueberschuss / totalIncome) * 100
+  };
+  
   let cumulativePercentage = 0;
   const slices = [
-    { name: 'Fixkosten', value: percentages.fixkosten, color: '#004225', page: 'fixkosten' },
-    { name: 'Lifestyle', value: percentages.lifestyle, color: '#1f5f3f', page: 'lifestyle' },
-    { name: 'Sicherheit', value: percentages.sicherheit, color: '#4d7c5f', page: 'sicherheit' },
-    { name: 'Überschuss/Defizit', value: percentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
+    { name: 'Fixkosten', value: normalizedPercentages.fixkosten, color: '#004225', page: 'fixkosten' },
+    { name: 'Lifestyle', value: normalizedPercentages.lifestyle, color: '#1f5f3f', page: 'lifestyle' },
+    { name: 'Sicherheit', value: normalizedPercentages.sicherheit, color: '#4d7c5f', page: 'sicherheit' },
+    { name: 'Überschuss/Defizit', value: normalizedPercentages.ueberschuss, color: percentages.ueberschuss < 0 ? '#ef4444' : '#10b981' }
   ];
-  
+
   return slices.map((slice, index) => {
-    // Hier ist die wichtige Änderung: - Math.PI / 2 hinzufügen
+    // Nur positive Werte verwenden
+    if (slice.value <= 0) return null;
+    
     const startAngle = (cumulativePercentage / 100) * 2 * Math.PI - Math.PI / 2;
     const endAngle = ((cumulativePercentage + slice.value) / 100) * 2 * Math.PI - Math.PI / 2;
     
