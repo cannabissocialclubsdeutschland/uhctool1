@@ -19,17 +19,18 @@ const FinanzTool = () => {
     sicherheit: 1170,
     ueberschuss: -100
   });
-
-const [kundenName, setKundenName] = useState('');
   
-const [budgetData, setBudgetData] = useState({
-  gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
-  zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
-  kapitalertraege: [{ bezeichnung: 'Dividenden', betrag: 0 }],
-  mieteinnahmen: [{ bezeichnung: 'Wohnung', betrag: 0 }],
-  individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }],  // ✅ Komma ist OK
-});
+  const [kundenName, setKundenName] = useState('');  // Korrekte Einrückung
+  
+  const [budgetData, setBudgetData] = useState({
+    gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
+    zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
+    kapitalertraege: [{ bezeichnung: 'Dividenden', betrag: 0 }],
+    mieteinnahmen: [{ bezeichnung: 'Wohnung', betrag: 0 }],
+    individuell: [{ bezeichnung: 'Sonstiges', betrag: 0 }],
+  });
 
+  // ... rest deines Codes
   // Euro-Anzeige 
   const [showEuroValues, setShowEuroValues] = useState(false);
   
