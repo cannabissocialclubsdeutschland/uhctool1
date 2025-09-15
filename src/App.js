@@ -109,9 +109,6 @@ const [langfristigData, setLangfristigData] = useState({
     zusatzleistungen: 0
   });
 
-  // State für Kundennamen (füge das zu deinen anderen States hinzu)
-const [kundenName, setKundenName] = useState('');
-  
   // Animation states
   const [pageTransition, setPageTransition] = useState(false);
 
