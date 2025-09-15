@@ -20,6 +20,8 @@ const FinanzTool = () => {
     ueberschuss: -100
   });
 
+const [kundenName, setKundenName] = useState('');
+  
 const [budgetData, setBudgetData] = useState({
   gehaltNetto: [{ bezeichnung: 'Gehalt', betrag: 2500 }],
   zusatzeinkommen: [{ bezeichnung: 'Nebenjob', betrag: 0 }],
@@ -1100,7 +1102,30 @@ const ZigarettenPage = () => {
 
 
   // Overview Page
-  const OverviewPage = () => {
+ const OverviewPage = ({ 
+  kundenName, 
+  setKundenName,
+  finanzData,
+  fixkostenData,
+  lifestyleData,
+  sicherheitData,
+  kurzfristigWuensche,
+  langfristigWuensche,
+  kurzfristigData,
+  mittelfristigData,
+  langfristigData,
+  basisData,
+  calculateBudget,
+  setCurrentPage,
+  pageTransition,
+  percentages,
+  showEuroValues,
+  setShowEuroValues,
+  calculateEuroValue,
+  createPieChart,
+  Sidebar,
+  NavigationButtons
+}) => {
    const exportPDF = () => {
   const pdfContent = `
     <!DOCTYPE html>
@@ -3335,8 +3360,33 @@ const SparzielPage = ({ data, setData, title, subtitle, kategorien, color }) => 
 
 const renderCurrentPage = () => {
   switch(currentPage) {
-    case 'overview':
-      return <OverviewPage />;
+   case 'overview':
+  return (
+    <OverviewPage 
+      kundenName={kundenName}
+      setKundenName={setKundenName}
+      finanzData={finanzData}
+      fixkostenData={fixkostenData}
+      lifestyleData={lifestyleData}
+      sicherheitData={sicherheitData}
+      kurzfristigWuensche={kurzfristigWuensche}
+      langfristigWuensche={langfristigWuensche}
+      kurzfristigData={kurzfristigData}
+      mittelfristigData={mittelfristigData}
+      langfristigData={langfristigData}
+      basisData={basisData}
+      calculateBudget={calculateBudget}
+      setCurrentPage={setCurrentPage}
+      pageTransition={pageTransition}
+      percentages={percentages}
+      showEuroValues={showEuroValues}
+      setShowEuroValues={setShowEuroValues}
+      calculateEuroValue={calculateEuroValue}
+      createPieChart={createPieChart}
+      Sidebar={Sidebar}
+      NavigationButtons={NavigationButtons}
+    />
+  );
     case 'budget':
       return <BudgetPage />;
     case 'basisabsicherung':
