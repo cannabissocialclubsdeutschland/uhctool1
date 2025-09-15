@@ -1339,8 +1339,8 @@ return (
         <label className="text-xs text-slate-500 mb-1">Kundenname:</label>
         <input
           type="text"
-          value={kundenName}
-          onChange={(e) => setKundenName(e.target.value)}
+          defaultValue={kundenName}
+          onBlur={(e) => setKundenName(e.target.value)}
           placeholder="Name eingeben..."
           className="px-3 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/80"
           style={{ width: '180px' }}
